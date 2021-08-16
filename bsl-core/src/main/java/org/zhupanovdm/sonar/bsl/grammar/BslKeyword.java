@@ -3,6 +3,8 @@ package org.zhupanovdm.sonar.bsl.grammar;
 import com.sonar.sslr.api.AstNode;
 import org.sonar.sslr.grammar.GrammarRuleKey;
 
+import javax.annotation.Nullable;
+
 public enum BslKeyword implements BilingualWord, GrammarRuleKey {
     IF("Если"),
     THEN("Тогда"),
@@ -47,7 +49,7 @@ public enum BslKeyword implements BilingualWord, GrammarRuleKey {
         this(null);
     }
 
-    BslKeyword(String valueRu) {
+    BslKeyword(@Nullable String valueRu) {
         this.valueRu = valueRu;
     }
 
