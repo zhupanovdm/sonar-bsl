@@ -217,7 +217,6 @@ public enum BslGrammar implements GrammarRuleKey {
         b.rule(STATEMENT).is(b.firstOf(
             ASSIGNMENT_STATEMENT,
             CALL_STATEMENT,
-            EMPTY_STATEMENT,
             RETURN_STATEMENT,
             IF_STATEMENT,
             WHILE_STATEMENT,
@@ -231,7 +230,8 @@ public enum BslGrammar implements GrammarRuleKey {
             ADD_HANDLER_STATEMENT,
             REMOVE_HANDLER_STATEMENT,
             LABEL_DEFINITION,
-            GOTO_STATEMENT)
+            GOTO_STATEMENT,
+            EMPTY_STATEMENT)
         ).skipIfOneChild();
 
         b.rule(COMPOUND_STATEMENT).is(b.oneOrMore(STATEMENT, b.zeroOrMore(SEMICOLON, STATEMENT)));
@@ -282,13 +282,11 @@ public enum BslGrammar implements GrammarRuleKey {
 
         b.rule(ADD_HANDLER_STATEMENT).is(
             word(b, "AddHandler", "ДобавитьОбработчик"),
-            EXPRESSION, DOT, IDENTIFIER,
-            EXPRESSION, DOT, IDENTIFIER);
+            EXPRESSION, COMMA, EXPRESSION);
 
         b.rule(REMOVE_HANDLER_STATEMENT).is(
             word(b, "RemoveHandler", "УдалитьОбработчик"),
-            EXPRESSION, DOT, IDENTIFIER,
-            EXPRESSION, DOT, IDENTIFIER);
+            EXPRESSION, COMMA, EXPRESSION);
 
         b.rule(GOTO_STATEMENT).is(GOTO, LABEL);
     }
