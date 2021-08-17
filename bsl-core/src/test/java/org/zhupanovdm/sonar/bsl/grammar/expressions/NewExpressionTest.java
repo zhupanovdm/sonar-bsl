@@ -16,7 +16,7 @@ public class NewExpressionTest {
                 .matches("new Structure()")
                 .matches("new Structure(\"field\",, 10 + 1,)")
                 .matches("new Array(10)")
-                .matches("новый Структура");
+                .matches("Новый Структура");
     }
 
 }
