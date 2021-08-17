@@ -12,10 +12,10 @@ public class NewExpressionTest {
     @Test
     public void test() {
         Assertions.assertThat(g.rule(BslGrammar.NEW_EXPRESSION))
-                .matches("new Structure")
-                .matches("new Structure()")
-                .matches("new Structure(\"field\",, 10 + 1,)")
-                .matches("new Array(10)")
+                .matches("New Structure")
+                .matches("New Structure()")
+                .matches("New Structure(\"field\",, 10 + 1,)")
+                .matches("New Array(10)")
                 .matches("Новый Структура");
     }
 

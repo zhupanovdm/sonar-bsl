@@ -12,11 +12,11 @@ public class IfStatementTest {
     @Test
     public void test() {
         Assertions.assertThat(g.rule(BslGrammar.IF_STATEMENT))
-                .matches("if expr1 then endif")
-                .matches("if expr1 then else endif")
-                .matches("if expr1 then elsif expr2 then endif")
-                .matches("if expr1 then elsif expr2 then else endif")
-                .matches("if expr1 then elsif expr2 then elsif expr3 then else endif")
+                .matches("If expr1 Then EndIf")
+                .matches("If expr1 Then Else EndIf")
+                .matches("If expr1 Then ElsIf expr2 Then EndIf")
+                .matches("If expr1 Then ElsIf expr2 Then Else EndIf")
+                .matches("If expr1 Then ElsIf expr2 Then ElsIf expr3 Then Else EndIf")
                 .matches("Если выражение1 Тогда ИначеЕсли выражение2 Тогда Иначе КонецЕсли");
     }
 
