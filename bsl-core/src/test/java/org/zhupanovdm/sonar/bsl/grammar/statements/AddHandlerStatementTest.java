@@ -5,7 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.sonar.sslr.tests.Assertions;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
-public class AddHandlerStatement {
+public class AddHandlerStatementTest {
 
     private final LexerlessGrammar g = BslGrammar.createGrammar();
 
