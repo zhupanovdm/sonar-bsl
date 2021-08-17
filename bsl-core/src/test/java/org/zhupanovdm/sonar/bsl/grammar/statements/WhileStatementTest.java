@@ -13,7 +13,8 @@ public class WhileStatementTest {
     public void test() {
         Assertions.assertThat(g.rule(BslGrammar.WHILE_STATEMENT))
                 .matches("While expr1 Do EndDo")
-                .matches("While expr1 Do Break; Continue EndDo");
+                .matches("While expr1 Do Break; Continue EndDo")
+                .matches("Пока выражение1 Цикл КонецЦикла");
     }
 
 }
