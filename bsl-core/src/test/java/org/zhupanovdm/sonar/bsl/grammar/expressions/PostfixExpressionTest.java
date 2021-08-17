@@ -23,7 +23,8 @@ public class PostfixExpressionTest {
                 .matches("()")
                 .matches("(a)")
                 .matches("(a, b)")
-                .matches("(,a,, b, c,)");
+                .matches("(,a,, b, c,)")
+                .notMatches("(a b)");
     }
 
     @Test
