@@ -12,30 +12,30 @@ public class StringTest {
     @Test
     public void basic() {
         Assertions.assertThat(g.rule(BslGrammar.STRING))
-            .matches("\"foo\"")
-            .matches("\"\"")
-            .matches("\"\"\"\"")
-            .matches("\"foo\"\"\"")
-            .matches("\"|\"")
-            .notMatches("\"\"\"")
-            .notMatches("\"");
+                .matches("\"foo\"")
+                .matches("\"\"")
+                .matches("\"\"\"\"")
+                .matches("\"foo\"\"\"")
+                .matches("\"|\"")
+                .notMatches("\"\"\"")
+                .notMatches("\"");
     }
 
     @Test
     public void compound() {
         Assertions.assertThat(g.rule(BslGrammar.STRING))
-            .matches("\"foo\" \"bar\"")
-            .matches("\"foo\"\n\"bar\"")
-            .matches("\"\" \"\"")
-            .matches("\"\" \"\n|\" \"\" \"\n|\"");
+                .matches("\"foo\" \"bar\"")
+                .matches("\"foo\"\n\"bar\"")
+                .matches("\"\" \"\"")
+                .matches("\"\" \"\n|\" \"\" \"\n|\"");
     }
 
     @Test
     public void carryover() {
         Assertions.assertThat(g.rule(BslGrammar.STRING))
-            .matches("\"\n|\"")
-            .matches("\"foo\n|bar\"")
-            .matches("\"\"\"\n|\"\"\"");
+                .matches("\"\n|\"")
+                .matches("\"foo\n|bar\"")
+                .matches("\"\"\"\n|\"\"\"");
     }
 
 }
