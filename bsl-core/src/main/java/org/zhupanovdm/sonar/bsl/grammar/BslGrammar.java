@@ -159,7 +159,7 @@ public enum BslGrammar implements GrammarRuleKey {
         b.rule(LOGIC_OPERATOR).is(b.firstOf(OR, AND, NOT));
 
         b.rule(RELATIONAL_EXPRESSION).is(ADDITIVE_EXPRESSION, b.optional(RELATIONAL_OPERATOR, RELATIONAL_EXPRESSION)).skipIfOneChild();
-        b.rule(RELATIONAL_OPERATOR).is(b.firstOf(EQ, NEQ, LT, LE, GT, GE));
+        b.rule(RELATIONAL_OPERATOR).is(b.firstOf(NEQ, LE, GE, GT, LT, EQ));
 
         b.rule(ADDITIVE_EXPRESSION).is(MULTIPLICATIVE_EXPRESSION, b.optional(ADDITIVE_OPERATOR, ADDITIVE_EXPRESSION)).skipIfOneChild();
         b.rule(ADDITIVE_OPERATOR).is(b.firstOf(PLUS, MINUS));
