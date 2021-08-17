@@ -273,7 +273,7 @@ public enum BslGrammar implements GrammarRuleKey {
             TRY,
             COMPOUND_STATEMENT,
             EXCEPT,
-            COMPOUND_STATEMENT,
+            b.optional(COMPOUND_STATEMENT),
             END_TRY);
 
         b.rule(RAISE_STATEMENT).is(RAISE, EXPRESSION);
