@@ -16,7 +16,8 @@ public class IfStatementTest {
                 .matches("if expr1 then else endif")
                 .matches("if expr1 then elsif expr2 then endif")
                 .matches("if expr1 then elsif expr2 then else endif")
-                .matches("if expr1 then elsif expr2 then elsif expr3 then else endif");
+                .matches("if expr1 then elsif expr2 then elsif expr3 then else endif")
+                .matches("Если выражение1 Тогда ИначеЕсли выражение2 Тогда Иначе КонецЕсли");
     }
 
 }
