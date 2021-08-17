@@ -15,7 +15,10 @@ public class PrimaryExpressionTest {
                 .matches("1")
                 .matches("foo")
                 .matches("null")
+                .matches("(a)")
+                .matches("((a))")
                 .matches("(1 + 1)")
+                .notMatches("()")
                 .notMatches("1 + 1");
     }
 
