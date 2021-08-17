@@ -12,20 +12,17 @@ public class IdentifierTest {
     @Test
     public void test() {
         Assertions.assertThat(g.rule(BslGrammar.IDENTIFIER))
+                .matches("foo")
+                .matches("бар")
                 .matches("_")
                 .matches("_1")
-                .matches("_яz")
-                .matches("identifier")
-                .matches("идентификатор")
-                .matches("пока123")
-                .matches("while123")
-                .notMatches("for")
-                .notMatches("For")
-                .notMatches("для")
-                .notMatches("Для")
-                .notMatches("123")
-                .notMatches("123qwer")
-                .notMatches("123йцук");
+                .matches("_яz0")
+                .matches("whilee")
+                .matches("покаa")
+                .notMatches("while")
+                .notMatches("пока")
+                .notMatches("123foo")
+                .notMatches("123бар");
     }
 
 }
