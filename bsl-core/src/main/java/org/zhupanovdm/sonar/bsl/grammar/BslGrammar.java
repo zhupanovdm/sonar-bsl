@@ -107,7 +107,7 @@ public enum BslGrammar implements GrammarRuleKey {
 
     private static final String STRING_REGEXP = "\\\"(?:[^\\\"\\r\\n]|\\\"{2}|(?:[\\r\\n]\\|))*\\\"";
     private static final String NUMBER_REGEXP = "[0-9]+(?:\\.(?:[0-9]++)?+)?";
-    private static final String DATE_REGEXP = "'(\\d{8}(\\d{6})?|\\d{4}\\.\\d{2}\\.\\d{2}( \\d{2}:\\d{2}:\\d{2})?)'";
+    private static final String DATE_REGEXP = "'(?:\\d{8}(?:\\d{6})?|\\d{4}\\.\\d{2}\\.\\d{2}(?: \\d{2}:\\d{2}:\\d{2})?)'";
 
     public static LexerlessGrammar createGrammar() {
         LexerlessGrammarBuilder b = LexerlessGrammarBuilder.create();
