@@ -280,10 +280,12 @@ public enum BslGrammar implements GrammarRuleKey {
 
         b.rule(EXECUTE_STATEMENT).is(EXECUTE, LPAREN, EXPRESSION, RPAREN);
 
+        // TODO: AddHandler expression.identifier, expression.identifier
         b.rule(ADD_HANDLER_STATEMENT).is(
             word(b, "AddHandler", "ДобавитьОбработчик"),
             EXPRESSION, COMMA, EXPRESSION);
 
+        // TODO: RemoveHandler expression.identifier, expression.identifier
         b.rule(REMOVE_HANDLER_STATEMENT).is(
             word(b, "RemoveHandler", "УдалитьОбработчик"),
             EXPRESSION, COMMA, EXPRESSION);
@@ -292,8 +294,8 @@ public enum BslGrammar implements GrammarRuleKey {
     }
 
     private static void directives(LexerlessGrammarBuilder b) {
-        // TODO: Инструкции препроцессора
-        // TODO: #Region / #Область ... #EndRegion / #КонецОбласти
+        // TODO Инструкции препроцессора
+        // TODO #Region / #Область ... #EndRegion / #КонецОбласти
 
         for (BslCompilationDirective directive : BslCompilationDirective.values())
             b.rule(directive).is(AMP, b.optional(b.regexp("[ \\t]+")), b.regexp(directive.getRegexp()), b.nextNot(IDENTIFIER_PART));
@@ -308,6 +310,8 @@ public enum BslGrammar implements GrammarRuleKey {
     }
 
     private static void definitions(LexerlessGrammarBuilder b) {
+        // TODO async/await to be added
+
         b.rule(VAR_DEFINITION).is(b.optional(VAR_DIRECTIVE), VAR, VARIABLE, b.zeroOrMore(b.sequence(COMMA, VARIABLE)), SEMICOLON);
         b.rule(VARIABLE).is(IDENTIFIER, b.optional(EXPORT));
 
