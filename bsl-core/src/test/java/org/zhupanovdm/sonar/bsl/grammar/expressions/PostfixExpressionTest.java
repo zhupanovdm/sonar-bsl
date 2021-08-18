@@ -2,8 +2,9 @@ package org.zhupanovdm.sonar.bsl.grammar.expressions;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.sonar.sslr.tests.Assertions;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
+
+import static org.sonar.sslr.tests.Assertions.assertThat;
 
 public class PostfixExpressionTest {
 
@@ -11,7 +12,7 @@ public class PostfixExpressionTest {
 
     @Test
     public void indexOperator() {
-        Assertions.assertThat(g.rule(BslGrammar.INDEX_OPERATOR))
+        assertThat(g.rule(BslGrammar.INDEX_OPERATOR))
                 .matches("[1]")
                 .matches("[x + y]")
                 .notMatches("[]");
@@ -19,7 +20,7 @@ public class PostfixExpressionTest {
 
     @Test
     public void callOperator() {
-        Assertions.assertThat(g.rule(BslGrammar.CALL_OPERATOR))
+        assertThat(g.rule(BslGrammar.CALL_OPERATOR))
                 .matches("()")
                 .matches("(a)")
                 .matches("(a, b)")
@@ -29,7 +30,7 @@ public class PostfixExpressionTest {
 
     @Test
     public void postfixExpression() {
-        Assertions.assertThat(g.rule(BslGrammar.POSTFIX_EXPRESSION))
+        assertThat(g.rule(BslGrammar.POSTFIX_EXPRESSION))
                 .matches("foo[0]")
                 .matches("foo[1][2][3]")
                 .matches("a.b.c.d.e.f")
@@ -54,7 +55,7 @@ public class PostfixExpressionTest {
 
     @Test
     public void assignable() {
-        Assertions.assertThat(g.rule(BslGrammar.ASSIGNABLE))
+        assertThat(g.rule(BslGrammar.ASSIGNABLE))
                 .matches("a")
                 .matches("a[0]")
                 .matches("a.b.c")
@@ -69,7 +70,7 @@ public class PostfixExpressionTest {
 
     @Test
     public void callable() {
-        Assertions.assertThat(g.rule(BslGrammar.CALLABLE))
+        assertThat(g.rule(BslGrammar.CALLABLE))
                 .matches("a()")
                 .matches("a.b()")
                 .matches("a[0].b()")

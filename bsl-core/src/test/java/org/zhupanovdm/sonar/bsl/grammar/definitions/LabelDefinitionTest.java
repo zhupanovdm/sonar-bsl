@@ -2,8 +2,9 @@ package org.zhupanovdm.sonar.bsl.grammar.definitions;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.sonar.sslr.tests.Assertions;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
+
+import static org.sonar.sslr.tests.Assertions.assertThat;
 
 public class LabelDefinitionTest {
 
@@ -11,7 +12,7 @@ public class LabelDefinitionTest {
 
     @Test
     public void label() {
-        Assertions.assertThat(g.rule(BslGrammar.LABEL))
+        assertThat(g.rule(BslGrammar.LABEL))
                 .matches("~label")
                 .notMatches("~ label")
                 .notMatches("~\nlabel");
@@ -19,7 +20,7 @@ public class LabelDefinitionTest {
 
     @Test
     public void definition() {
-        Assertions.assertThat(g.rule(BslGrammar.LABEL_DEFINITION))
+        assertThat(g.rule(BslGrammar.LABEL_DEFINITION))
                 .matches("~label:")
                 .matches("~label\n:");
     }

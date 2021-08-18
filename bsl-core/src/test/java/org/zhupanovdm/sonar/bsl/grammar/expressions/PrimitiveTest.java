@@ -2,8 +2,9 @@ package org.zhupanovdm.sonar.bsl.grammar.expressions;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.sonar.sslr.tests.Assertions;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
+
+import static org.sonar.sslr.tests.Assertions.assertThat;
 
 public class PrimitiveTest {
 
@@ -11,7 +12,7 @@ public class PrimitiveTest {
 
     @Test
     public void primitive() {
-        Assertions.assertThat(g.rule(BslGrammar.PRIMITIVE))
+        assertThat(g.rule(BslGrammar.PRIMITIVE))
                 .matches("Undefined")
                 .matches("Неопределено")
                 .matches("NULL")

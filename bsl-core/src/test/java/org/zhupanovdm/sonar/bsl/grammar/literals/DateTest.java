@@ -2,8 +2,9 @@ package org.zhupanovdm.sonar.bsl.grammar.literals;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.sonar.sslr.tests.Assertions;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
+
+import static org.sonar.sslr.tests.Assertions.assertThat;
 
 public class DateTest {
 
@@ -11,7 +12,7 @@ public class DateTest {
 
     @Test
     public void test() {
-        Assertions.assertThat(g.rule(BslGrammar.DATE))
+        assertThat(g.rule(BslGrammar.DATE))
                 .matches("'20210807224656'")
                 .matches("'00010101000000'")
                 .matches("'20210807'")

@@ -2,8 +2,9 @@ package org.zhupanovdm.sonar.bsl.grammar.expressions;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.sonar.sslr.tests.Assertions;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
+
+import static org.sonar.sslr.tests.Assertions.assertThat;
 
 public class BinaryExpressionTest {
 
@@ -11,15 +12,15 @@ public class BinaryExpressionTest {
 
     @Test
     public void logic() {
-        Assertions.assertThat(g.rule(BslGrammar.LOGIC_OR_EXPRESSION))
+        assertThat(g.rule(BslGrammar.LOGIC_OR_EXPRESSION))
                 .matches("foo OR bar")
                 .matches("фу ИЛИ бар");
 
-        Assertions.assertThat(g.rule(BslGrammar.LOGIC_AND_EXPRESSION))
+        assertThat(g.rule(BslGrammar.LOGIC_AND_EXPRESSION))
                 .matches("foo AND bar")
                 .matches("фу И бар");
 
-        Assertions.assertThat(g.rule(BslGrammar.LOGIC_NOT_EXPRESSION))
+        assertThat(g.rule(BslGrammar.LOGIC_NOT_EXPRESSION))
                 .matches("NOT foo")
                 .notMatches("NOT NOT foo")
                 .matches("NOT (NOT foo)")
@@ -28,7 +29,7 @@ public class BinaryExpressionTest {
 
     @Test
     public void relational() {
-        Assertions.assertThat(g.rule(BslGrammar.RELATIONAL_EXPRESSION))
+        assertThat(g.rule(BslGrammar.RELATIONAL_EXPRESSION))
                 .matches("foo = bar")
                 .matches("foo <> bar")
                 .matches("foo > bar")
@@ -39,14 +40,14 @@ public class BinaryExpressionTest {
 
     @Test
     public void additive() {
-        Assertions.assertThat(g.rule(BslGrammar.ADDITIVE_EXPRESSION))
+        assertThat(g.rule(BslGrammar.ADDITIVE_EXPRESSION))
                 .matches("foo + bar")
                 .matches("foo - bar");
     }
 
     @Test
     public void multiplicative() {
-        Assertions.assertThat(g.rule(BslGrammar.MULTIPLICATIVE_EXPRESSION))
+        assertThat(g.rule(BslGrammar.MULTIPLICATIVE_EXPRESSION))
                 .matches("foo * bar")
                 .matches("foo / bar")
                 .matches("foo % bar");

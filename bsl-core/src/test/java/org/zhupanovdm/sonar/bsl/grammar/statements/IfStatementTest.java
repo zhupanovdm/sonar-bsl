@@ -2,8 +2,9 @@ package org.zhupanovdm.sonar.bsl.grammar.statements;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.sonar.sslr.tests.Assertions;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
+
+import static org.sonar.sslr.tests.Assertions.assertThat;
 
 public class IfStatementTest {
 
@@ -11,7 +12,7 @@ public class IfStatementTest {
 
     @Test
     public void test() {
-        Assertions.assertThat(g.rule(BslGrammar.IF_STATEMENT))
+        assertThat(g.rule(BslGrammar.IF_STATEMENT))
                 .matches("If expr1 Then EndIf")
                 .matches("If expr1 Then Else EndIf")
                 .matches("If expr1 Then ElsIf expr2 Then EndIf")

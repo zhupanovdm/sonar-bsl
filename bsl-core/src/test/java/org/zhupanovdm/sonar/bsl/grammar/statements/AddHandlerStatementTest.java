@@ -2,8 +2,9 @@ package org.zhupanovdm.sonar.bsl.grammar.statements;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.sonar.sslr.tests.Assertions;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
+
+import static org.sonar.sslr.tests.Assertions.assertThat;
 
 public class AddHandlerStatementTest {
 
@@ -11,7 +12,7 @@ public class AddHandlerStatementTest {
 
     @Test
     public void test() {
-        Assertions.assertThat(g.rule(BslGrammar.ADD_HANDLER_STATEMENT))
+        assertThat(g.rule(BslGrammar.ADD_HANDLER_STATEMENT))
                 .matches("AddHandler expr1.Event, expr2.Handler")
                 .matches("ДобавитьОбработчик выражение1.Событие, выражение2.Обработчик");
     }

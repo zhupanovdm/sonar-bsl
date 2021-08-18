@@ -2,8 +2,9 @@ package org.zhupanovdm.sonar.bsl.grammar.expressions;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.sonar.sslr.tests.Assertions;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
+
+import static org.sonar.sslr.tests.Assertions.assertThat;
 
 public class IdentifierTest {
 
@@ -11,7 +12,7 @@ public class IdentifierTest {
 
     @Test
     public void test() {
-        Assertions.assertThat(g.rule(BslGrammar.IDENTIFIER))
+        assertThat(g.rule(BslGrammar.IDENTIFIER))
                 .matches("foo")
                 .matches("бар")
                 .matches("_")
