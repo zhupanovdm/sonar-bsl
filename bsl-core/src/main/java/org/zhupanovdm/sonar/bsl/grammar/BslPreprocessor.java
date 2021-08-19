@@ -3,7 +3,7 @@ package org.zhupanovdm.sonar.bsl.grammar;
 import com.sonar.sslr.api.AstNode;
 import org.sonar.sslr.grammar.GrammarRuleKey;
 
-public enum BslPreprocessorToken implements BilingualWord, GrammarRuleKey {
+public enum BslPreprocessor implements BilingualWord, GrammarRuleKey {
     SERVER("Сервер"),
     AT_SERVER("НаСервере"),
     CLIENT("Клиент"),
@@ -14,11 +14,14 @@ public enum BslPreprocessorToken implements BilingualWord, GrammarRuleKey {
     THICK_CLIENT_MANAGED_APPLICATION("ТолстыйКлиентУправляемоеПриложение"),
     THICK_CLIENT_ORDINARY_APPLICATION("ТолстыйКлиентОбычноеПриложение"),
     MOBILE_APP_CLIENT("МобильноеПриложениеКлиент"),
-    MOBILE_APP_SERVER("МобильноеПриложениеСервер");
+    MOBILE_APP_SERVER("МобильноеПриложениеСервер"),
+
+    REGION("Область"),
+    END_REGION("КонецОбласти");
 
     private final String valueRu;
 
-    BslPreprocessorToken(String valueRu) {
+    BslPreprocessor(String valueRu) {
         this.valueRu = valueRu;
     }
 
