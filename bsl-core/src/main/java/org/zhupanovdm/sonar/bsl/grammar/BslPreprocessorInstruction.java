@@ -4,7 +4,7 @@ import com.sonar.sslr.api.AstNode;
 
 public enum BslPreprocessorInstruction implements BslWord {
     IF("Если"),
-    ELS_IF("ИначеЕсли"),
+    ELSIF("ИначеЕсли"),
     END_IF("КонецЕсли"),
     REGION("Область"),
     END_REGION("КонецОбласти");

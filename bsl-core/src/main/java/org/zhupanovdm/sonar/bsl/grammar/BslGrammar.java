@@ -104,7 +104,8 @@ public enum BslGrammar implements GrammarRuleKey {
 
     PREPROCESSOR,
     PREPROCESSOR_SYMBOL,
-    PREPROCESSOR_INSTRUCTION;
+    PREPROCESSOR_INSTRUCTION,
+    PREPROCESSOR_CONDITION;
 
     private static final String COMMENT_REGEXP = "//[^\\n\\r]*+";
 
@@ -324,19 +325,22 @@ public enum BslGrammar implements GrammarRuleKey {
         b.rule(PREPROCESSOR_SYMBOL).is(
                 group(b, BslPreprocessorSymbol.values(), w -> b.sequence(SPACING, exactWord(b, w)))
         ).skipIfOneChild();
+        b.rule(PREPROCESSOR_CONDITION).is(b.optional(NOT), PREPROCESSOR_SYMBOL, b.zeroOrMore(b.firstOf(OR, AND), b.optional(NOT), PREPROCESSOR_SYMBOL));
 
-        b.rule(PREPROCESSOR).is(b.firstOf(
-                b.sequence(REGION, IDENTIFIER),
-                END_REGION,
-                b.sequence(
-                        HASH, b.optional(SPACING_NO_LB), exactWord(b, IF),
-                        b.optional(NOT), PREPROCESSOR_SYMBOL, b.zeroOrMore(b.firstOf(OR, AND), b.optional(NOT), PREPROCESSOR_SYMBOL), THEN),
-                b.sequence(
-                        HASH, b.optional(SPACING_NO_LB), exactWord(b, ELSIF),
-                        b.optional(NOT), PREPROCESSOR_SYMBOL, b.zeroOrMore(b.firstOf(OR, AND), b.optional(NOT), PREPROCESSOR_SYMBOL), THEN),
-                b.sequence(HASH, b.optional(SPACING_NO_LB), exactWord(b, END_IF)))
-        );
+        //preprocessorWrap(b, PREPROCESSOR_VAR, VAR_DEFINITION);
 
+    }
+
+    private static void preprocessorWrap(LexerlessGrammarBuilder b, GrammarRuleKey rule, Object downstream) {
+        b.rule(rule).is(b.firstOf(
+                downstream,
+                b.firstOf(
+                        b.sequence(REGION, IDENTIFIER, rule, END_REGION),
+                        b.sequence(
+                                BslPreprocessorInstruction.IF, PREPROCESSOR_CONDITION, THEN, rule,
+                                b.zeroOrMore(BslPreprocessorInstruction.ELSIF, PREPROCESSOR_CONDITION, THEN, rule),
+                                BslPreprocessorInstruction.END_IF))
+        )).skipIfOneChild();
     }
 
     private static void definitions(LexerlessGrammarBuilder b) {

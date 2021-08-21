@@ -31,7 +31,7 @@ public class BslPreprocessorInstructionTest {
     @Test
     public void bilingual() {
         assertThat(g.rule(IF)).matches("#if").matches("#Если");
-        assertThat(g.rule(ELS_IF)).matches("#elsif").matches("#ИначеЕсли");
+        assertThat(g.rule(ELSIF)).matches("#elsif").matches("#ИначеЕсли");
         assertThat(g.rule(END_IF)).matches("#endif").matches("#КонецЕсли");
         assertThat(g.rule(REGION)).matches("#region").matches("#Область");
         assertThat(g.rule(END_REGION)).matches("#endregion").matches("#КонецОбласти");
