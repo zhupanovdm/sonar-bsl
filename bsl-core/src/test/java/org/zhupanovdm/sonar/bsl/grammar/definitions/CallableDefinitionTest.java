@@ -12,14 +12,6 @@ public class CallableDefinitionTest {
     private final LexerlessGrammar g = BslGrammar.createGrammar();
 
     @Test
-    public void definition() {
-        assertThat(g.rule(CALLABLE_DEFINITION))
-                .matches("function a() export;")
-                .matches("procedure a() export;")
-                .notMatches("function a() export");
-    }
-
-    @Test
     public void function() {
         assertThat(g.rule(FUNC_DEFINITION))
                 .matches("function a() export endfunction")
@@ -39,7 +31,7 @@ public class CallableDefinitionTest {
 
     @Test
     public void signature() {
-        assertThat(g.rule(CALLABLE_SIGNATURE))
+        assertThat(g.rule(SIGNATURE))
                 .matches("a() export")
                 .matches("a\n()\nexport")
                 .matches("a()");
@@ -47,14 +39,14 @@ public class CallableDefinitionTest {
 
     @Test
     public void parameters() {
-        assertThat(g.rule(CALLABLE_PARAMETERS))
-                .matches("()")
-                .matches("(a)")
-                .matches("(a, b, c)")
-                .matches("(\na\n,\nb,\nn)")
-                .notMatches("(a + b)")
-                .notMatches("(,)")
-                .notMatches("(a b)");
+        assertThat(g.rule(PARAMETER_LIST))
+                .matches("")
+                .matches("a")
+                .matches("a, b, c")
+                .matches("\na\n,\nb,\nc")
+                .notMatches("a + b")
+                .notMatches(",")
+                .notMatches("a b");
     }
 
     @Test

@@ -27,12 +27,13 @@ public enum BslGrammar implements GrammarRuleKey {
 
     FUNC_DEFINITION,
     PROC_DEFINITION,
-
-    CALLABLE_DEFINITION,
-    CALLABLE_SIGNATURE,
-    CALLABLE_PARAMETERS,
+    SIGNATURE,
     PARAMETER,
-    PARAMETER_DEFAULT_VALUE,
+    PARAMETER_LIST,
+    DEFAULT_VALUE,
+
+    ASYNC,
+    AWAIT,
 
     LABEL_DEFINITION,
 
@@ -127,7 +128,6 @@ public enum BslGrammar implements GrammarRuleKey {
         LexerlessGrammarBuilder b = LexerlessGrammarBuilder.create();
 
         b.rule(WHITESPACE).is(b.regexp("[" + LINE_TERMINATOR_REGEXP + WHITESPACE_REGEXP + "]*+"));
-
         b.rule(SPACING).is(
                 b.skippedTrivia(WHITESPACE),
                 b.zeroOrMore(b.commentTrivia(b.regexp(COMMENT_REGEXP)), b.skippedTrivia(WHITESPACE))
@@ -140,19 +140,9 @@ public enum BslGrammar implements GrammarRuleKey {
         b.rule(IDENTIFIER_PART).is(b.regexp(IDENTIFIER_PART_REGEXP));
 
         b.rule(MODULE).is(
-                b.zeroOrMore(
-                        b.skippedTrivia(b.zeroOrMore(PREPROCESSOR)),
-                        VAR_DEFINITION,
-                        b.skippedTrivia(b.zeroOrMore(PREPROCESSOR))),
-                b.zeroOrMore(
-                        b.skippedTrivia(b.zeroOrMore(PREPROCESSOR)),
-                        CALLABLE_DEFINITION,
-                        b.skippedTrivia(b.zeroOrMore(PREPROCESSOR))),
-                b.zeroOrMore(
-                        b.skippedTrivia(b.zeroOrMore(PREPROCESSOR)),
-                        b.firstOf(FUNC_DEFINITION, PROC_DEFINITION),
-                        b.skippedTrivia(b.zeroOrMore(PREPROCESSOR))),
-                PROGRAM,
+                b.zeroOrMore(VAR_DEFINITION),
+                b.zeroOrMore(b.firstOf(FUNC_DEFINITION, PROC_DEFINITION)),
+                b.optional(PROGRAM),
                 SPACING,
                 b.endOfInput());
 
@@ -243,37 +233,33 @@ public enum BslGrammar implements GrammarRuleKey {
     }
 
     private static void statements(LexerlessGrammarBuilder b) {
-        b.rule(STATEMENT).is(
-                b.skippedTrivia(b.zeroOrMore(PREPROCESSOR)),
-                b.firstOf(
-                        ASSIGNMENT_STATEMENT,
-                        CALL_STATEMENT,
-                        RETURN_STATEMENT,
-                        IF_STATEMENT,
-                        WHILE_STATEMENT,
-                        FOREACH_STATEMENT,
-                        FOR_STATEMENT,
-                        BREAK_STATEMENT,
-                        CONTINUE_STATEMENT,
-                        TRY_STATEMENT,
-                        RAISE_STATEMENT,
-                        EXECUTE_STATEMENT,
-                        ADD_HANDLER_STATEMENT,
-                        REMOVE_HANDLER_STATEMENT,
-                        LABEL_DEFINITION,
-                        GOTO_STATEMENT,
-                        EMPTY_STATEMENT),
-                b.skippedTrivia(b.zeroOrMore(PREPROCESSOR))
+        b.rule(STATEMENT).is(b.firstOf(
+                ASSIGNMENT_STATEMENT,
+                CALL_STATEMENT,
+                RETURN_STATEMENT,
+                IF_STATEMENT,
+                WHILE_STATEMENT,
+                FOREACH_STATEMENT,
+                FOR_STATEMENT,
+                BREAK_STATEMENT,
+                CONTINUE_STATEMENT,
+                TRY_STATEMENT,
+                RAISE_STATEMENT,
+                EXECUTE_STATEMENT,
+                ADD_HANDLER_STATEMENT,
+                REMOVE_HANDLER_STATEMENT,
+                LABEL_DEFINITION,
+                GOTO_STATEMENT,
+                EMPTY_STATEMENT)
         ).skipIfOneChild();
 
-        b.rule(PROGRAM).is(b.skippedTrivia(b.zeroOrMore(PREPROCESSOR)), b.optional(COMPOUND_STATEMENT)).skipIfOneChild();
+        b.rule(PROGRAM).is(b.optional(COMPOUND_STATEMENT)).skipIfOneChild();
         b.rule(COMPOUND_STATEMENT).is(b.oneOrMore(STATEMENT, b.zeroOrMore(SEMICOLON, STATEMENT)));
-
-        b.rule(ASSIGNMENT_STATEMENT).is(ASSIGNABLE, EQ, EXPRESSION);
-
-        b.rule(CALL_STATEMENT).is(CALLABLE);
-
         b.rule(EMPTY_STATEMENT).is(SEMICOLON);
+
+        b.rule(ASSIGNMENT_STATEMENT).is(ASSIGNABLE, EQ, b.optional(AWAIT), EXPRESSION);
+        b.rule(CALL_STATEMENT).is(b.optional(AWAIT), CALLABLE);
+        b.rule(AWAIT).is(SPACING, exactWord(b, "Await", "Ждать"));
 
         b.rule(RETURN_STATEMENT).is(RETURN, b.optional(EXPRESSION));
 
@@ -354,35 +340,37 @@ public enum BslGrammar implements GrammarRuleKey {
     }
 
     private static void definitions(LexerlessGrammarBuilder b) {
-        // TODO async/await to be added
-
         b.rule(VAR_DEFINITION).is(
                 b.optional(b.next(b.firstOf(AT_CLIENT, AT_SERVER)), DIRECTIVE),
                 VAR, VARIABLE, b.zeroOrMore(COMMA, VARIABLE), SEMICOLON);
         b.rule(VARIABLE).is(IDENTIFIER, b.optional(EXPORT));
 
-        b.rule(CALLABLE_DEFINITION).is(b.firstOf(FUNCTION, PROCEDURE), CALLABLE_SIGNATURE, SEMICOLON);
-        b.rule(CALLABLE_SIGNATURE).is(IDENTIFIER, CALLABLE_PARAMETERS, b.optional(EXPORT));
-        b.rule(CALLABLE_PARAMETERS).is(LPAREN, b.optional(PARAMETER, b.zeroOrMore(COMMA, PARAMETER)), RPAREN);
-
-        b.rule(PARAMETER).is(
-                b.optional(VAL),
-                IDENTIFIER,
-                b.optional(b.sequence(EQ, PARAMETER_DEFAULT_VALUE)));
-        b.rule(PARAMETER_DEFAULT_VALUE).is(PRIMITIVE);
-
         b.rule(FUNC_DEFINITION).is(
-                b.optional(DIRECTIVE),
-                FUNCTION, CALLABLE_SIGNATURE,
+                b.optional(b.firstOf(
+                        b.sequence(b.nextNot(AT_CLIENT), DIRECTIVE),
+                        b.sequence(AT_CLIENT, b.optional(ASYNC)))
+                ),
+                FUNCTION, SIGNATURE,
                 b.zeroOrMore(VAR_DEFINITION),
                 PROGRAM,
                 END_FUNCTION);
         b.rule(PROC_DEFINITION).is(
-                b.optional(DIRECTIVE),
-                PROCEDURE, CALLABLE_SIGNATURE,
+                b.optional(b.firstOf(
+                        b.sequence(b.nextNot(AT_CLIENT), DIRECTIVE),
+                        b.sequence(AT_CLIENT, b.optional(ASYNC)))
+                ),
+                PROCEDURE, SIGNATURE,
                 b.zeroOrMore(VAR_DEFINITION),
                 PROGRAM,
                 END_PROCEDURE);
+        b.rule(SIGNATURE).is(IDENTIFIER, LPAREN, PARAMETER_LIST, RPAREN, b.optional(EXPORT));
+        b.rule(ASYNC).is(SPACING, exactWord(b, "Async", "Асинх"));
+
+        b.rule(PARAMETER_LIST).is(b.optional(PARAMETER, b.zeroOrMore(COMMA, PARAMETER)));
+        b.rule(PARAMETER).is(
+                b.optional(VAL), IDENTIFIER,
+                b.optional(b.sequence(EQ, DEFAULT_VALUE)));
+        b.rule(DEFAULT_VALUE).is(PRIMITIVE);
 
         b.rule(LABEL_DEFINITION).is(LABEL, COLON);
         b.rule(LABEL).is(TILDA, b.regexp(IDENTIFIER_START_REGEXP + IDENTIFIER_PART_REGEXP + "*+"));
