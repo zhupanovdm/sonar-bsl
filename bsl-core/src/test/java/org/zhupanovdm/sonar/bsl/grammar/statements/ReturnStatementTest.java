@@ -13,9 +13,8 @@ public class ReturnStatementTest {
     @Test
     public void test() {
         assertThat(g.rule(BslGrammar.RETURN_STATEMENT))
-                .matches("Return")
-                .matches("Return foo")
-                .matches("Возврат");
+                .matches("return")
+                .matches("return foo");
     }
 
 }

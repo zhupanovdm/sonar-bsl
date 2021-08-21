@@ -13,9 +13,8 @@ public class ForEachStatementTest {
     @Test
     public void test() {
         assertThat(g.rule(BslGrammar.FOREACH_STATEMENT))
-                .matches("For each var1 In expr1 Do EndDo")
-                .matches("For each var1 In expr1 Do Break; Continue EndDo")
-                .matches("Для каждого перем1 Из выражение1 Цикл КонецЦикла");
+                .matches("for each var1 in expr1 do enddo")
+                .matches("for each var1 in expr1 do foo(); break; continue enddo");
     }
 
 }

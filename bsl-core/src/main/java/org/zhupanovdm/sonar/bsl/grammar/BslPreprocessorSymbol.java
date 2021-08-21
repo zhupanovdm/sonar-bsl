@@ -1,9 +1,8 @@
 package org.zhupanovdm.sonar.bsl.grammar;
 
 import com.sonar.sslr.api.AstNode;
-import org.sonar.sslr.grammar.GrammarRuleKey;
 
-public enum BslPreprocessor implements BilingualWord, GrammarRuleKey {
+public enum BslPreprocessorSymbol implements BslWord {
     SERVER("Сервер"),
     AT_SERVER("НаСервере"),
     CLIENT("Клиент"),
@@ -14,20 +13,17 @@ public enum BslPreprocessor implements BilingualWord, GrammarRuleKey {
     THICK_CLIENT_MANAGED_APPLICATION("ТолстыйКлиентУправляемоеПриложение"),
     THICK_CLIENT_ORDINARY_APPLICATION("ТолстыйКлиентОбычноеПриложение"),
     MOBILE_APP_CLIENT("МобильноеПриложениеКлиент"),
-    MOBILE_APP_SERVER("МобильноеПриложениеСервер"),
-
-    REGION("Область"),
-    END_REGION("КонецОбласти");
+    MOBILE_APP_SERVER("МобильноеПриложениеСервер");
 
     private final String valueRu;
 
-    BslPreprocessor(String valueRu) {
+    BslPreprocessorSymbol(String valueRu) {
         this.valueRu = valueRu;
     }
 
     @Override
     public String getValue() {
-        return name().replaceAll("_", "");
+        return BslWord.enumToValue(this);
     }
 
     @Override

@@ -13,9 +13,8 @@ public class TryStatementTest {
     @Test
     public void test() {
         assertThat(g.rule(BslGrammar.TRY_STATEMENT))
-                .matches("Try foo() Except EndTry")
-                .matches("Try foo() Except Raise \"\" EndTry")
-                .matches("Попытка фуу() Исключение КонецПопытки");
+                .matches("try foo() except endtry")
+                .matches("try foo() except raise \"\" endtry");
     }
 
 }

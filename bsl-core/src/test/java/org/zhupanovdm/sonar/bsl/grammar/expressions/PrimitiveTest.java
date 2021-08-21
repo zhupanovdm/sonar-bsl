@@ -13,13 +13,10 @@ public class PrimitiveTest {
     @Test
     public void primitive() {
         assertThat(g.rule(BslGrammar.PRIMITIVE))
-                .matches("Undefined")
-                .matches("Неопределено")
-                .matches("NULL")
-                .matches("True")
-                .matches("Истина")
-                .matches("False")
-                .matches("Ложь")
+                .matches("undefined")
+                .matches("null")
+                .matches("true")
+                .matches("false")
                 .matches("\"\"")
                 .matches("123")
                 .matches("'00010101'")

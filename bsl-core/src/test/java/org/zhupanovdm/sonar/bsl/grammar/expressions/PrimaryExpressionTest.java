@@ -15,7 +15,7 @@ public class PrimaryExpressionTest {
         assertThat(g.rule(BslGrammar.PRIMARY_EXPRESSION))
                 .matches("1")
                 .matches("foo")
-                .matches("NULL")
+                .matches("null")
                 .matches("(a)")
                 .matches("((a))")
                 .matches("(1 + 1)")

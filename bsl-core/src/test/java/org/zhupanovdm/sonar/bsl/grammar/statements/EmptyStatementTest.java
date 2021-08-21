@@ -12,8 +12,7 @@ public class EmptyStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.EMPTY_STATEMENT))
-                .matches(";");
+        assertThat(g.rule(BslGrammar.EMPTY_STATEMENT)).matches(";");
     }
 
 }

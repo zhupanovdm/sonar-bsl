@@ -12,9 +12,7 @@ public class GotoStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.GOTO_STATEMENT))
-                .matches("Goto ~label")
-                .matches("Перейти ~метка");
+        assertThat(g.rule(BslGrammar.GOTO_STATEMENT)).matches("goto ~label");
     }
 
 }

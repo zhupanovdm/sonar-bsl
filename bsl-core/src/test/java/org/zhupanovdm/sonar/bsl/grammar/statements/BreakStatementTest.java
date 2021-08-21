@@ -12,9 +12,7 @@ public class BreakStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.BREAK_STATEMENT))
-                .matches("Break")
-                .matches("Прервать");
+        assertThat(g.rule(BslGrammar.BREAK_STATEMENT)).matches("break");
     }
 
 }

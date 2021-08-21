@@ -13,10 +13,9 @@ public class ExecuteStatementTest {
     @Test
     public void test() {
         assertThat(g.rule(BslGrammar.EXECUTE_STATEMENT))
-                .matches("Execute(expr1 + \"\")")
-                .matches("Выполнить(выражение1 + \"\")")
-                .notMatches("Execute()")
-                .notMatches("Execute(a, b)");
+                .matches("execute(expr1 + \"\")")
+                .notMatches("execute()")
+                .notMatches("execute(a, b)");
     }
 
 }

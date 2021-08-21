@@ -6,7 +6,7 @@ import org.sonar.colorizer.*;
 import org.sonar.sslr.toolkit.AbstractConfigurationModel;
 import org.sonar.sslr.toolkit.ConfigurationProperty;
 import org.zhupanovdm.sonar.bsl.grammar.BslKeyword;
-import org.zhupanovdm.sonar.utils.BilingualUtils;
+import org.zhupanovdm.sonar.bsl.grammar.BslWord;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -24,7 +24,7 @@ public class BslConfigurationModel extends AbstractConfigurationModel {
     public List<Tokenizer> doGetTokenizers() {
         return ImmutableList.of(
                 new StringTokenizer("<span class=\"s\">", "</span>"),
-                new KeywordsTokenizer("<span class=\"k\">", "</span>", BilingualUtils.wordValues(BslKeyword.values())));
+                new KeywordsTokenizer("<span class=\"k\">", "</span>", BslWord.allValues(BslKeyword.values())));
     }
 
     @Override

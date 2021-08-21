@@ -12,9 +12,7 @@ public class RaiseStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.RAISE_STATEMENT))
-                .matches("Raise \"Text\"")
-                .matches("ВызватьИсключение \"Текст\"");
+        assertThat(g.rule(BslGrammar.RAISE_STATEMENT)).matches("raise expr1");
     }
 
 }

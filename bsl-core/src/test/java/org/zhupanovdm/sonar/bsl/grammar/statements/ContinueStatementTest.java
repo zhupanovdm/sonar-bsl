@@ -12,9 +12,7 @@ public class ContinueStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.CONTINUE_STATEMENT))
-                .matches("Continue")
-                .matches("Продолжить");
+        assertThat(g.rule(BslGrammar.CONTINUE_STATEMENT)).matches("continue");
     }
 
 }

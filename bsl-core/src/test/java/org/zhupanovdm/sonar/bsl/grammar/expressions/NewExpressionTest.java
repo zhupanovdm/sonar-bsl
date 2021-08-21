@@ -15,9 +15,7 @@ public class NewExpressionTest {
         assertThat(g.rule(BslGrammar.NEW_EXPRESSION))
                 .matches("New Structure")
                 .matches("New Structure()")
-                .matches("New Structure(\"field\",, 10 + 1,)")
-                .matches("New Array(10)")
-                .matches("Новый Структура");
+                .matches("New Structure(\"field\",, 10 + 1,)");
     }
 
 }

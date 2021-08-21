@@ -1,9 +1,8 @@
 package org.zhupanovdm.sonar.bsl.grammar;
 
 import com.sonar.sslr.api.AstNode;
-import org.sonar.sslr.grammar.GrammarRuleKey;
 
-public enum BslCompilationDirective implements BilingualWord, GrammarRuleKey {
+public enum BslDirective implements BslWord {
     AT_CLIENT("НаКлиенте"),
     AT_SERVER("НаСервере"),
     AT_SERVER_NO_CONTEXT("НаСервереБезКонтекста"),
@@ -12,13 +11,13 @@ public enum BslCompilationDirective implements BilingualWord, GrammarRuleKey {
 
     private final String valueRu;
 
-    BslCompilationDirective(String valueRu) {
+    BslDirective(String valueRu) {
         this.valueRu = valueRu;
     }
 
     @Override
     public String getValue() {
-        return name().replaceAll("_", "");
+        return BslWord.enumToValue(this);
     }
 
     @Override

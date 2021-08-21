@@ -1,11 +1,10 @@
 package org.zhupanovdm.sonar.bsl.grammar;
 
 import com.sonar.sslr.api.AstNode;
-import org.sonar.sslr.grammar.GrammarRuleKey;
 
 import javax.annotation.Nullable;
 
-public enum BslKeyword implements BilingualWord, GrammarRuleKey {
+public enum BslKeyword implements BslWord {
     IF("Если"),
     THEN("Тогда"),
     ELSIF("ИначеЕсли"),
@@ -60,7 +59,7 @@ public enum BslKeyword implements BilingualWord, GrammarRuleKey {
 
     @Override
     public String getValue() {
-        return name().replaceAll("_", "");
+        return BslWord.enumToValue(this);
     }
 
     @Override
