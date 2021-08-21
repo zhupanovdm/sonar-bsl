@@ -358,12 +358,12 @@ public enum BslGrammar implements GrammarRuleKey {
 
         b.rule(VAR_DEFINITION).is(
                 b.optional(b.next(b.firstOf(AT_CLIENT, AT_SERVER)), DIRECTIVE),
-                VAR, VARIABLE, b.zeroOrMore(b.sequence(COMMA, VARIABLE)), SEMICOLON);
+                VAR, VARIABLE, b.zeroOrMore(COMMA, VARIABLE), SEMICOLON);
         b.rule(VARIABLE).is(IDENTIFIER, b.optional(EXPORT));
 
         b.rule(CALLABLE_DEFINITION).is(b.firstOf(FUNCTION, PROCEDURE), CALLABLE_SIGNATURE, SEMICOLON);
         b.rule(CALLABLE_SIGNATURE).is(IDENTIFIER, CALLABLE_PARAMETERS, b.optional(EXPORT));
-        b.rule(CALLABLE_PARAMETERS).is(LPAREN, b.zeroOrMore(PARAMETER, b.zeroOrMore(b.sequence(COMMA, PARAMETER))), RPAREN);
+        b.rule(CALLABLE_PARAMETERS).is(LPAREN, b.optional(PARAMETER, b.zeroOrMore(COMMA, PARAMETER)), RPAREN);
 
         b.rule(PARAMETER).is(
                 b.optional(VAL),
