@@ -19,18 +19,33 @@
 
     <modules>
         <module>bsl-core</module>
+        <module>sonar-bsl-plugin</module>
     </modules>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
 
+        <sonar.version>7.9</sonar.version>
         <sslr.version>1.23</sslr.version>
         <junit.version>4.13.2</junit.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sonar-bsl-plugin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.sonarsource.sonarqube</groupId>
+                <artifactId>sonar-plugin-api</artifactId>
+                <version>${sonar.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.sonarsource.sslr</groupId>
                 <artifactId>sslr-core</artifactId>
