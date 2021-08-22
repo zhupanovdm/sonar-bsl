@@ -12,9 +12,9 @@ public class BinaryExpressionTest {
 
     @Test
     public void logic() {
-        assertThat(g.rule(BslGrammar.LOGIC_OR_EXPRESSION)).matches("foo OR bar");
-        assertThat(g.rule(BslGrammar.LOGIC_AND_EXPRESSION)).matches("foo AND bar");
-        assertThat(g.rule(BslGrammar.LOGIC_NOT_EXPRESSION))
+        assertThat(g.rule(BslGrammar.OR_EXPRESSION)).matches("foo OR bar");
+        assertThat(g.rule(BslGrammar.AND_EXPRESSION)).matches("foo AND bar");
+        assertThat(g.rule(BslGrammar.NOT_EXPRESSION))
                 .matches("NOT foo")
                 .notMatches("NOT NOT foo")
                 .matches("NOT (NOT foo)");
