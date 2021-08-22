@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.REMOVE_HANDLER_STATEMENT;
 
 public class RemoveHandlerStatementTest {
 
@@ -12,7 +13,7 @@ public class RemoveHandlerStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.REMOVE_HANDLER_STATEMENT))
+        assertThat(g.rule(REMOVE_HANDLER_STATEMENT))
                 .matches("RemoveHandler expr1.Event, expr2.Handler")
                 .matches("УдалитьОбработчик выражение1.Событие, выражение2.Обработчик");
     }

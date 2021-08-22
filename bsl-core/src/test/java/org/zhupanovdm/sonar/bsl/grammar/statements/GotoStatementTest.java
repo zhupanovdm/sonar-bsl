@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.GOTO_STATEMENT;
 
 public class GotoStatementTest {
 
@@ -12,7 +13,7 @@ public class GotoStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.GOTO_STATEMENT)).matches("goto ~label");
+        assertThat(g.rule(GOTO_STATEMENT)).matches("goto ~label");
     }
 
 }

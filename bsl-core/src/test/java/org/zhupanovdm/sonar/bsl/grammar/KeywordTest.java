@@ -8,7 +8,7 @@ import static org.sonar.sslr.tests.Assertions.assertThat;
 import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.KEYWORD;
 import static org.zhupanovdm.sonar.bsl.grammar.BslKeyword.*;
 
-public class BslKeywordTest {
+public class KeywordTest {
 
     private final LexerlessGrammar g = BslGrammar.createGrammar();
 

@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.RAISE_STATEMENT;
 
 public class RaiseStatementTest {
 
@@ -12,7 +13,7 @@ public class RaiseStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.RAISE_STATEMENT)).matches("raise expr1");
+        assertThat(g.rule(RAISE_STATEMENT)).matches("raise expr1");
     }
 
 }

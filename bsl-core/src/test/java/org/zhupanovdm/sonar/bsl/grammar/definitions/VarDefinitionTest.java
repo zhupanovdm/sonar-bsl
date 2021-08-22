@@ -6,7 +6,7 @@ import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
 import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.VARIABLE;
-import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.VAR_DEFINITION;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.VAR_DEF;
 
 public class VarDefinitionTest {
 
@@ -14,12 +14,10 @@ public class VarDefinitionTest {
 
     @Test
     public void definition() {
-        assertThat(g.rule(VAR_DEFINITION))
+        assertThat(g.rule(VAR_DEF))
                 .matches("var a;")
-                .matches("var a export;")
                 .matches("var a, b, c;")
-                .matches("&AtServer var a, b export, c;")
-                .matches("&AtServer\nvar\na\n,\nb export\n,\nc\n;")
+                .matches("&AtServer var a, b, c;")
                 .notMatches("var a")
                 .notMatches("var a b;");
     }
@@ -29,7 +27,6 @@ public class VarDefinitionTest {
         assertThat(g.rule(VARIABLE))
                 .matches("a")
                 .matches("a export")
-                .matches("a\nexport")
                 .notMatches("for")
                 .notMatches("1")
                 .notMatches("");

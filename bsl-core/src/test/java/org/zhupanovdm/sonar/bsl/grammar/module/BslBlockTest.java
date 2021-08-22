@@ -12,14 +12,12 @@ public class BslBlockTest {
     private final LexerlessGrammar g = BslGrammar.createGrammar();
 
     @Test
-    public void program() {
+    public void block() {
         assertThat(g.rule(BLOCK))
+                .matches("var a; function b() endfunction a = b()")
+                .matches("var a; var b;")
+                .matches("function b() endfunction procedure b() endprocedure")
                 .matches("a = b()")
-                .matches("a = b(); c()")
-                .notMatches("a")
-                .notMatches("1 + 1")
-                .notMatches("var a;")
-                .notMatches("function a() endfunction")
                 .notMatches("");
     }
 
@@ -27,7 +25,7 @@ public class BslBlockTest {
     public void preprocessor() {
         assertThat(g.rule(BLOCK))
                 .matches("#if server then #endif")
-                .matches("#if server then ; #endif")
+                .matches("var v; v = 3 #if server then f() #endif g() #if server then m() #endif")
                 .matches(
                         "#if server then\n" +
                         "#region a #endregion\n" +
@@ -35,27 +33,21 @@ public class BslBlockTest {
                         "#region b #endregion\n" +
                         "#endif")
                 .matches(
-                        ";\n" +
                         "#if server then\n" +
-                        ";\n" +
                         "#if server then\n" +
-                        ";\n" +
                         "#elsif client then\n" +
-                        ";\n" +
                         "#elsif client then\n" +
                         "#endif\n" +
                         "#elsif client then\n" +
-                        ";\n" +
                         "#elsif client then\n" +
-                        "#endif\n" +
-                        ";");
+                        "#endif");
     }
 
     @Test
     public void region() {
         assertThat(g.rule(BLOCK))
                 .matches("#region a #endregion")
-                .matches("#region a a=b; #endregion")
+                .matches("#region a ; #endregion")
                 .matches("#region a #region b #endregion #endregion")
                 .matches(
                         "#region a\n" +

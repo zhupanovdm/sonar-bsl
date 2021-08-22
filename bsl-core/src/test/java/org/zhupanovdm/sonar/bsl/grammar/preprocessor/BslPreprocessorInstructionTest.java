@@ -30,11 +30,11 @@ public class BslPreprocessorInstructionTest {
 
     @Test
     public void bilingual() {
-        assertThat(g.rule(IF)).matches("#if").matches("#Если");
-        assertThat(g.rule(ELSIF)).matches("#elsif").matches("#ИначеЕсли");
-        assertThat(g.rule(END_IF)).matches("#endif").matches("#КонецЕсли");
-        assertThat(g.rule(REGION)).matches("#region").matches("#Область");
-        assertThat(g.rule(END_REGION)).matches("#endregion").matches("#КонецОбласти");
+        assertThat(g.rule(PP_IF)).matches("#if").matches("#Если");
+        assertThat(g.rule(PP_ELSIF)).matches("#elsif").matches("#ИначеЕсли");
+        assertThat(g.rule(PP_END_IF)).matches("#endif").matches("#КонецЕсли");
+        assertThat(g.rule(PP_REGION)).matches("#region").matches("#Область");
+        assertThat(g.rule(PP_END_REGION)).matches("#endregion").matches("#КонецОбласти");
 
         assertThat(BslPreprocessorInstruction.values()).hasSize(5);
     }

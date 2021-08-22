@@ -5,15 +5,15 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.IDENTIFIER;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.FIELD;
 
-public class IdentifierTest {
+public class FieldTest {
 
     private final LexerlessGrammar g = BslGrammar.createGrammar();
 
     @Test
     public void test() {
-        assertThat(g.rule(IDENTIFIER))
+        assertThat(g.rule(FIELD))
                 .matches("foo")
                 .matches("бар")
                 .matches("_")
@@ -21,8 +21,8 @@ public class IdentifierTest {
                 .matches("_яz0")
                 .matches("whilee")
                 .matches("покаa")
-                .notMatches("while")
-                .notMatches("пока")
+                .matches("while")
+                .matches("пока")
                 .notMatches("123foo")
                 .notMatches("123бар");
     }

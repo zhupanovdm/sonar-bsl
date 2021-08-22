@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.BREAK_STATEMENT;
 
 public class BreakStatementTest {
 
@@ -12,7 +13,7 @@ public class BreakStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.BREAK_STATEMENT)).matches("break");
+        assertThat(g.rule(BREAK_STATEMENT)).matches("break");
     }
 
 }

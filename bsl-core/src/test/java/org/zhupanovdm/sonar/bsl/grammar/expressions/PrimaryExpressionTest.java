@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.PRIMARY_EXPRESSION;
 
 public class PrimaryExpressionTest {
 
@@ -12,7 +13,7 @@ public class PrimaryExpressionTest {
 
     @Test
     public void primaryExpression() {
-        assertThat(g.rule(BslGrammar.PRIMARY_EXPRESSION))
+        assertThat(g.rule(PRIMARY_EXPRESSION))
                 .matches("1")
                 .matches("foo")
                 .matches("null")

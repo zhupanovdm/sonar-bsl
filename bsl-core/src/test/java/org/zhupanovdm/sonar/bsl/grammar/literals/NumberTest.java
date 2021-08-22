@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.NUMBER;
 
 public class NumberTest {
 
@@ -12,7 +13,7 @@ public class NumberTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.NUMBER))
+        assertThat(g.rule(NUMBER))
                 .matches("123")
                 .matches("123.01230");
     }

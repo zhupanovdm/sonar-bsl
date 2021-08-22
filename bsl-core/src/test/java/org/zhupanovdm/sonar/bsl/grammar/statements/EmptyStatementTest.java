@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.EMPTY_STATEMENT;
 
 public class EmptyStatementTest {
 
@@ -12,7 +13,7 @@ public class EmptyStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.EMPTY_STATEMENT)).matches(";");
+        assertThat(g.rule(EMPTY_STATEMENT)).matches(";");
     }
 
 }

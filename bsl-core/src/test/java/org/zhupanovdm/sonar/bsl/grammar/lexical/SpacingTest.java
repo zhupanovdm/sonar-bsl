@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.SPACING;
 
 public class SpacingTest {
 
@@ -12,13 +13,13 @@ public class SpacingTest {
 
     @Test
     public void empty() {
-        assertThat(g.rule(BslGrammar.SPACING))
+        assertThat(g.rule(SPACING))
                 .matches("");
     }
 
     @Test
     public void whitespace() {
-        assertThat(g.rule(BslGrammar.SPACING))
+        assertThat(g.rule(SPACING))
                 .matches(" ")
                 .matches("\t")
                 .matches("\n")
@@ -28,7 +29,7 @@ public class SpacingTest {
 
     @Test
     public void comment() {
-        assertThat(g.rule(BslGrammar.SPACING))
+        assertThat(g.rule(SPACING))
                 .matches(" // comment")
                 .matches(" // comment \n");
     }

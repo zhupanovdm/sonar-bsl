@@ -5,7 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.PREPROCESSOR_CONDITION;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.PP_CONDITION;
 
 public class BslPreprocessorConditionTest {
 
@@ -13,7 +13,7 @@ public class BslPreprocessorConditionTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(PREPROCESSOR_CONDITION))
+        assertThat(g.rule(PP_CONDITION))
                 .matches("server")
                 .matches("not server")
                 .matches("server and client")
@@ -21,7 +21,6 @@ public class BslPreprocessorConditionTest {
                 .matches("not server and client")
                 .matches("not server and not client")
                 .notMatches("not not server")
-                .notMatches("abc")
                 .notMatches("1 + 1")
                 .notMatches("");
     }

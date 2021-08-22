@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.NEW_EXPRESSION;
 
 public class NewExpressionTest {
 
@@ -12,10 +13,10 @@ public class NewExpressionTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.NEW_EXPRESSION))
-                .matches("New Structure")
-                .matches("New Structure()")
-                .matches("New Structure(\"field\",, 10 + 1,)");
+        assertThat(g.rule(NEW_EXPRESSION))
+                .matches("new Structure")
+                .matches("new Structure()")
+                .matches("new Structure(\"field\",, 10 + 1,)");
     }
 
 }

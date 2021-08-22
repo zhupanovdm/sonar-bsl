@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.TERNARY_EXPRESSION;
 
 public class TernaryExpressionTest {
 
@@ -12,7 +13,7 @@ public class TernaryExpressionTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.TERNARY_EXPRESSION))
+        assertThat(g.rule(TERNARY_EXPRESSION))
                 .matches("?(true, true, false)")
                 .notMatches("?()")
                 .notMatches("?(true, true)")

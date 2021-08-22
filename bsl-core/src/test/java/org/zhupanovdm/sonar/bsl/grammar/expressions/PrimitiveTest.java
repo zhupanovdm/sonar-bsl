@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.PRIMITIVE;
 
 public class PrimitiveTest {
 
@@ -12,7 +13,7 @@ public class PrimitiveTest {
 
     @Test
     public void primitive() {
-        assertThat(g.rule(BslGrammar.PRIMITIVE))
+        assertThat(g.rule(PRIMITIVE))
                 .matches("undefined")
                 .matches("null")
                 .matches("true")
@@ -20,7 +21,8 @@ public class PrimitiveTest {
                 .matches("\"\"")
                 .matches("123")
                 .matches("'00010101'")
-                .notMatches("1 + 1");
+                .notMatches("1 + 1")
+                .notMatches("");
     }
 
 }

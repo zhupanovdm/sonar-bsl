@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.WHILE_STATEMENT;
 
 public class WhileStatementTest {
 
@@ -12,7 +13,7 @@ public class WhileStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.WHILE_STATEMENT))
+        assertThat(g.rule(WHILE_STATEMENT))
                 .matches("while expr1 do enddo")
                 .matches("while expr1 do foo(); break; continue enddo");
     }

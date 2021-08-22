@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.TRY_STATEMENT;
 
 public class TryStatementTest {
 
@@ -12,7 +13,7 @@ public class TryStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.TRY_STATEMENT))
+        assertThat(g.rule(TRY_STATEMENT))
                 .matches("try foo() except endtry")
                 .matches("try foo() except raise \"\" endtry");
     }

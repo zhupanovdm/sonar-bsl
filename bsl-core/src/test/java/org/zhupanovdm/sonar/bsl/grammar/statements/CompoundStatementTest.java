@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.COMPOUND_STATEMENT;
 
 public class CompoundStatementTest {
 
@@ -12,7 +13,7 @@ public class CompoundStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.COMPOUND_STATEMENT))
+        assertThat(g.rule(COMPOUND_STATEMENT))
                 .matches("a = 1")
                 .matches("a = 1; b()")
                 .matches("a = 1; b();")

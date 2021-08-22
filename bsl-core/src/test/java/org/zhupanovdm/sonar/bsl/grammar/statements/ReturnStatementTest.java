@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.RETURN_STATEMENT;
 
 public class ReturnStatementTest {
 
@@ -12,7 +13,7 @@ public class ReturnStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.RETURN_STATEMENT))
+        assertThat(g.rule(RETURN_STATEMENT))
                 .matches("return")
                 .matches("return foo");
     }

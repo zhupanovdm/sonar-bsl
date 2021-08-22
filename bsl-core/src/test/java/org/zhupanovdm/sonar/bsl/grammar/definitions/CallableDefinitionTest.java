@@ -13,40 +13,29 @@ public class CallableDefinitionTest {
 
     @Test
     public void function() {
-        assertThat(g.rule(FUNC_DEFINITION))
-                .matches("function a() export endfunction")
+        assertThat(g.rule(FUNC_DEF))
+                .matches("function a() endfunction")
                 .matches("&AtServer function a() endfunction")
-                .matches("&AtServer\nfunction\na()\nfoo()\nendfunction")
-                .notMatches("function a() export endfunction;");
+                .notMatches("function a() endfunction;");
     }
 
     @Test
     public void procedure() {
-        assertThat(g.rule(PROC_DEFINITION))
-                .matches("procedure a() export endprocedure")
+        assertThat(g.rule(PROC_DEF))
+                .matches("procedure a() endprocedure")
                 .matches("&AtServer procedure a() endprocedure")
-                .matches("&AtServer\nprocedure\na()\nfoo()\nendprocedure")
-                .notMatches("procedure a() export endprocedure;");
+                .notMatches("procedure a() endprocedure;");
     }
 
     @Test
     public void signature() {
         assertThat(g.rule(SIGNATURE))
+                .matches("a()")
                 .matches("a() export")
-                .matches("a\n()\nexport")
-                .matches("a()");
-    }
-
-    @Test
-    public void parameters() {
-        assertThat(g.rule(PARAMETER_LIST))
-                .matches("")
-                .matches("a")
-                .matches("a, b, c")
-                .matches("\na\n,\nb,\nc")
-                .notMatches("a + b")
-                .notMatches(",")
-                .notMatches("a b");
+                .matches("a(a)")
+                .matches("a(a, b)")
+                .notMatches("a(a b)")
+                .notMatches("a(,)");
     }
 
     @Test
@@ -55,10 +44,9 @@ public class CallableDefinitionTest {
                 .matches("a")
                 .matches("a = null")
                 .matches("val a")
-                .matches("val a = null")
-                .matches("val\na\n=\nnull")
-                .notMatches("")
-                .notMatches("a = foo()");
+                .matches("a = 1")
+                .notMatches("a = 1 + 1")
+                .notMatches("");
     }
 
 }

@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.CONTINUE_STATEMENT;
 
 public class ContinueStatementTest {
 
@@ -12,7 +13,7 @@ public class ContinueStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.CONTINUE_STATEMENT)).matches("continue");
+        assertThat(g.rule(CONTINUE_STATEMENT)).matches("continue");
     }
 
 }

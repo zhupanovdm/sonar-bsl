@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.IF_STATEMENT;
 
 public class IfStatementTest {
 
@@ -12,7 +13,7 @@ public class IfStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BslGrammar.IF_STATEMENT))
+        assertThat(g.rule(IF_STATEMENT))
                 .matches("if expr1 then endif")
                 .matches("if expr1 then else endif")
                 .matches("if expr1 then elsif expr2 then endif")

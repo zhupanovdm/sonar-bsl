@@ -3,21 +3,23 @@ package org.zhupanovdm.sonar.bsl.grammar;
 import com.sonar.sslr.api.AstNode;
 
 public enum BslPreprocessorInstruction implements BslWord {
-    IF("Если"),
-    ELSIF("ИначеЕсли"),
-    END_IF("КонецЕсли"),
-    REGION("Область"),
-    END_REGION("КонецОбласти");
+    PP_IF("if", "Если"),
+    PP_ELSIF("elsif", "ИначеЕсли"),
+    PP_END_IF("endif", "КонецЕсли"),
+    PP_REGION("region", "Область"),
+    PP_END_REGION("endregion", "КонецОбласти");
 
+    private final String value;
     private final String valueRu;
 
-    BslPreprocessorInstruction(String valueRu) {
+    BslPreprocessorInstruction(String value, String valueRu) {
+        this.value = value;
         this.valueRu = valueRu;
     }
 
     @Override
     public String getValue() {
-        return BslWord.enumToValue(this);
+        return value;
     }
 
     @Override

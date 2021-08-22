@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.*;
 
 public class PostfixExpressionTest {
 
@@ -12,7 +13,7 @@ public class PostfixExpressionTest {
 
     @Test
     public void indexOperator() {
-        assertThat(g.rule(BslGrammar.INDEX_OPERATOR))
+        assertThat(g.rule(INDEX_OPERATOR))
                 .matches("[1]")
                 .matches("[x + y]")
                 .notMatches("[]");
@@ -20,7 +21,7 @@ public class PostfixExpressionTest {
 
     @Test
     public void callOperator() {
-        assertThat(g.rule(BslGrammar.CALL_OPERATOR))
+        assertThat(g.rule(CALL_OPERATOR))
                 .matches("()")
                 .matches("(a)")
                 .matches("(a, b)")
@@ -29,8 +30,8 @@ public class PostfixExpressionTest {
     }
 
     @Test
-    public void postfixExpression() {
-        assertThat(g.rule(BslGrammar.POSTFIX_EXPRESSION))
+    public void postfix() {
+        assertThat(g.rule(POSTFIX_EXPRESSION))
                 .matches("foo[0]")
                 .matches("foo[1][2][3]")
                 .matches("a.b.c.d.e.f")
@@ -44,6 +45,8 @@ public class PostfixExpressionTest {
                 .matches("foo.bar[0]")
                 .matches("foo.bar")
                 .matches("foo.bar()")
+                .matches("foo.bar()")
+                .matches("Запрос.Выполнить()")
 
                 .matches("foo().bar[0]")
                 .matches("foo().bar")
@@ -55,7 +58,7 @@ public class PostfixExpressionTest {
 
     @Test
     public void assignable() {
-        assertThat(g.rule(BslGrammar.ASSIGNABLE))
+        assertThat(g.rule(ASSIGNABLE_EXPRESSION))
                 .matches("a")
                 .matches("a[0]")
                 .matches("a.b.c")
@@ -70,7 +73,7 @@ public class PostfixExpressionTest {
 
     @Test
     public void callable() {
-        assertThat(g.rule(BslGrammar.CALLABLE))
+        assertThat(g.rule(CALLABLE_EXPRESSION))
                 .matches("a()")
                 .matches("a.b()")
                 .matches("a[0].b()")

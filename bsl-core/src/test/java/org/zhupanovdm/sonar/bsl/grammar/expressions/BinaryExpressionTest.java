@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.*;
 
 public class BinaryExpressionTest {
 
@@ -12,17 +13,17 @@ public class BinaryExpressionTest {
 
     @Test
     public void logic() {
-        assertThat(g.rule(BslGrammar.OR_EXPRESSION)).matches("foo OR bar");
-        assertThat(g.rule(BslGrammar.AND_EXPRESSION)).matches("foo AND bar");
-        assertThat(g.rule(BslGrammar.NOT_EXPRESSION))
-                .matches("NOT foo")
-                .notMatches("NOT NOT foo")
-                .matches("NOT (NOT foo)");
+        assertThat(g.rule(OR_EXPRESSION)).matches("foo or bar");
+        assertThat(g.rule(AND_EXPRESSION)).matches("foo and bar");
+        assertThat(g.rule(NOT_EXPRESSION))
+                .matches("not foo")
+                .matches("not (not foo)")
+                .notMatches("not not foo");
     }
 
     @Test
     public void relational() {
-        assertThat(g.rule(BslGrammar.RELATIONAL_EXPRESSION))
+        assertThat(g.rule(RELATIONAL_EXPRESSION))
                 .matches("foo = bar")
                 .matches("foo <> bar")
                 .matches("foo > bar")
@@ -33,14 +34,14 @@ public class BinaryExpressionTest {
 
     @Test
     public void additive() {
-        assertThat(g.rule(BslGrammar.ADDITIVE_EXPRESSION))
+        assertThat(g.rule(ADDITIVE_EXPRESSION))
                 .matches("foo + bar")
                 .matches("foo - bar");
     }
 
     @Test
     public void multiplicative() {
-        assertThat(g.rule(BslGrammar.MULTIPLICATIVE_EXPRESSION))
+        assertThat(g.rule(MULTIPLICATIVE_EXPRESSION))
                 .matches("foo * bar")
                 .matches("foo / bar")
                 .matches("foo % bar");

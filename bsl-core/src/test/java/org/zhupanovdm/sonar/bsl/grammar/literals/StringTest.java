@@ -5,6 +5,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.zhupanovdm.sonar.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.sonar.bsl.grammar.BslGrammar.STRING;
 
 public class StringTest {
 
@@ -12,7 +13,7 @@ public class StringTest {
 
     @Test
     public void basic() {
-        assertThat(g.rule(BslGrammar.STRING))
+        assertThat(g.rule(STRING))
                 .matches("\"foo\"")
                 .matches("\"\"")
                 .matches("\"\"\"\"")
@@ -24,7 +25,7 @@ public class StringTest {
 
     @Test
     public void compound() {
-        assertThat(g.rule(BslGrammar.STRING))
+        assertThat(g.rule(STRING))
                 .matches("\"foo\" \"bar\"")
                 .matches("\"foo\"\n\"bar\"")
                 .matches("\"\" \"\"")
@@ -33,9 +34,10 @@ public class StringTest {
 
     @Test
     public void carryover() {
-        assertThat(g.rule(BslGrammar.STRING))
+        assertThat(g.rule(STRING))
                 .matches("\"\n|\"")
                 .matches("\"foo\n|bar\"")
+                .matches("\"foo\n\t |bar\"")
                 .matches("\"\"\"\n|\"\"\"");
     }
 
