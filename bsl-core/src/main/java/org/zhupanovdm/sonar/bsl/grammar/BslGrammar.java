@@ -21,6 +21,7 @@ public enum BslGrammar implements GrammarRuleKey {
 
     MODULE,
     PROGRAM,
+    VAR_BLOCK,
 
     VAR_DEFINITION,
     VARIABLE,
@@ -102,7 +103,6 @@ public enum BslGrammar implements GrammarRuleKey {
 
     DIRECTIVE,
 
-    PREPROCESSOR,
     PREPROCESSOR_SYMBOL,
     PREPROCESSOR_INSTRUCTION,
     PREPROCESSOR_CONDITION;
@@ -141,11 +141,13 @@ public enum BslGrammar implements GrammarRuleKey {
         b.rule(IDENTIFIER_PART).is(b.regexp(IDENTIFIER_PART_REGEXP));
 
         b.rule(MODULE).is(
-                b.zeroOrMore(VAR_DEFINITION),
+                b.optional(VAR_BLOCK),
                 b.zeroOrMore(b.firstOf(FUNC_DEFINITION, PROC_DEFINITION)),
                 b.optional(PROGRAM),
                 SPACING,
                 b.endOfInput());
+
+        b.rule(VAR_BLOCK).is(preprocessorWrapped(b, VAR_BLOCK, VAR_DEFINITION));
 
         punctuators(b);
         keywords(b);
@@ -315,32 +317,28 @@ public enum BslGrammar implements GrammarRuleKey {
 
     private static void directives(LexerlessGrammarBuilder b) {
         b.rule(DIRECTIVE).is(group(b, BslDirective.values(),
-                w -> b.sequence(AMP, b.optional(SPACING_NO_LB), exactWord(b, w))));
+                w -> b.sequence(AMP, SPACING_NO_LB, exactWord(b, w))));
     }
 
     private static void preprocessor(LexerlessGrammarBuilder b) {
         b.rule(PREPROCESSOR_INSTRUCTION).is(
-                group(b, BslPreprocessorInstruction.values(), w -> b.sequence(HASH, b.optional(SPACING_NO_LB), exactWord(b, w)))
+                group(b, BslPreprocessorInstruction.values(), w -> b.sequence(HASH, SPACING_NO_LB, exactWord(b, w)))
         ).skipIfOneChild();
         b.rule(PREPROCESSOR_SYMBOL).is(
                 group(b, BslPreprocessorSymbol.values(), w -> b.sequence(SPACING, exactWord(b, w)))
         ).skipIfOneChild();
         b.rule(PREPROCESSOR_CONDITION).is(b.optional(NOT), PREPROCESSOR_SYMBOL, b.zeroOrMore(b.firstOf(OR, AND), b.optional(NOT), PREPROCESSOR_SYMBOL));
-
-        //preprocessorWrap(b, PREPROCESSOR_VAR, VAR_DEFINITION);
-
     }
 
-    private static void preprocessorWrap(LexerlessGrammarBuilder b, GrammarRuleKey rule, Object downstream) {
-        b.rule(rule).is(b.firstOf(
-                downstream,
-                b.firstOf(
-                        b.sequence(REGION, IDENTIFIER, rule, END_REGION),
-                        b.sequence(
-                                BslPreprocessorInstruction.IF, PREPROCESSOR_CONDITION, THEN, rule,
-                                b.zeroOrMore(BslPreprocessorInstruction.ELSIF, PREPROCESSOR_CONDITION, THEN, rule),
-                                BslPreprocessorInstruction.END_IF))
-        )).skipIfOneChild();
+    private static Object preprocessorWrapped(LexerlessGrammarBuilder b, GrammarRuleKey rule, Object downstream) {
+        return b.oneOrMore(b.firstOf(
+                b.sequence(REGION, IDENTIFIER, b.optional(rule), END_REGION),
+                b.sequence(
+                        BslPreprocessorInstruction.IF, PREPROCESSOR_CONDITION, THEN, b.optional(rule),
+                        b.zeroOrMore(BslPreprocessorInstruction.ELSIF, PREPROCESSOR_CONDITION, THEN, b.optional(rule)),
+                        BslPreprocessorInstruction.END_IF),
+                downstream)
+        );
     }
 
     private static void definitions(LexerlessGrammarBuilder b) {
