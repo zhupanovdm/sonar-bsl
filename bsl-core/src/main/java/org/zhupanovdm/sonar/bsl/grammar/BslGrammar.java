@@ -21,7 +21,10 @@ public enum BslGrammar implements GrammarRuleKey {
 
     MODULE,
     PROGRAM,
-    VAR_BLOCK,
+    BODY,
+    BLOCK,
+    VAR_DEF,
+    CALLABLE_DEF,
 
     VAR_DEFINITION,
     VARIABLE,
@@ -140,15 +143,7 @@ public enum BslGrammar implements GrammarRuleKey {
 
         b.rule(IDENTIFIER_PART).is(b.regexp(IDENTIFIER_PART_REGEXP));
 
-        b.rule(MODULE).is(
-                b.optional(VAR_BLOCK),
-                b.zeroOrMore(b.firstOf(FUNC_DEFINITION, PROC_DEFINITION)),
-                b.optional(PROGRAM),
-                SPACING,
-                b.endOfInput());
-
-        b.rule(VAR_BLOCK).is(preprocessorWrapped(b, VAR_BLOCK, VAR_DEFINITION));
-
+        module(b);
         punctuators(b);
         keywords(b);
         literals(b);
@@ -161,6 +156,26 @@ public enum BslGrammar implements GrammarRuleKey {
         b.setRootRule(MODULE);
 
         return b.build();
+    }
+
+    private static void module(LexerlessGrammarBuilder b) {
+        b.rule(MODULE).is(
+                b.optional(PROGRAM),
+                SPACING,
+                b.endOfInput());
+
+        b.rule(PROGRAM).is(preprocessorWrapper(b, PROGRAM, b.firstOf(
+                VAR_DEF,
+                b.sequence(CALLABLE_DEF, b.nextNot(VAR_DEF)),
+                b.sequence(BLOCK, b.nextNot(b.firstOf(VAR_DEF, CALLABLE_DEF)))))
+        );
+        b.rule(BODY).is(preprocessorWrapper(b, BODY, b.firstOf(
+                VAR_DEF,
+                b.sequence(BLOCK, b.nextNot(VAR_DEF))))
+        );
+        b.rule(VAR_DEF).is(preprocessorWrapper(b, VAR_DEF, VAR_DEFINITION));
+        b.rule(CALLABLE_DEF).is(preprocessorWrapper(b, CALLABLE_DEF, b.firstOf(FUNC_DEFINITION, PROC_DEFINITION)));
+        b.rule(BLOCK).is(preprocessorWrapper(b, BLOCK, COMPOUND_STATEMENT));
     }
 
     private static void literals(LexerlessGrammarBuilder b) {
@@ -256,7 +271,6 @@ public enum BslGrammar implements GrammarRuleKey {
                 EMPTY_STATEMENT)
         ).skipIfOneChild();
 
-        b.rule(PROGRAM).is(b.optional(COMPOUND_STATEMENT)).skipIfOneChild();
         b.rule(COMPOUND_STATEMENT).is(b.oneOrMore(STATEMENT, b.zeroOrMore(SEMICOLON, STATEMENT)));
         b.rule(EMPTY_STATEMENT).is(SEMICOLON);
 
@@ -268,24 +282,24 @@ public enum BslGrammar implements GrammarRuleKey {
 
         b.rule(IF_STATEMENT).is(
                 IF, EXPRESSION, THEN,
-                PROGRAM,
-                b.zeroOrMore(ELSIF, EXPRESSION, THEN, PROGRAM),
-                b.optional(ELSE, PROGRAM),
+                b.optional(BLOCK),
+                b.zeroOrMore(ELSIF, EXPRESSION, THEN, b.optional(BLOCK)),
+                b.optional(ELSE, b.optional(BLOCK)),
                 END_IF);
 
         b.rule(WHILE_STATEMENT).is(
                 WHILE, EXPRESSION, DO,
-                PROGRAM,
+                b.optional(BLOCK),
                 END_DO);
 
         b.rule(FOREACH_STATEMENT).is(
                 FOR, EACH, IDENTIFIER, IN, EXPRESSION, DO,
-                PROGRAM,
+                b.optional(BLOCK),
                 END_DO);
 
         b.rule(FOR_STATEMENT).is(
                 FOR, IDENTIFIER, EQ, EXPRESSION, TO, EXPRESSION, DO,
-                PROGRAM,
+                b.optional(BLOCK),
                 END_DO);
 
         b.rule(BREAK_STATEMENT).is(BREAK);
@@ -293,9 +307,9 @@ public enum BslGrammar implements GrammarRuleKey {
 
         b.rule(TRY_STATEMENT).is(
                 TRY,
-                PROGRAM,
+                BLOCK,
                 EXCEPT,
-                PROGRAM,
+                b.optional(BLOCK),
                 END_TRY);
 
         b.rule(RAISE_STATEMENT).is(RAISE, EXPRESSION);
@@ -330,14 +344,14 @@ public enum BslGrammar implements GrammarRuleKey {
         b.rule(PREPROCESSOR_CONDITION).is(b.optional(NOT), PREPROCESSOR_SYMBOL, b.zeroOrMore(b.firstOf(OR, AND), b.optional(NOT), PREPROCESSOR_SYMBOL));
     }
 
-    private static Object preprocessorWrapped(LexerlessGrammarBuilder b, GrammarRuleKey rule, Object downstream) {
+    private static Object preprocessorWrapper(LexerlessGrammarBuilder b, GrammarRuleKey rule, Object body) {
         return b.oneOrMore(b.firstOf(
                 b.sequence(REGION, IDENTIFIER, b.optional(rule), END_REGION),
                 b.sequence(
                         BslPreprocessorInstruction.IF, PREPROCESSOR_CONDITION, THEN, b.optional(rule),
                         b.zeroOrMore(BslPreprocessorInstruction.ELSIF, PREPROCESSOR_CONDITION, THEN, b.optional(rule)),
                         BslPreprocessorInstruction.END_IF),
-                downstream)
+                body)
         );
     }
 
@@ -353,8 +367,7 @@ public enum BslGrammar implements GrammarRuleKey {
                         b.sequence(AT_CLIENT, b.optional(ASYNC)))
                 ),
                 FUNCTION, SIGNATURE,
-                b.zeroOrMore(VAR_DEFINITION),
-                PROGRAM,
+                b.optional(BODY),
                 END_FUNCTION);
         b.rule(PROC_DEFINITION).is(
                 b.optional(b.firstOf(
@@ -362,8 +375,7 @@ public enum BslGrammar implements GrammarRuleKey {
                         b.sequence(AT_CLIENT, b.optional(ASYNC)))
                 ),
                 PROCEDURE, SIGNATURE,
-                b.zeroOrMore(VAR_DEFINITION),
-                PROGRAM,
+                b.optional(BODY),
                 END_PROCEDURE);
         b.rule(SIGNATURE).is(IDENTIFIER, LPAREN, PARAMETER_LIST, RPAREN, b.optional(EXPORT));
         b.rule(ASYNC).is(SPACING, exactWord(b, "Async", "Асинх"));
