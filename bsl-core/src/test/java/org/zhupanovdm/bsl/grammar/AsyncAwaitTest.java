@@ -4,6 +4,8 @@ import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
+import static org.zhupanovdm.bsl.grammar.BslAsync.ASYNC;
+import static org.zhupanovdm.bsl.grammar.BslAsync.AWAIT;
 import static org.zhupanovdm.bsl.grammar.BslGrammar.*;
 
 public class AsyncAwaitTest {

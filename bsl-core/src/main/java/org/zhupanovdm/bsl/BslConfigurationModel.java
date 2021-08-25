@@ -7,6 +7,7 @@ import org.sonar.sslr.toolkit.AbstractConfigurationModel;
 import org.sonar.sslr.toolkit.ConfigurationProperty;
 import org.zhupanovdm.bsl.grammar.BslKeyword;
 import org.zhupanovdm.bsl.grammar.BslWord;
+import org.zhupanovdm.bsl.parser.BslParser;
 
 import java.nio.charset.Charset;
 import java.util.Collections;

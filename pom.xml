@@ -28,6 +28,7 @@
 
         <sonar.version>7.9</sonar.version>
         <sslr.version>1.23</sslr.version>
+        <version.sslr-squid-bridge>2.7.1.392</version.sslr-squid-bridge>
         <junit.version>4.13.2</junit.version>
     </properties>
 
@@ -44,6 +45,21 @@
                 <artifactId>sonar-plugin-api</artifactId>
                 <version>${sonar.version}</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.sonarsource.sslr-squid-bridge</groupId>
+                <artifactId>sslr-squid-bridge</artifactId>
+                <version>${version.sslr-squid-bridge}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.picocontainer</groupId>
+                        <artifactId>picocontainer</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>

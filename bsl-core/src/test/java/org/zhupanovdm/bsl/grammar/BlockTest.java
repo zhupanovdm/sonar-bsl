@@ -18,6 +18,8 @@ public class BlockTest {
                 .matches("var a; var b;")
                 .matches("function b() endfunction procedure b() endprocedure")
                 .matches("a = b()")
+                .matches("a = b;; c = d")
+                .notMatches("a = b c = d")
                 .notMatches("");
     }
 

@@ -5,6 +5,8 @@ import org.sonar.sslr.grammar.LexerlessGrammarBuilder;
 import org.sonar.sslr.parser.LexerlessGrammar;
 
 import static com.sonar.sslr.api.GenericTokenType.EOF;
+import static org.zhupanovdm.bsl.grammar.BslAsync.ASYNC;
+import static org.zhupanovdm.bsl.grammar.BslAsync.AWAIT;
 import static org.zhupanovdm.bsl.grammar.BslDirective.AT_CLIENT;
 import static org.zhupanovdm.bsl.grammar.BslDirective.AT_SERVER;
 import static org.zhupanovdm.bsl.grammar.BslKeyword.*;
@@ -27,6 +29,7 @@ public enum BslGrammar implements GrammarRuleKey {
     LABEL,
 
     STATEMENT,
+    STATEMENT_NO_EMPTY,
     COMPOUND_STATEMENT,
     ASSIGNMENT_STATEMENT,
     CALL_STATEMENT,
@@ -68,7 +71,6 @@ public enum BslGrammar implements GrammarRuleKey {
     INDEX_OPERATOR,
     CALL_OPERATOR,
 
-
     INDEX_POSTFIX, DEREFERENCE_POSTFIX, CALL_POSTFIX,
     ASSIGNABLE_INDEX_POSTFIX, ASSIGNABLE_DEREFERENCE_POSTFIX, ASSIGNABLE_CALL_POSTFIX,
     CALLABLE_INDEX_POSTFIX, CALLABLE_DEREFERENCE_POSTFIX, CALLABLE_CALL_POSTFIX,
@@ -81,24 +83,23 @@ public enum BslGrammar implements GrammarRuleKey {
     DATE,
 
     DIRECTIVE,
-    PREPROCESSOR_INSTRUCTION, PP_CONDITION,
+    PREPROCESSOR_INSTRUCTION, PP_CONDITION;
 
-    ASYNC, AWAIT;
+    public static final String COMMENT_REGEXP = "//[^\\n\\r]*+";
+
+    public static final String NOSONAR_FLAG = "NOSONAR";
+
+    public static final String STRING_REGEXP = "\\\"(?:[^\\\"\\r\\n]|\\\"{2}|(?:[\\r\\n]\\s*\\|))*\\\"";
+    public static final String NUMBER_REGEXP = "[0-9]+(?:\\.(?:[0-9]++)?+)?";
+    public static final String DATE_REGEXP = "'(?:\\d{8}(?:\\d{6})?|\\d{4}\\.\\d{2}\\.\\d{2}(?: \\d{2}:\\d{2}:\\d{2})?)'";
 
     private static final String LINE_TERMINATOR_REGEXP = "\\n\\r\\p{Zl}\\p{Zp}";
     private static final String WHITESPACE_REGEXP = "\\t\\v\\f\\u0020\\u00A0\\uFEFF\\p{Zs}";
 
-    private static final String COMMENT_REGEXP = "//[^\\n\\r]*+";
-
     private static final String UNICODE_LETTER = "\\p{Lu}\\p{Ll}\\p{Lt}\\p{Lm}\\p{Lo}\\p{Nl}";
     private static final String UNICODE_DIGIT = "\\p{Nd}";
-
     private static final String IDENTIFIER_START_REGEXP = "(?:[_" + UNICODE_LETTER + "])";
     private static final String IDENTIFIER_PART_REGEXP = "(?:" + IDENTIFIER_START_REGEXP + "|[" + UNICODE_DIGIT + "])";
-
-    private static final String STRING_REGEXP = "\\\"(?:[^\\\"\\r\\n]|\\\"{2}|(?:[\\r\\n]\\s*\\|))*\\\"";
-    private static final String NUMBER_REGEXP = "[0-9]+(?:\\.(?:[0-9]++)?+)?";
-    private static final String DATE_REGEXP = "'(?:\\d{8}(?:\\d{6})?|\\d{4}\\.\\d{2}\\.\\d{2}(?: \\d{2}:\\d{2}:\\d{2})?)'";
 
     public static LexerlessGrammar createGrammar() {
         LexerlessGrammarBuilder b = LexerlessGrammarBuilder.create();
@@ -236,12 +237,18 @@ public enum BslGrammar implements GrammarRuleKey {
                 EMPTY_STATEMENT)
         ).skipIfOneChild();
 
-        b.rule(COMPOUND_STATEMENT).is(b.oneOrMore(STATEMENT, b.zeroOrMore(SEMICOLON, STATEMENT)));
-        b.rule(EMPTY_STATEMENT).is(SEMICOLON);
+        b.rule(COMPOUND_STATEMENT).is(b.oneOrMore(b.firstOf(
+                b.sequence(STATEMENT_NO_EMPTY, b.oneOrMore(EMPTY_STATEMENT), b.nextNot(STATEMENT_NO_EMPTY)),
+                b.sequence(STATEMENT_NO_EMPTY, SEMICOLON, b.next(STATEMENT)),
+                b.sequence(STATEMENT_NO_EMPTY, b.nextNot(STATEMENT_NO_EMPTY)),
+                EMPTY_STATEMENT
+        )));
 
+        b.rule(EMPTY_STATEMENT).is(SEMICOLON);
+        b.rule(STATEMENT_NO_EMPTY).is(b.nextNot(EMPTY_STATEMENT), STATEMENT).skip();
         b.rule(ASSIGNMENT_STATEMENT).is(ASSIGNABLE_EXPRESSION, EQ, b.optional(AWAIT), EXPRESSION);
         b.rule(CALL_STATEMENT).is(b.optional(AWAIT), CALLABLE_EXPRESSION);
-        b.rule(AWAIT).is(SPACING, exactWord(b, "Await", "Ждать"));
+        b.rule(AWAIT).is(SPACING, exactWord(b, AWAIT));
 
         b.rule(RETURN_STATEMENT).is(RETURN, b.optional(EXPRESSION));
 
@@ -324,7 +331,7 @@ public enum BslGrammar implements GrammarRuleKey {
                 b.optional(BLOCK),
                 END_PROCEDURE);
         b.rule(SIGNATURE).is(IDENTIFIER, LPAREN, b.optional(PARAMETER, b.zeroOrMore(COMMA, PARAMETER)), RPAREN, b.optional(EXPORT));
-        b.rule(ASYNC).is(SPACING, exactWord(b, "Async", "Асинх"));
+        b.rule(ASYNC).is(SPACING, exactWord(b, ASYNC));
 
         b.rule(PARAMETER).is(
                 b.optional(VAL), IDENTIFIER,

@@ -12,20 +12,36 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.sonar.sslr.api.GenericTokenType.CONSTANT;
 import static com.sonar.sslr.api.GenericTokenType.IDENTIFIER;
+import static org.zhupanovdm.bsl.grammar.BslAsync.ASYNC;
+import static org.zhupanovdm.bsl.grammar.BslAsync.AWAIT;
+import static org.zhupanovdm.bsl.grammar.BslKeyword.*;
 
 public class BslIdentifierAndKeywordChannel extends Channel<Lexer> {
 
-    private final Map<String, TokenType> keywordsMap = new HashMap<>();
+    private final Map<String, TokenType> tokenMap = new HashMap<>();
     private final StringBuilder tmpBuilder = new StringBuilder();
     private final Matcher matcher = Pattern.compile("\\p{javaJavaIdentifierStart}++\\p{javaJavaIdentifierPart}*+").matcher("");
     private final Token.Builder tokenBuilder = Token.builder();
 
     public BslIdentifierAndKeywordChannel() {
         for (BslKeyword keyword : BslKeyword.values()) {
-            keywordsMap.put(keyword.getValue().toUpperCase(), keyword);
-            keywordsMap.put(keyword.getValueRu().toUpperCase(), keyword);
+            TokenType type = keyword;
+            if (keyword.equals(TRUE) ||
+                    keyword.equals(FALSE) ||
+                    keyword.equals(UNDEFINED) ||
+                    keyword.equals(NULL))
+                type = CONSTANT;
+            tokenMap.put(keyword.getValue().toUpperCase(), type);
+            tokenMap.put(keyword.getValueRu().toUpperCase(), type);
         }
+
+        tokenMap.put(ASYNC.getValue().toUpperCase(), ASYNC);
+        tokenMap.put(ASYNC.getValueRu().toUpperCase(), ASYNC);
+
+        tokenMap.put(AWAIT.getValue().toUpperCase(), AWAIT);
+        tokenMap.put(AWAIT.getValueRu().toUpperCase(), AWAIT);
     }
 
     @Override
@@ -37,7 +53,7 @@ public class BslIdentifierAndKeywordChannel extends Channel<Lexer> {
         String wordOriginal = word;
         word = word.toUpperCase();
 
-        TokenType keywordType = keywordsMap.get(word);
+        TokenType keywordType = tokenMap.get(word);
         Token token = tokenBuilder
                 .setType(keywordType == null ? IDENTIFIER : keywordType)
                 .setValueAndOriginalValue(word, wordOriginal)

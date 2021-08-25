@@ -19,6 +19,8 @@ public class CompoundStatementTest {
                 .matches("a = 1; b();")
                 .matches(";")
                 .matches(";;;")
+                .matches("a = b;; c = d")
+                .notMatches("1 + 1 a + b")
                 .notMatches("");
     }
 

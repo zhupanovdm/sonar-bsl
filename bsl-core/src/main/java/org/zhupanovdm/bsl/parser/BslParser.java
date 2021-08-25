@@ -1,4 +1,4 @@
-package org.zhupanovdm.bsl;
+package org.zhupanovdm.bsl.parser;
 
 import com.sonar.sslr.impl.Parser;
 import org.sonar.sslr.parser.LexerlessGrammar;

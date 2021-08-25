@@ -6,7 +6,7 @@ public class Bsl extends AbstractLanguage {
     public static final String NAME = "BSL";
     public static final String KEY = "bsl";
 
-    public static final String FILE_SUFFIX = "as";
+    public static final String FILE_SUFFIX = "bsl";
 
     public Bsl() {
         super(KEY, NAME);
