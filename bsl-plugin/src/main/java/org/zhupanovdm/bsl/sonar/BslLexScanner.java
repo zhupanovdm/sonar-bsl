@@ -1,4 +1,4 @@
-package org.zhupanovdm.sonar.plugins.bsl;
+package org.zhupanovdm.bsl.sonar;
 
 import com.sonar.sslr.api.GenericTokenType;
 import com.sonar.sslr.api.Token;

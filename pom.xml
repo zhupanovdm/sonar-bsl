@@ -19,13 +19,17 @@
 
     <modules>
         <module>bsl-core</module>
-        <module>sonar-bsl-plugin</module>
+        <module>bsl-plugin</module>
+        <module>bsl-checks</module>
         <module>bsl-toolkit</module>
     </modules>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+
+        <license.title>SonarQube BSL Plugin</license.title>
+        <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
 
         <sonar.version>9.0.1.46107</sonar.version>
         <analyzerCommons.version>1.16.0.719</analyzerCommons.version>
@@ -37,7 +41,12 @@
         <dependencies>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>sonar-bsl-plugin</artifactId>
+                <artifactId>bsl-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bsl-checks</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -56,6 +65,11 @@
             <dependency>
                 <groupId>org.sonarsource.sslr</groupId>
                 <artifactId>sslr-core</artifactId>
+                <version>${sslr.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.sonarsource.sslr</groupId>
+                <artifactId>sslr-xpath</artifactId>
                 <version>${sslr.version}</version>
             </dependency>
             <dependency>

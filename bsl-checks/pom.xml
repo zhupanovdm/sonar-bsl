@@ -5,34 +5,31 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.zhupanovdm</groupId>
         <artifactId>sonar-bsl</artifactId>
+        <groupId>org.zhupanovdm</groupId>
         <version>0.1</version>
     </parent>
 
-    <artifactId>sonar-bsl-plugin</artifactId>
-    <packaging>sonar-plugin</packaging>
+    <artifactId>bsl-checks</artifactId>
 
-    <name>BSL :: SonarQube Plugin</name>
-    <description>Code Quality and Security for BSL</description>
-
-    <properties>
-        <sonar.pluginClass>org.zhupanovdm.sonar.plugins.bsl.BslPlugin</sonar.pluginClass>
-        <sonar.pluginName>BSL Code Quality and Security</sonar.pluginName>
-        <sonar.skipDependenciesPackaging>true</sonar.skipDependenciesPackaging>
-    </properties>
+    <name>BSL :: Checks</name>
+    <description>Code checks for BSL</description>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>bsl-core</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.sonarsource.sonarqube</groupId>
             <artifactId>sonar-plugin-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.sonarsource.sslr</groupId>
+            <artifactId>sslr-xpath</artifactId>
         </dependency>
 
     </dependencies>

@@ -1,4 +1,4 @@
-package org.zhupanovdm.sonar.plugins.bsl;
+package org.zhupanovdm.bsl.sonar;
 
 import com.sonar.sslr.api.AstNode;
 import com.sonar.sslr.api.RecognitionException;
@@ -8,18 +8,26 @@ import org.sonar.api.batch.fs.FilePredicate;
 import org.sonar.api.batch.fs.FilePredicates;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
+import org.sonar.api.batch.rule.CheckFactory;
+import org.sonar.api.batch.rule.Checks;
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
+import org.sonar.api.batch.sensor.issue.NewIssue;
+import org.sonar.api.batch.sensor.issue.NewIssueLocation;
 import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.measures.FileLinesContext;
 import org.sonar.api.measures.FileLinesContextFactory;
 import org.sonar.api.measures.Metric;
+import org.sonar.api.rule.RuleKey;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 import org.sonar.sslr.parser.LexerlessGrammar;
 import org.sonarsource.analyzer.commons.ProgressReport;
+import org.zhupanovdm.bsl.BslCheck;
 import org.zhupanovdm.bsl.BslParser;
+import org.zhupanovdm.bsl.Issue;
+import org.zhupanovdm.bsl.checks.CheckList;
 import org.zhupanovdm.bsl.metrics.ComplexityVisitor;
 import org.zhupanovdm.bsl.metrics.FileLinesVisitor;
 import org.zhupanovdm.bsl.metrics.ModuleMetrics;
@@ -29,6 +37,8 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -38,10 +48,14 @@ public class BslSensor implements Sensor {
 
     private static final Logger LOG = Loggers.get(BslSensor.class);
 
+    private final Checks<BslCheck> checks;
     private final FileLinesContextFactory fileLinesContextFactory;
 
-    public BslSensor(FileLinesContextFactory fileLinesContextFactory) {
+    public BslSensor(CheckFactory checkFactory, FileLinesContextFactory fileLinesContextFactory) {
         this.fileLinesContextFactory = fileLinesContextFactory;
+        this.checks = checkFactory
+                .<BslCheck>create(CheckList.REPOSITORY_KEY)
+                .addAnnotatedChecks(CheckList.getChecks());
     }
 
     @Override
@@ -84,16 +98,38 @@ public class BslSensor implements Sensor {
 
         Charset charset = file.charset();
         Parser<LexerlessGrammar> parser = BslParser.create(charset);
-        AstNode tree = null;
+        AstNode tree;
         try {
             tree = parser.parse(contents);
         } catch (RecognitionException e) {
             LOG.error("Unable to parse file: {}", file);
             LOG.error(e.getMessage());
+            return;
         }
+
+        BiConsumer<BslCheck, Issue> issueConsumer = (check, issue) -> saveIssue(context, check, issue, file);
+
+        List<BslCheck> allChecks = new LinkedList<>(checks.all());
+        allChecks.forEach(check -> check.setIssueConsumer(issueConsumer));
+        new AstWalker(allChecks).walkAndVisit(tree);
 
         saveMeasures(context, file, tree);
         new BslLexScanner(context).scan(file, contents);
+    }
+
+    private void saveIssue(SensorContext context, BslCheck check, Issue checkIssue, InputFile file) {
+        RuleKey ruleKey = Objects.requireNonNull(checks.ruleKey(check), "Rule key for check is required");
+        NewIssue issue = context.newIssue();
+        NewIssueLocation location = issue.newLocation().on(file).message(checkIssue.message());
+        Integer line = checkIssue.line();
+        if (line != null) {
+            location.at(file.selectLine(line));
+        }
+        Double cost = checkIssue.cost();
+        if (cost != null) {
+            issue.gap(cost);
+        }
+        issue.at(location).forRule(ruleKey).save();
     }
 
     private void saveMeasures(SensorContext context, InputFile file, AstNode tree) {

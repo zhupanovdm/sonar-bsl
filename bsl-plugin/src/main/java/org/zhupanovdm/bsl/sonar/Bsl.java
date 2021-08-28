@@ -1,4 +1,4 @@
-package org.zhupanovdm.sonar.plugins.bsl;
+package org.zhupanovdm.bsl.sonar;
 
 import org.sonar.api.resources.AbstractLanguage;
 
