@@ -19,7 +19,6 @@ import org.sonar.api.utils.log.Loggers;
 import org.sonar.sslr.parser.LexerlessGrammar;
 import org.sonarsource.analyzer.commons.ProgressReport;
 import org.zhupanovdm.bsl.BslParser;
-import org.zhupanovdm.bsl.lexer.BslLexer;
 import org.zhupanovdm.bsl.metrics.ComplexityVisitor;
 import org.zhupanovdm.bsl.metrics.FileLinesVisitor;
 import org.zhupanovdm.bsl.metrics.ModuleMetrics;
@@ -93,7 +92,7 @@ public class BslSensor implements Sensor {
         }
 
         saveMeasures(context, file, tree);
-        new BslTokensVisitor(context, BslLexer.create(charset), file, contents).scanFile(tree);
+        new BslLexScanner(context).scan(file, contents);
     }
 
     private void saveMeasures(SensorContext context, InputFile file, AstNode tree) {

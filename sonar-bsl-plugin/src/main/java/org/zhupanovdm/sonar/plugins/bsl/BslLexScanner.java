@@ -1,6 +1,9 @@
 package org.zhupanovdm.sonar.plugins.bsl;
 
-import com.sonar.sslr.api.*;
+import com.sonar.sslr.api.GenericTokenType;
+import com.sonar.sslr.api.Token;
+import com.sonar.sslr.api.TokenType;
+import com.sonar.sslr.api.Trivia;
 import com.sonar.sslr.impl.Lexer;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.SensorContext;
@@ -8,39 +11,30 @@ import org.sonar.api.batch.sensor.cpd.NewCpdTokens;
 import org.sonar.api.batch.sensor.highlighting.NewHighlighting;
 import org.sonar.api.batch.sensor.highlighting.TypeOfText;
 import org.sonarsource.analyzer.commons.TokenLocation;
-import org.zhupanovdm.bsl.BslAstVisitor;
 import org.zhupanovdm.bsl.api.BslKeyword;
+import org.zhupanovdm.bsl.lexer.BslLexer;
 import org.zhupanovdm.bsl.lexer.BslTokenType;
 
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-public class BslTokensVisitor extends BslAstVisitor {
+public class BslLexScanner {
 
     private static final String NORMALIZED_CHARACTER_LITERAL = "$CHARS";
     private static final String NORMALIZED_NUMERIC_LITERAL = "$NUMBER";
     private static final Set<TokenType> KEYWORDS = Arrays.stream(BslKeyword.values()).collect(Collectors.toSet());
 
     private final SensorContext context;
-    private final Lexer lexer;
-    private final InputFile inputFile;
-    private final String contents;
 
-    public BslTokensVisitor(SensorContext context, Lexer lexer, InputFile inputFile, String contents) {
+    public BslLexScanner(SensorContext context) {
         this.context = context;
-        this.lexer = lexer;
-        this.inputFile = inputFile;
-        this.contents = contents;
     }
 
-    @Override
-    public List<AstNodeType> subscribedTo() {
-        return Collections.emptyList();
-    }
+    public void scan(InputFile inputFile, String contents) {
+        Lexer lexer = BslLexer.create(inputFile.charset());
 
-    @Override
-    public void visitFile(@Nullable AstNode node) {
         NewHighlighting highlighting = context.newHighlighting();
         highlighting.onFile(inputFile);
 
