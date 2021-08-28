@@ -1,6 +1,5 @@
 package org.zhupanovdm.sonar.plugins.bsl;
 
-import com.google.common.collect.Sets;
 import com.sonar.sslr.api.*;
 import com.sonar.sslr.impl.Lexer;
 import com.sonar.sslr.impl.Parser;
@@ -20,21 +19,19 @@ import org.sonar.api.measures.FileLinesContextFactory;
 import org.sonar.api.measures.Metric;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
-import org.sonar.squidbridge.ProgressReport;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.grammar.BslKeyword;
-import org.zhupanovdm.bsl.parser.BslParser;
+import org.zhupanovdm.bsl.api.BslWord;
+import org.zhupanovdm.bsl.api.BslKeyword;
 import org.zhupanovdm.bsl.lexer.BslLexer;
 import org.zhupanovdm.bsl.metrics.ComplexityMetricsStub;
 import org.zhupanovdm.bsl.metrics.LinesMetrics;
 import org.zhupanovdm.bsl.metrics.ModuleMetrics;
+import org.zhupanovdm.bsl.BslParser;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.sonar.api.batch.fs.InputFile.Type.MAIN;
 
 public class BslSensor implements Sensor {
@@ -42,7 +39,10 @@ public class BslSensor implements Sensor {
     private static final Logger LOG = Loggers.get(BslSensor.class);
 
     private static final String NORMALIZED_CHARACTER_LITERAL = "$CHARS";
-    private static final Set<BslKeyword> KEYWORDS = Sets.immutableEnumSet(Arrays.asList(BslKeyword.values()));
+    /*
+    private static final Set<? extends BslWord> KEYWORDS = Sets.immutableEnumSet(Arrays.asList(BslKeyword.values()));
+     */
+    private static final Set<? extends BslWord> KEYWORDS = Collections.emptySet();
 
     private final FileLinesContextFactory fileLinesContextFactory;
 
@@ -67,6 +67,7 @@ public class BslSensor implements Sensor {
         List<InputFile> files = new LinkedList<>();
         fs.inputFiles(predicate).forEach(files::add);
 
+        /*
         ProgressReport progress = new ProgressReport("Report about progress of the SonarSource BSL analyzer", SECONDS.toMillis(10));
         List<String> filenames = files.stream().map(InputFile::toString).collect(Collectors.toList());
         progress.start(filenames);
@@ -75,6 +76,7 @@ public class BslSensor implements Sensor {
             progress.nextFile();
         }
         progress.stop();
+         */
     }
 
     private void analyse(SensorContext context, InputFile file) {

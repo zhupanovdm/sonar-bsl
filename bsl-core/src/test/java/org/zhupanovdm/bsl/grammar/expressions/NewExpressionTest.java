@@ -2,10 +2,10 @@ package org.zhupanovdm.bsl.grammar.expressions;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.grammar.BslGrammar;
+import org.zhupanovdm.bsl.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.grammar.BslGrammar.NEW_EXPRESSION;
+import static org.zhupanovdm.bsl.BslGrammar.NEW_EXPRESSION;
 
 public class NewExpressionTest {
 
@@ -14,9 +14,9 @@ public class NewExpressionTest {
     @Test
     public void test() {
         assertThat(g.rule(NEW_EXPRESSION))
-                .matches("new Structure")
-                .matches("new Structure()")
-                .matches("new Structure(\"field\",, 10 + 1,)");
+                .matches("New Structure")
+                .matches("New Structure()")
+                .matches("New Structure(\"field\",, 10 + 1,)");
     }
 
 }

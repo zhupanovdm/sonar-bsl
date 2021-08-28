@@ -2,10 +2,10 @@ package org.zhupanovdm.bsl.grammar;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.grammar.BslGrammar;
+import org.zhupanovdm.bsl.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.grammar.BslGrammar.BLOCK;
+import static org.zhupanovdm.bsl.BslGrammar.BLOCK;
 
 public class BlockTest {
 
@@ -14,9 +14,9 @@ public class BlockTest {
     @Test
     public void block() {
         assertThat(g.rule(BLOCK))
-                .matches("var a; function b() endfunction a = b()")
-                .matches("var a; var b;")
-                .matches("function b() endfunction procedure b() endprocedure")
+                .matches("Var a; Function b() EndFunction a = b()")
+                .matches("Var a; Var b;")
+                .matches("Function b() EndFunction Procedure b() EndProcedure")
                 .matches("a = b()")
                 .matches("a = b;; c = d")
                 .notMatches("a = b c = d")
@@ -26,46 +26,46 @@ public class BlockTest {
     @Test
     public void preprocessor() {
         assertThat(g.rule(BLOCK))
-                .matches("#if server then #endif")
-                .matches("var v; v = 3 #if server then f() #endif g() #if server then m() #endif")
+                .matches("#If Server Then #EndIf")
+                .matches("Var v; v = 3 #If Server Then f() #EndIf g() #If Server Then m() #EndIf")
                 .matches(
-                        "#if server then\n" +
-                        "#region a #endregion\n" +
-                        "#elsif client then\n" +
-                        "#region b #endregion\n" +
-                        "#endif")
+                        "#If Server then\n" +
+                        "#Region a #EndRegion\n" +
+                        "#ElsIf Client Then\n" +
+                        "#Region b #EndRegion\n" +
+                        "#EndIf")
                 .matches(
-                        "#if server then\n" +
-                        "#if server then\n" +
-                        "#elsif client then\n" +
-                        "#elsif client then\n" +
-                        "#endif\n" +
-                        "#elsif client then\n" +
-                        "#elsif client then\n" +
-                        "#endif");
+                        "#If Server Then\n" +
+                        "#If Server Then\n" +
+                        "#ElsIf Client Then\n" +
+                        "#ElsIf Client Then\n" +
+                        "#EndIf\n" +
+                        "#ElsIf Client Then\n" +
+                        "#ElsIf Client Then\n" +
+                        "#EndIf");
     }
 
     @Test
     public void region() {
         assertThat(g.rule(BLOCK))
-                .matches("#region a #endregion")
-                .matches("#region a ; #endregion")
-                .matches("#region a #region b #endregion #endregion")
+                .matches("#Region a #EndRegion")
+                .matches("#Region a ; #EndRegion")
+                .matches("#Region a #Region b #EndRegion #EndRegion")
                 .matches(
-                        "#region a\n" +
-                        "#if server then\n" +
-                        "#elsif client then\n" +
-                        "#endif\n" +
-                        "#endregion")
+                        "#Region a\n" +
+                        "#If Server Then\n" +
+                        "#ElsIf Client Then\n" +
+                        "#EndIf\n" +
+                        "#EndRegion")
                 .matches(
                         ";\n" +
-                        "#region b\n" +
+                        "#Region b\n" +
                         ";\n" +
-                        "#region c\n" +
+                        "#Region c\n" +
                         ";\n" +
-                        "#endregion\n" +
+                        "#EndRegion\n" +
                         ";\n" +
-                        "#endregion\n" +
+                        "#EndRegion\n" +
                         ";");
     }
 

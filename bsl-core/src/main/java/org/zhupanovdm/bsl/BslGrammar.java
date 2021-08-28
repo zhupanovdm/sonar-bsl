@@ -1,27 +1,27 @@
-package org.zhupanovdm.bsl.grammar;
+package org.zhupanovdm.bsl;
 
 import org.sonar.sslr.grammar.GrammarRuleKey;
 import org.sonar.sslr.grammar.LexerlessGrammarBuilder;
 import org.sonar.sslr.parser.LexerlessGrammar;
+import org.zhupanovdm.bsl.api.*;
 
 import static com.sonar.sslr.api.GenericTokenType.EOF;
-import static org.zhupanovdm.bsl.grammar.BslAsync.ASYNC;
-import static org.zhupanovdm.bsl.grammar.BslAsync.AWAIT;
-import static org.zhupanovdm.bsl.grammar.BslDirective.AT_CLIENT;
-import static org.zhupanovdm.bsl.grammar.BslDirective.AT_SERVER;
-import static org.zhupanovdm.bsl.grammar.BslKeyword.*;
-import static org.zhupanovdm.bsl.grammar.BslPreprocessorInstruction.*;
-import static org.zhupanovdm.bsl.grammar.BslPunctuator.*;
-import static org.zhupanovdm.bsl.utils.BslGrammarUtils.group;
+import static org.zhupanovdm.bsl.api.BslDirective.AT_CLIENT;
+import static org.zhupanovdm.bsl.api.BslDirective.AT_SERVER;
+import static org.zhupanovdm.bsl.api.BslKeyword.*;
+import static org.zhupanovdm.bsl.api.BslPreprocessor.*;
+import static org.zhupanovdm.bsl.api.BslPunctuator.*;
+import static org.zhupanovdm.bsl.utils.BslGrammarUtils.wordGroup;
 import static org.zhupanovdm.bsl.utils.BslGrammarUtils.word;
 
 public enum BslGrammar implements GrammarRuleKey {
-    SPACING, SPACING_NO_LB, WHITESPACE,
+    SPACING, SPACING_NO_LB,
+
     KEYWORD,
 
     MODULE, BLOCK,
 
-    VAR_DEF, FUNC_DEF, PROC_DEF, LABEL_DEFINITION,
+    VAR_DEF, FUNC_DEF, PROC_DEF, LABEL_DEF,
 
     VARIABLE,
     SIGNATURE,
@@ -29,8 +29,10 @@ public enum BslGrammar implements GrammarRuleKey {
     LABEL,
 
     STATEMENT,
-    STATEMENT_NO_EMPTY,
     COMPOUND_STATEMENT,
+    EMPTY_STATEMENT,
+    STATEMENT_NO_EMPTY,
+
     ASSIGNMENT_STATEMENT,
     CALL_STATEMENT,
     IF_STATEMENT,
@@ -46,7 +48,6 @@ public enum BslGrammar implements GrammarRuleKey {
     TRY_STATEMENT,
     ADD_HANDLER_STATEMENT,
     REMOVE_HANDLER_STATEMENT,
-    EMPTY_STATEMENT,
 
     EXPRESSION,
     OR_EXPRESSION,
@@ -57,11 +58,11 @@ public enum BslGrammar implements GrammarRuleKey {
     MULTIPLICATIVE_EXPRESSION,
     UNARY_EXPRESSION,
     POSTFIX_EXPRESSION,
-    ASSIGNABLE_EXPRESSION,
-    CALLABLE_EXPRESSION,
     TERNARY_EXPRESSION,
     PRIMARY_EXPRESSION,
     NEW_EXPRESSION,
+    ASSIGNABLE_EXPRESSION,
+    CALLABLE_EXPRESSION,
 
     LOGIC_OPERATOR,
     RELATIONAL_OPERATOR,
@@ -75,47 +76,21 @@ public enum BslGrammar implements GrammarRuleKey {
     ASSIGNABLE_INDEX_POSTFIX, ASSIGNABLE_DEREFERENCE_POSTFIX, ASSIGNABLE_CALL_POSTFIX,
     CALLABLE_INDEX_POSTFIX, CALLABLE_DEREFERENCE_POSTFIX, CALLABLE_CALL_POSTFIX,
 
-    IDENTIFIER, IDENTIFIER_PART,
+    IDENTIFIER,
     FIELD,
     PRIMITIVE,
-    STRING, STRING_PART,
+    STRING, STRING_LITERAL,
     NUMBER,
     DATE,
 
     DIRECTIVE,
     PREPROCESSOR_INSTRUCTION, PP_CONDITION;
 
-    public static final String COMMENT_REGEXP = "//[^\\n\\r]*+";
-
-    public static final String NOSONAR_FLAG = "NOSONAR";
-
-    public static final String STRING_REGEXP = "\\\"(?:[^\\\"\\r\\n]|\\\"{2}|(?:[\\r\\n]\\s*\\|))*\\\"";
-    public static final String NUMBER_REGEXP = "[0-9]+(?:\\.(?:[0-9]++)?+)?";
-    public static final String DATE_REGEXP = "'(?:\\d{8}(?:\\d{6})?|\\d{4}\\.\\d{2}\\.\\d{2}(?: \\d{2}:\\d{2}:\\d{2})?)'";
-
-    private static final String LINE_TERMINATOR_REGEXP = "\\n\\r\\p{Zl}\\p{Zp}";
-    private static final String WHITESPACE_REGEXP = "\\t\\v\\f\\u0020\\u00A0\\uFEFF\\p{Zs}";
-
-    private static final String UNICODE_LETTER = "\\p{Lu}\\p{Ll}\\p{Lt}\\p{Lm}\\p{Lo}\\p{Nl}";
-    private static final String UNICODE_DIGIT = "\\p{Nd}";
-    private static final String IDENTIFIER_START_REGEXP = "(?:[_" + UNICODE_LETTER + "])";
-    private static final String IDENTIFIER_PART_REGEXP = "(?:" + IDENTIFIER_START_REGEXP + "|[" + UNICODE_DIGIT + "])";
-
     public static LexerlessGrammar createGrammar() {
         LexerlessGrammarBuilder b = LexerlessGrammarBuilder.create();
+        b.setRootRule(MODULE);
 
-        b.rule(WHITESPACE).is(b.regexp("[" + LINE_TERMINATOR_REGEXP + WHITESPACE_REGEXP + "]*+"));
-        b.rule(SPACING).is(
-                b.skippedTrivia(WHITESPACE),
-                b.zeroOrMore(b.commentTrivia(b.regexp(COMMENT_REGEXP)), b.skippedTrivia(WHITESPACE))
-        ).skip();
-        b.rule(SPACING_NO_LB).is(b.zeroOrMore(b.firstOf(
-                b.skippedTrivia(b.regexp("[\\s&&[^\n\r]]++")),
-                b.commentTrivia(b.regexp(COMMENT_REGEXP))
-        ))).skip();
-
-        b.rule(IDENTIFIER_PART).is(b.regexp(IDENTIFIER_PART_REGEXP));
-
+        lexical(b);
         module(b);
         punctuators(b);
         keywords(b);
@@ -126,9 +101,12 @@ public enum BslGrammar implements GrammarRuleKey {
         directives(b);
         preprocessor(b);
 
-        b.setRootRule(MODULE);
-
         return b.build();
+    }
+
+    private static void lexical(LexerlessGrammarBuilder b) {
+        b.rule(SPACING).is(whitespace(b), b.zeroOrMore(comment(b), whitespace(b))).skip();
+        b.rule(SPACING_NO_LB).is(b.zeroOrMore(b.firstOf(b.skippedTrivia(b.regexp("[\\s&&[^\n\r]]+")), comment(b)))).skip();
     }
 
     private static void module(LexerlessGrammarBuilder b) {
@@ -144,12 +122,12 @@ public enum BslGrammar implements GrammarRuleKey {
     }
 
     private static void literals(LexerlessGrammarBuilder b) {
-        b.rule(STRING).is(STRING_PART, b.zeroOrMore(STRING_PART));
-        b.rule(STRING_PART).is(SPACING, b.regexp(STRING_REGEXP));
+        b.rule(STRING).is(STRING_LITERAL, b.zeroOrMore(STRING_LITERAL));
+        b.rule(STRING_LITERAL).is(SPACING, b.regexp("\\\"(?:[^\\\"\\r\\n]|\\\"{2}|(?:[\\r\\n]\\s*\\|))*\\\""));
 
-        b.rule(NUMBER).is(SPACING, b.regexp(NUMBER_REGEXP));
+        b.rule(NUMBER).is(SPACING, b.regexp("[0-9]+(?:\\.(?:[0-9]++)?+)?"));
 
-        b.rule(DATE).is(SPACING, b.regexp(DATE_REGEXP));
+        b.rule(DATE).is(SPACING, b.regexp("'(?:\\d{8}(?:\\d{6})?|\\d{4}\\.\\d{2}\\.\\d{2}(?: \\d{2}:\\d{2}:\\d{2})?)'"));
     }
 
     private static void expressions(LexerlessGrammarBuilder b) {
@@ -197,8 +175,8 @@ public enum BslGrammar implements GrammarRuleKey {
 
         b.rule(PRIMARY_EXPRESSION).is(b.firstOf(IDENTIFIER, PRIMITIVE, b.sequence(LPAREN, EXPRESSION, RPAREN)));
 
-        b.rule(IDENTIFIER).is(SPACING, b.nextNot(KEYWORD), b.regexp(IDENTIFIER_START_REGEXP + IDENTIFIER_PART_REGEXP + "*+"));
-        b.rule(FIELD).is(SPACING, b.regexp(IDENTIFIER_START_REGEXP + IDENTIFIER_PART_REGEXP + "*+"));
+        b.rule(IDENTIFIER).is(SPACING, b.nextNot(KEYWORD), identifier(b));
+        b.rule(FIELD).is(SPACING, identifier(b));
         b.rule(PRIMITIVE).is(b.firstOf(UNDEFINED, NULL, TRUE, FALSE, STRING, NUMBER, DATE));
 
         b.rule(ASSIGNABLE_EXPRESSION).is(IDENTIFIER, b.optional(b.firstOf(ASSIGNABLE_INDEX_POSTFIX, ASSIGNABLE_DEREFERENCE_POSTFIX, ASSIGNABLE_CALL_POSTFIX)));
@@ -232,7 +210,7 @@ public enum BslGrammar implements GrammarRuleKey {
                 EXECUTE_STATEMENT,
                 ADD_HANDLER_STATEMENT,
                 REMOVE_HANDLER_STATEMENT,
-                LABEL_DEFINITION,
+                LABEL_DEF,
                 GOTO_STATEMENT,
                 EMPTY_STATEMENT)
         ).skipIfOneChild();
@@ -248,7 +226,6 @@ public enum BslGrammar implements GrammarRuleKey {
         b.rule(STATEMENT_NO_EMPTY).is(b.nextNot(EMPTY_STATEMENT), STATEMENT).skip();
         b.rule(ASSIGNMENT_STATEMENT).is(ASSIGNABLE_EXPRESSION, EQ, b.optional(AWAIT), EXPRESSION);
         b.rule(CALL_STATEMENT).is(b.optional(AWAIT), CALLABLE_EXPRESSION);
-        b.rule(AWAIT).is(SPACING, exactWord(b, AWAIT));
 
         b.rule(RETURN_STATEMENT).is(RETURN, b.optional(EXPRESSION));
 
@@ -289,22 +266,23 @@ public enum BslGrammar implements GrammarRuleKey {
         b.rule(EXECUTE_STATEMENT).is(EXECUTE, LPAREN, EXPRESSION, RPAREN);
 
         b.rule(ADD_HANDLER_STATEMENT).is(
-                b.sequence(SPACING, exactWord(b, "AddHandler", "ДобавитьОбработчик")),
+                b.sequence(SPACING, keyword(b, ADD_HANDLER)),
                 EXPRESSION, COMMA, EXPRESSION);
 
         b.rule(REMOVE_HANDLER_STATEMENT).is(
-                b.sequence(SPACING, exactWord(b, "RemoveHandler", "УдалитьОбработчик")),
+                b.sequence(SPACING, keyword(b, REMOVE_HANDLER)),
                 EXPRESSION, COMMA, EXPRESSION);
 
         b.rule(GOTO_STATEMENT).is(GOTO, LABEL);
     }
 
     private static void directives(LexerlessGrammarBuilder b) {
-        b.rule(DIRECTIVE).is(group(b, BslDirective.values(), w -> b.sequence(AMP, SPACING_NO_LB, exactWord(b, w))));
+        b.rule(DIRECTIVE).is(wordGroup(b, BslDirective.values(), w -> b.sequence(AMP, SPACING_NO_LB, keyword(b, w))));
     }
 
     private static void preprocessor(LexerlessGrammarBuilder b) {
-        b.rule(PREPROCESSOR_INSTRUCTION).is(group(b, BslPreprocessorInstruction.values(), w -> b.sequence(HASH, SPACING_NO_LB, exactWord(b, w))));
+        b.rule(PREPROCESSOR_INSTRUCTION).is(wordGroup(b, BslPreprocessor.values(),
+                        w -> b.sequence(HASH, SPACING_NO_LB, keyword(b, w))));
         b.rule(PP_CONDITION).is(b.optional(NOT), IDENTIFIER, b.zeroOrMore(b.firstOf(OR, AND), b.optional(NOT), IDENTIFIER));
     }
 
@@ -331,31 +309,45 @@ public enum BslGrammar implements GrammarRuleKey {
                 b.optional(BLOCK),
                 END_PROCEDURE);
         b.rule(SIGNATURE).is(IDENTIFIER, LPAREN, b.optional(PARAMETER, b.zeroOrMore(COMMA, PARAMETER)), RPAREN, b.optional(EXPORT));
-        b.rule(ASYNC).is(SPACING, exactWord(b, ASYNC));
 
         b.rule(PARAMETER).is(
                 b.optional(VAL), IDENTIFIER,
                 b.optional(b.sequence(EQ, PRIMITIVE)));
 
-        b.rule(LABEL_DEFINITION).is(LABEL, COLON);
-        b.rule(LABEL).is(TILDA, b.regexp(IDENTIFIER_START_REGEXP + IDENTIFIER_PART_REGEXP + "*+"));
+        b.rule(LABEL_DEF).is(LABEL, COLON);
+        b.rule(LABEL).is(TILDA, identifier(b));
     }
 
     private static void keywords(LexerlessGrammarBuilder b) {
-        b.rule(KEYWORD).is(group(b, BslKeyword.values(), w -> b.sequence(SPACING, exactWord(b, w))));
+        b.rule(KEYWORD).is(wordGroup(b, BslKeyword.keywords(), w -> b.sequence(SPACING, keyword(b, w))));
+
+        b.rule(ASYNC).is(SPACING, keyword(b, ASYNC));
+        b.rule(AWAIT).is(SPACING, keyword(b, AWAIT));
+
+        b.rule(ADD_HANDLER).is(SPACING, keyword(b, ADD_HANDLER));
+        b.rule(REMOVE_HANDLER).is(SPACING, keyword(b, REMOVE_HANDLER));
     }
 
     private static void punctuators(LexerlessGrammarBuilder b) {
-        for (BslPunctuator punctuator : BslPunctuator.values())
+        for (BslPunctuator punctuator : BslPunctuator.values()) {
             b.rule(punctuator).is(SPACING, punctuator.getValue());
+        }
     }
 
-    private static Object exactWord(LexerlessGrammarBuilder b, BslWord bslWord) {
-        return b.sequence(word(b, bslWord), b.nextNot(IDENTIFIER_PART));
+    private static Object keyword(LexerlessGrammarBuilder b, BslWord bslWord) {
+        return b.sequence(word(b, bslWord), b.nextNot(b.regexp("[\\p{javaJavaIdentifierPart}&&[^$]]")));
     }
 
-    private static Object exactWord(LexerlessGrammarBuilder b, String value, String valueRu) {
-        return b.sequence(word(b, value, valueRu), b.nextNot(IDENTIFIER_PART));
+    private static Object comment(LexerlessGrammarBuilder b) {
+        return b.commentTrivia(b.regexp("//[^\\n\\r]*+"));
+    }
+
+    private static Object identifier(LexerlessGrammarBuilder b) {
+        return b.regexp("[\\p{javaJavaIdentifierStart}&&[^$]]+[\\p{javaJavaIdentifierPart}&&[^$]]*+");
+    }
+
+    private static Object whitespace(LexerlessGrammarBuilder b) {
+        return b.skippedTrivia(b.regexp("[\\s]*+"));
     }
 
 }

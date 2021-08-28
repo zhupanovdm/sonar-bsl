@@ -1,23 +1,27 @@
-package org.zhupanovdm.bsl.parser;
+package org.zhupanovdm.bsl;
 
-import com.google.common.collect.ImmutableSet;
 import com.sonar.sslr.api.AstNode;
 import com.sonar.sslr.api.AstNodeType;
 import com.sonar.sslr.api.Token;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-public abstract class AstVisitor {
+public abstract class BslAstVisitor {
 
     private Set<AstNodeType> subscribedKinds = null;
 
     public abstract List<AstNodeType> subscribedTo();
 
     private Set<AstNodeType> subscribedKinds() {
+        /*
         if (subscribedKinds == null)
             subscribedKinds = ImmutableSet.copyOf(subscribedTo());
         return subscribedKinds;
+         */
+
+        return Collections.emptySet();
     }
 
     public void visitNode(AstNode node) {

@@ -4,7 +4,7 @@ import com.sonar.sslr.api.AstNode;
 import com.sonar.sslr.api.AstNodeType;
 import com.sonar.sslr.api.Token;
 import com.sonar.sslr.api.Trivia;
-import org.zhupanovdm.bsl.parser.AstVisitor;
+import org.zhupanovdm.bsl.BslAstVisitor;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Set;
 
 import static com.sonar.sslr.api.GenericTokenType.EOF;
-import static org.zhupanovdm.bsl.grammar.BslGrammar.NOSONAR_FLAG;
 
 public class LinesMetrics {
+    private static final String NOSONAR_FLAG = "NOSONAR";
 
     private final Set<Integer> linesOfCode = new HashSet<>();
     private final Set<Integer> linesOfComments = new HashSet<>();
@@ -36,7 +36,7 @@ public class LinesMetrics {
         return Collections.unmodifiableSet(linesNoSonar);
     }
 
-    private class TokenVisitor extends AstVisitor {
+    private class TokenVisitor extends BslAstVisitor {
         @Override
         public List<AstNodeType> subscribedTo() {
             return Collections.emptyList();

@@ -2,10 +2,10 @@ package org.zhupanovdm.bsl.grammar.preprocessor;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.grammar.BslGrammar;
+import org.zhupanovdm.bsl.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.grammar.BslGrammar.PP_CONDITION;
+import static org.zhupanovdm.bsl.BslGrammar.PP_CONDITION;
 
 public class PreprocessorConditionTest {
 
@@ -14,13 +14,13 @@ public class PreprocessorConditionTest {
     @Test
     public void test() {
         assertThat(g.rule(PP_CONDITION))
-                .matches("server")
-                .matches("not server")
-                .matches("server and client")
-                .matches("server or client")
-                .matches("not server and client")
-                .matches("not server and not client")
-                .notMatches("not not server")
+                .matches("Server")
+                .matches("Not Server")
+                .matches("Server And Client")
+                .matches("Server Or Client")
+                .matches("Not Server And Client")
+                .matches("Not Server And Not Client")
+                .notMatches("Not Not Server")
                 .notMatches("1 + 1")
                 .notMatches("");
     }

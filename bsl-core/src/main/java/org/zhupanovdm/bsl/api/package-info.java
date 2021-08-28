@@ -1,2 +1,2 @@
 @javax.annotation.ParametersAreNonnullByDefault
-package org.zhupanovdm.bsl.grammar;
+package org.zhupanovdm.bsl.api;

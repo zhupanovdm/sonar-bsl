@@ -2,10 +2,10 @@ package org.zhupanovdm.bsl.grammar.expressions;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.grammar.BslGrammar;
+import org.zhupanovdm.bsl.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.grammar.BslGrammar.*;
+import static org.zhupanovdm.bsl.BslGrammar.*;
 
 public class BinaryExpressionTest {
 
@@ -13,12 +13,12 @@ public class BinaryExpressionTest {
 
     @Test
     public void logic() {
-        assertThat(g.rule(OR_EXPRESSION)).matches("foo or bar");
-        assertThat(g.rule(AND_EXPRESSION)).matches("foo and bar");
+        assertThat(g.rule(OR_EXPRESSION)).matches("foo Or bar");
+        assertThat(g.rule(AND_EXPRESSION)).matches("foo And bar");
         assertThat(g.rule(NOT_EXPRESSION))
-                .matches("not foo")
-                .matches("not (not foo)")
-                .notMatches("not not foo");
+                .matches("Not foo")
+                .matches("Not (Not foo)")
+                .notMatches("Not Not foo");
     }
 
     @Test

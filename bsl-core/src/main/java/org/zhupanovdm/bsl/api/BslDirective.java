@@ -1,6 +1,4 @@
-package org.zhupanovdm.bsl.grammar;
-
-import com.sonar.sslr.api.AstNode;
+package org.zhupanovdm.bsl.api;
 
 public enum BslDirective implements BslWord {
     AT_CLIENT("НаКлиенте"),
@@ -9,20 +7,20 @@ public enum BslDirective implements BslWord {
     AT_CLIENT_AT_SERVER("НаКлиентеНаСервере"),
     AT_CLIENT_AT_SERVER_NO_CONTEXT("НаКлиентеНаСервереБезКонтекста");
 
-    private final String valueRu;
+    private final String valueAlt;
 
-    BslDirective(String valueRu) {
-        this.valueRu = valueRu;
+    BslDirective(String valueAlt) {
+        this.valueAlt = valueAlt;
     }
 
     @Override
     public String getValue() {
-        return BslWord.enumToValue(this);
+        return BslWord.toValue(this);
     }
 
     @Override
-    public String getValueRu() {
-        return valueRu;
+    public String getValueAlt() {
+        return valueAlt;
     }
 
     @Override
@@ -30,8 +28,4 @@ public enum BslDirective implements BslWord {
         return name();
     }
 
-    @Override
-    public boolean hasToBeSkippedFromAst(AstNode node) {
-        return false;
-    }
 }

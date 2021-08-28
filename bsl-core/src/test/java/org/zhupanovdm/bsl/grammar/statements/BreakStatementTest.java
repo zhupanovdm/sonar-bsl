@@ -2,10 +2,10 @@ package org.zhupanovdm.bsl.grammar.statements;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.grammar.BslGrammar;
+import org.zhupanovdm.bsl.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.grammar.BslGrammar.BREAK_STATEMENT;
+import static org.zhupanovdm.bsl.BslGrammar.BREAK_STATEMENT;
 
 public class BreakStatementTest {
 
@@ -13,7 +13,8 @@ public class BreakStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(BREAK_STATEMENT)).matches("break");
+        assertThat(g.rule(BREAK_STATEMENT))
+                .matches("Break");
     }
 
 }

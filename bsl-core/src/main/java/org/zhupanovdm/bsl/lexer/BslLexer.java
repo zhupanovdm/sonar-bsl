@@ -5,17 +5,13 @@ import com.sonar.sslr.impl.Lexer;
 import com.sonar.sslr.impl.channel.BlackHoleChannel;
 import com.sonar.sslr.impl.channel.PunctuatorChannel;
 import com.sonar.sslr.impl.channel.UnknownCharacterChannel;
-import org.zhupanovdm.bsl.grammar.BslPunctuator;
+import org.zhupanovdm.bsl.api.BslKeyword;
+import org.zhupanovdm.bsl.api.BslPunctuator;
 
 import java.nio.charset.Charset;
 
-import static com.sonar.sslr.api.GenericTokenType.CONSTANT;
-import static com.sonar.sslr.api.GenericTokenType.LITERAL;
-import static com.sonar.sslr.impl.channel.RegexpChannelBuilder.commentRegexp;
-import static com.sonar.sslr.impl.channel.RegexpChannelBuilder.regexp;
-import static org.zhupanovdm.bsl.grammar.BslGrammar.*;
-import static org.zhupanovdm.bsl.grammar.BslPunctuator.AMP;
-import static org.zhupanovdm.bsl.grammar.BslPunctuator.HASH;
+import static org.zhupanovdm.bsl.api.BslPunctuator.AMP;
+import static org.zhupanovdm.bsl.api.BslPunctuator.HASH;
 
 public final class BslLexer {
 
@@ -28,6 +24,7 @@ public final class BslLexer {
 
                 .withChannel(new BlackHoleChannel("\\s++"))
 
+                /*
                 // Comments
                 .withChannel(commentRegexp(COMMENT_REGEXP))
 
@@ -35,6 +32,7 @@ public final class BslLexer {
                 .withChannel(regexp(LITERAL, STRING_REGEXP))
                 .withChannel(regexp(CONSTANT, NUMBER_REGEXP))
                 .withChannel(regexp(CONSTANT, DATE_REGEXP))
+                 */
 
                 .withChannel(new BslIdentifierAndKeywordChannel())
 
@@ -52,6 +50,21 @@ public final class BslLexer {
                 result[i++] = tokenType;
         }
         return result;
+    }
+
+    public static String[] keywords() {
+        BslKeyword[] words = BslKeyword.values();
+        String[] keywordsValue = new String[words.length * 2];
+        for (int i = 0; i < words.length; i++) {
+            String value = words[i].getValue().toUpperCase();
+            keywordsValue[2 * i] = value;
+            if (words[i].getValueAlt() == null) {
+                keywordsValue[2 * i + 1] = value;
+            } else {
+                keywordsValue[2 * i + 1] = words[i].getValueAlt().toUpperCase();
+            }
+        }
+        return keywordsValue;
     }
 
 

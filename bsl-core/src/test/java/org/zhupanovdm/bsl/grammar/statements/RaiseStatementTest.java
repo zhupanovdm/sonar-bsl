@@ -2,10 +2,10 @@ package org.zhupanovdm.bsl.grammar.statements;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.grammar.BslGrammar;
+import org.zhupanovdm.bsl.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.grammar.BslGrammar.RAISE_STATEMENT;
+import static org.zhupanovdm.bsl.BslGrammar.RAISE_STATEMENT;
 
 public class RaiseStatementTest {
 
@@ -13,7 +13,9 @@ public class RaiseStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(RAISE_STATEMENT)).matches("raise expr1");
+        assertThat(g.rule(RAISE_STATEMENT))
+                .matches("Raise expr1")
+                .notMatches("Raise");
     }
 
 }

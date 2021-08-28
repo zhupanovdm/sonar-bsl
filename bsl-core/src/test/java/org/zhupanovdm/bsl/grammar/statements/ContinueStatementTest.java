@@ -2,10 +2,10 @@ package org.zhupanovdm.bsl.grammar.statements;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.grammar.BslGrammar;
+import org.zhupanovdm.bsl.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.grammar.BslGrammar.CONTINUE_STATEMENT;
+import static org.zhupanovdm.bsl.BslGrammar.CONTINUE_STATEMENT;
 
 public class ContinueStatementTest {
 
@@ -13,7 +13,8 @@ public class ContinueStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(CONTINUE_STATEMENT)).matches("continue");
+        assertThat(g.rule(CONTINUE_STATEMENT))
+                .matches("Continue");
     }
 
 }

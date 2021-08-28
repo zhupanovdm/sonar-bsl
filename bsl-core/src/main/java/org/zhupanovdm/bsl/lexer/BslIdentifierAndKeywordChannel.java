@@ -5,7 +5,8 @@ import com.sonar.sslr.api.TokenType;
 import com.sonar.sslr.impl.Lexer;
 import org.sonar.sslr.channel.Channel;
 import org.sonar.sslr.channel.CodeReader;
-import org.zhupanovdm.bsl.grammar.BslKeyword;
+import org.zhupanovdm.bsl.api.BslWord;
+import org.zhupanovdm.bsl.api.BslKeyword;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,9 +15,7 @@ import java.util.regex.Pattern;
 
 import static com.sonar.sslr.api.GenericTokenType.CONSTANT;
 import static com.sonar.sslr.api.GenericTokenType.IDENTIFIER;
-import static org.zhupanovdm.bsl.grammar.BslAsync.ASYNC;
-import static org.zhupanovdm.bsl.grammar.BslAsync.AWAIT;
-import static org.zhupanovdm.bsl.grammar.BslKeyword.*;
+import static org.zhupanovdm.bsl.api.BslKeyword.*;
 
 public class BslIdentifierAndKeywordChannel extends Channel<Lexer> {
 
@@ -26,7 +25,7 @@ public class BslIdentifierAndKeywordChannel extends Channel<Lexer> {
     private final Token.Builder tokenBuilder = Token.builder();
 
     public BslIdentifierAndKeywordChannel() {
-        for (BslKeyword keyword : BslKeyword.values()) {
+        for (BslWord keyword : BslKeyword.keywords()) {
             TokenType type = keyword;
             if (keyword.equals(TRUE) ||
                     keyword.equals(FALSE) ||
@@ -34,14 +33,14 @@ public class BslIdentifierAndKeywordChannel extends Channel<Lexer> {
                     keyword.equals(NULL))
                 type = CONSTANT;
             tokenMap.put(keyword.getValue().toUpperCase(), type);
-            tokenMap.put(keyword.getValueRu().toUpperCase(), type);
+            tokenMap.put(keyword.getValueAlt().toUpperCase(), type);
         }
 
         tokenMap.put(ASYNC.getValue().toUpperCase(), ASYNC);
-        tokenMap.put(ASYNC.getValueRu().toUpperCase(), ASYNC);
+        tokenMap.put(ASYNC.getValueAlt().toUpperCase(), ASYNC);
 
         tokenMap.put(AWAIT.getValue().toUpperCase(), AWAIT);
-        tokenMap.put(AWAIT.getValueRu().toUpperCase(), AWAIT);
+        tokenMap.put(AWAIT.getValueAlt().toUpperCase(), AWAIT);
     }
 
     @Override

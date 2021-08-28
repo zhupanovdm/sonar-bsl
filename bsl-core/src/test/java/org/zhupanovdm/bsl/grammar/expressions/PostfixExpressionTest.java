@@ -2,10 +2,10 @@ package org.zhupanovdm.bsl.grammar.expressions;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.grammar.BslGrammar;
+import org.zhupanovdm.bsl.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.grammar.BslGrammar.*;
+import static org.zhupanovdm.bsl.BslGrammar.*;
 
 public class PostfixExpressionTest {
 
@@ -46,7 +46,7 @@ public class PostfixExpressionTest {
                 .matches("foo.bar")
                 .matches("foo.bar()")
                 .matches("foo.bar()")
-                .matches("Запрос.Выполнить()")
+                .matches("запрос.выполнить()")
 
                 .matches("foo().bar[0]")
                 .matches("foo().bar")

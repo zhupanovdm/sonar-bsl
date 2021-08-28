@@ -1,14 +1,14 @@
 package org.zhupanovdm.bsl.grammar.preprocessor;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.grammar.BslGrammar;
-import org.zhupanovdm.bsl.grammar.BslPreprocessorInstruction;
+import org.zhupanovdm.bsl.api.BslPreprocessor;
+import org.zhupanovdm.bsl.BslGrammar;
 
-import static org.fest.assertions.Assertions.assertThat;
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.grammar.BslGrammar.PREPROCESSOR_INSTRUCTION;
-import static org.zhupanovdm.bsl.grammar.BslPreprocessorInstruction.*;
+import static org.zhupanovdm.bsl.api.BslPreprocessor.*;
+import static org.zhupanovdm.bsl.BslGrammar.PREPROCESSOR_INSTRUCTION;
 
 public class PreprocessorInstructionTest {
 
@@ -17,26 +17,26 @@ public class PreprocessorInstructionTest {
     @Test
     public void instruction() {
         assertThat(g.rule(PREPROCESSOR_INSTRUCTION))
-                .matches("#if")
-                .matches("#elsif")
-                .matches("#endif")
-                .matches("#region")
-                .matches("#endregion");
+                .matches("#If")
+                .matches("#ElsIf")
+                .matches("#EndIf")
+                .matches("#Region")
+                .matches("#EndRegion");
 
         assertThat(g.rule(PREPROCESSOR_INSTRUCTION))
-                .matches("# if")
-                .notMatches("#\nif");
+                .matches("# If")
+                .notMatches("#\nIf");
     }
 
     @Test
     public void bilingual() {
-        assertThat(g.rule(PP_IF)).matches("#if").matches("#Если");
-        assertThat(g.rule(PP_ELSIF)).matches("#elsif").matches("#ИначеЕсли");
-        assertThat(g.rule(PP_END_IF)).matches("#endif").matches("#КонецЕсли");
-        assertThat(g.rule(PP_REGION)).matches("#region").matches("#Область");
-        assertThat(g.rule(PP_END_REGION)).matches("#endregion").matches("#КонецОбласти");
+        assertThat(g.rule(PP_IF)).matches("#If").matches("#Если");
+        assertThat(g.rule(PP_ELSIF)).matches("#ElsIf").matches("#ИначеЕсли");
+        assertThat(g.rule(PP_END_IF)).matches("#EndIf").matches("#КонецЕсли");
+        assertThat(g.rule(PP_REGION)).matches("#Region").matches("#Область");
+        assertThat(g.rule(PP_END_REGION)).matches("#EndRegion").matches("#КонецОбласти");
 
-        assertThat(BslPreprocessorInstruction.values()).hasSize(5);
+        Assertions.assertThat(BslPreprocessor.values()).hasSize(5);
     }
 
 }

@@ -2,10 +2,10 @@ package org.zhupanovdm.bsl.grammar.statements;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.grammar.BslGrammar;
+import org.zhupanovdm.bsl.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.grammar.BslGrammar.GOTO_STATEMENT;
+import static org.zhupanovdm.bsl.BslGrammar.GOTO_STATEMENT;
 
 public class GotoStatementTest {
 
@@ -13,7 +13,10 @@ public class GotoStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(GOTO_STATEMENT)).matches("goto ~label");
+        assertThat(g.rule(GOTO_STATEMENT))
+                .matches("Goto ~label")
+                .notMatches("Goto label")
+                .notMatches("Goto");
     }
 
 }

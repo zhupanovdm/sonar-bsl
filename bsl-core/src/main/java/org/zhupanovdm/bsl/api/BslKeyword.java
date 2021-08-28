@@ -1,8 +1,8 @@
-package org.zhupanovdm.bsl.grammar;
-
-import com.sonar.sslr.api.AstNode;
+package org.zhupanovdm.bsl.api;
 
 import javax.annotation.Nullable;
+import java.util.LinkedList;
+import java.util.List;
 
 public enum BslKeyword implements BslWord {
     IF("Если"),
@@ -40,16 +40,24 @@ public enum BslKeyword implements BslWord {
     TRUE("Истина"),
     FALSE("Ложь"),
     UNDEFINED("Неопределено"),
-    NULL;
+    NULL(null),
 
-    private final String valueRu;
+    ASYNC("Асинх", true),
+    AWAIT("Ждать", true),
 
-    BslKeyword() {
-        this(null);
+    ADD_HANDLER("ДобавитьОбработчик", true),
+    REMOVE_HANDLER("УдалитьОбработчик", true);
+
+    private final String valueAlt;
+    private final boolean syntactic;
+
+    BslKeyword(@Nullable String valueAlt) {
+        this(valueAlt, false);
     }
 
-    BslKeyword(@Nullable String valueRu) {
-        this.valueRu = valueRu;
+    BslKeyword(@Nullable String valueAlt, boolean syntactic) {
+        this.valueAlt = valueAlt;
+        this.syntactic = syntactic;
     }
 
     @Override
@@ -59,16 +67,26 @@ public enum BslKeyword implements BslWord {
 
     @Override
     public String getValue() {
-        return BslWord.enumToValue(this);
+        return BslWord.toValue(this);
     }
 
     @Override
-    public String getValueRu() {
-        return valueRu;
+    public String getValueAlt() {
+        return valueAlt;
     }
 
-    @Override
-    public boolean hasToBeSkippedFromAst(AstNode node) {
-        return false;
+    public boolean isSyntactic() {
+        return syntactic;
     }
+
+    public static BslKeyword[] keywords() {
+        List<BslKeyword> list = new LinkedList<>();
+        for (BslKeyword keyword : values()) {
+            if (!keyword.isSyntactic()) {
+                list.add(keyword);
+            }
+        }
+        return list.toArray(new BslKeyword[0]);
+    }
+
 }

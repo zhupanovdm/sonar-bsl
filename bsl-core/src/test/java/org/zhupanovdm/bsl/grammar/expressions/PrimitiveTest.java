@@ -2,10 +2,10 @@ package org.zhupanovdm.bsl.grammar.expressions;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.grammar.BslGrammar;
+import org.zhupanovdm.bsl.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.grammar.BslGrammar.PRIMITIVE;
+import static org.zhupanovdm.bsl.BslGrammar.PRIMITIVE;
 
 public class PrimitiveTest {
 
@@ -14,10 +14,10 @@ public class PrimitiveTest {
     @Test
     public void primitive() {
         assertThat(g.rule(PRIMITIVE))
-                .matches("undefined")
-                .matches("null")
-                .matches("true")
-                .matches("false")
+                .matches("Undefined")
+                .matches("Null")
+                .matches("True")
+                .matches("False")
                 .matches("\"\"")
                 .matches("123")
                 .matches("'00010101'")

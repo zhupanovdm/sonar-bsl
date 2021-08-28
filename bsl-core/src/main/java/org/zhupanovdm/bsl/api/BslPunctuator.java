@@ -1,4 +1,4 @@
-package org.zhupanovdm.bsl.grammar;
+package org.zhupanovdm.bsl.api;
 
 import com.sonar.sslr.api.AstNode;
 import com.sonar.sslr.api.TokenType;

@@ -1,9 +1,8 @@
-package org.zhupanovdm.bsl.parser;
+package org.zhupanovdm.bsl;
 
 import com.sonar.sslr.impl.Parser;
 import org.sonar.sslr.parser.LexerlessGrammar;
 import org.sonar.sslr.parser.ParserAdapter;
-import org.zhupanovdm.bsl.grammar.BslGrammar;
 
 import java.nio.charset.Charset;
 

@@ -5,6 +5,6 @@ import com.sonar.sslr.api.AstNode;
 public class ComplexityMetricsStub {
     public static int complexity(AstNode tree) {
         // TODO: implementation
-        return 0;
+        return tree.getDescendants().size();
     }
 }

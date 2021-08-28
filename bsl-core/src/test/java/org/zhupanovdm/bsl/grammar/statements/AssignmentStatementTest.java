@@ -2,10 +2,10 @@ package org.zhupanovdm.bsl.grammar.statements;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.grammar.BslGrammar;
+import org.zhupanovdm.bsl.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.grammar.BslGrammar.ASSIGNMENT_STATEMENT;
+import static org.zhupanovdm.bsl.BslGrammar.ASSIGNMENT_STATEMENT;
 
 public class AssignmentStatementTest {
 
@@ -23,7 +23,7 @@ public class AssignmentStatementTest {
                 .notMatches("1 = b")
                 .notMatches("null = 1")
                 .notMatches("a + b = 1")
-                .notMatches("new array = 1")
+                .notMatches("New Array = 1")
                 .notMatches("?(1, 2, 3) = a");
     }
 

@@ -1,12 +1,14 @@
 package org.zhupanovdm.bsl.grammar;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
+import org.zhupanovdm.bsl.BslGrammar;
+import org.zhupanovdm.bsl.api.BslDirective;
 
-import static org.fest.assertions.Assertions.assertThat;
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.grammar.BslDirective.*;
-import static org.zhupanovdm.bsl.grammar.BslGrammar.DIRECTIVE;
+import static org.zhupanovdm.bsl.api.BslDirective.*;
+import static org.zhupanovdm.bsl.BslGrammar.DIRECTIVE;
 
 public class DirectiveTest {
 
@@ -34,7 +36,7 @@ public class DirectiveTest {
         assertThat(g.rule(AT_CLIENT_AT_SERVER)).matches("&AtClientAtServer").matches("&НаКлиентеНаСервере");
         assertThat(g.rule(AT_CLIENT_AT_SERVER_NO_CONTEXT)).matches("&AtClientAtServerNoContext").matches("&НаКлиентеНаСервереБезКонтекста");
 
-        assertThat(BslDirective.values()).hasSize(5);
+        Assertions.assertThat(BslDirective.values()).hasSize(5);
     }
 
 }

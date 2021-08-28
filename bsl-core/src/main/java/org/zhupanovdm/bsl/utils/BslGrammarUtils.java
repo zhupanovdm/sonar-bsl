@@ -1,8 +1,9 @@
 package org.zhupanovdm.bsl.utils;
 
 import org.sonar.sslr.grammar.LexerlessGrammarBuilder;
-import org.zhupanovdm.bsl.grammar.BslWord;
+import org.zhupanovdm.bsl.api.BslWord;
 
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 
@@ -11,30 +12,26 @@ public final class BslGrammarUtils {
     private BslGrammarUtils() {
     }
 
-    public static Object group(LexerlessGrammarBuilder b, BslWord[] words, Function<BslWord, Object> ruleMapper) {
-        if (words.length == 0)
+    public static Object wordGroup(LexerlessGrammarBuilder b, BslWord[] words, Function<BslWord, Object> ruleMapper) {
+        if (words.length == 0) {
             throw new NoSuchElementException("No words are passed");
-
-        Object[] rest = new Object[Math.max(words.length - 2, 0)];
-        for (int i = 0; i < words.length; i++) {
-            BslWord word = words[i];
-            b.rule(word).is(ruleMapper.apply(word));
-            if (i > 1)
-                rest[i - 2] = word;
         }
 
-        if (words.length == 1)
-            return b.sequence(words[0], rest);
+        for (BslWord word : words) {
+            b.rule(word).is(ruleMapper.apply(word));
+        }
 
-        return b.firstOf(words[0], words[1], rest);
+        if (words.length == 1) {
+            return words[0];
+        } else if (words.length == 2) {
+            return b.firstOf(words[0], words[1]);
+        }
+
+        return b.firstOf(words[0], words[1], (Object[]) Arrays.copyOfRange(words, 2, words.length));
     }
 
-    public static Object word(LexerlessGrammarBuilder b, BslWord word) {
-        return word(b, word.getValue(), word.getValueRu());
-    }
-
-    public static Object word(LexerlessGrammarBuilder b, String value, String valueRu) {
-        return b.regexp(caseInsensitiveRegexp(value, valueRu));
+    public static Object word(LexerlessGrammarBuilder b, BslWord w) {
+        return b.regexp(caseInsensitiveRegexp(w.getValue(), w.getValueAlt()));
     }
 
     private static String caseInsensitiveRegexp(String value, String valueRu) {
