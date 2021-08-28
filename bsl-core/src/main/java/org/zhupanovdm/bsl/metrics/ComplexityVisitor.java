@@ -2,7 +2,7 @@ package org.zhupanovdm.bsl.metrics;
 
 import com.sonar.sslr.api.AstNode;
 import com.sonar.sslr.api.AstNodeType;
-import org.zhupanovdm.bsl.BslAstVisitor;
+import com.sonar.sslr.api.AstVisitor;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -10,7 +10,7 @@ import java.util.List;
 
 import static org.zhupanovdm.bsl.BslGrammar.*;
 
-public class ComplexityVisitor extends BslAstVisitor {
+public class ComplexityVisitor implements AstVisitor {
 
     private int complexity;
 
@@ -19,7 +19,7 @@ public class ComplexityVisitor extends BslAstVisitor {
     }
 
     @Override
-    public List<AstNodeType> subscribedTo() {
+    public List<AstNodeType> getAstNodeTypesToVisit() {
         return Arrays.asList(
                 FUNC_DEF,
                 PROC_DEF,
@@ -37,12 +37,21 @@ public class ComplexityVisitor extends BslAstVisitor {
     }
 
     @Override
-    public void visitFile(@Nullable AstNode node) {
+    public void visitFile(@Nullable AstNode ast) {
         complexity = 0;
     }
 
     @Override
-    public void visitNode(AstNode node) {
+    public void leaveFile(@Nullable AstNode ast) {
+    }
+
+    @Override
+    public void visitNode(AstNode ast) {
         complexity++;
     }
+
+    @Override
+    public void leaveNode(AstNode ast) {
+    }
+
 }

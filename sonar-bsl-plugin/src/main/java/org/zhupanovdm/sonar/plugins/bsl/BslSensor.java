@@ -3,6 +3,7 @@ package org.zhupanovdm.sonar.plugins.bsl;
 import com.sonar.sslr.api.AstNode;
 import com.sonar.sslr.api.RecognitionException;
 import com.sonar.sslr.impl.Parser;
+import com.sonar.sslr.impl.ast.AstWalker;
 import org.sonar.api.batch.fs.FilePredicate;
 import org.sonar.api.batch.fs.FilePredicates;
 import org.sonar.api.batch.fs.FileSystem;
@@ -97,10 +98,8 @@ public class BslSensor implements Sensor {
 
     private void saveMeasures(SensorContext context, InputFile file, AstNode tree) {
         FileLinesVisitor fileLinesMetrics = new FileLinesVisitor();
-        fileLinesMetrics.scanFile(tree);
-
         ComplexityVisitor complexityMetrics = new ComplexityVisitor();
-        complexityMetrics.scanFile(tree);
+        new AstWalker(fileLinesMetrics, complexityMetrics).walkAndVisit(tree);
 
         ModuleMetrics moduleMetrics = new ModuleMetrics(tree);
 

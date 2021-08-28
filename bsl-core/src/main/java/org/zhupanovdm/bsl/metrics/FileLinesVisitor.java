@@ -1,10 +1,6 @@
 package org.zhupanovdm.bsl.metrics;
 
-import com.sonar.sslr.api.AstNode;
-import com.sonar.sslr.api.AstNodeType;
-import com.sonar.sslr.api.Token;
-import com.sonar.sslr.api.Trivia;
-import org.zhupanovdm.bsl.BslAstVisitor;
+import com.sonar.sslr.api.*;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -15,7 +11,8 @@ import java.util.Set;
 import static com.sonar.sslr.api.GenericTokenType.EOF;
 import static org.zhupanovdm.bsl.utils.BslCommentAnalyser.*;
 
-public class FileLinesVisitor extends BslAstVisitor {
+public class FileLinesVisitor implements AstAndTokenVisitor {
+
     private final Set<Integer> linesOfCode = new HashSet<>();
     private final Set<Integer> linesOfComments = new HashSet<>();
     private final Set<Integer> linesNoSonar = new HashSet<>();
@@ -33,15 +30,27 @@ public class FileLinesVisitor extends BslAstVisitor {
     }
 
     @Override
-    public List<AstNodeType> subscribedTo() {
+    public List<AstNodeType> getAstNodeTypesToVisit() {
         return Collections.emptyList();
     }
 
     @Override
-    public void visitFile(@Nullable AstNode node) {
+    public void visitFile(@Nullable AstNode ast) {
         linesOfCode.clear();
         linesOfComments.clear();
         linesNoSonar.clear();
+    }
+
+    @Override
+    public void leaveFile(@Nullable AstNode ast) {
+    }
+
+    @Override
+    public void visitNode(AstNode ast) {
+    }
+
+    @Override
+    public void leaveNode(AstNode ast) {
     }
 
     @Override
