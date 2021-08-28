@@ -9,7 +9,7 @@ import static org.zhupanovdm.bsl.BslGrammar.BLOCK;
 
 public class BlockTest {
 
-    private final LexerlessGrammar g = BslGrammar.createGrammar();
+    private final LexerlessGrammar g = BslGrammar.create();
 
     @Test
     public void block() {

@@ -9,7 +9,7 @@ import static org.zhupanovdm.bsl.BslGrammar.SPACING_NO_LB;
 
 public class SpacingNoLineBreakTest {
 
-    private final LexerlessGrammar g = BslGrammar.createGrammar();
+    private final LexerlessGrammar g = BslGrammar.create();
 
     @Test
     public void test() {

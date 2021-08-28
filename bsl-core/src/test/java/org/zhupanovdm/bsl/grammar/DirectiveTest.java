@@ -12,7 +12,7 @@ import static org.zhupanovdm.bsl.BslGrammar.DIRECTIVE;
 
 public class DirectiveTest {
 
-    private final LexerlessGrammar g = BslGrammar.createGrammar();
+    private final LexerlessGrammar g = BslGrammar.create();
 
     @Test
     public void directive() {

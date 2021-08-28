@@ -10,7 +10,7 @@ import static org.zhupanovdm.bsl.BslGrammar.LABEL_DEF;
 
 public class LabelDefinitionTest {
 
-    private final LexerlessGrammar g = BslGrammar.createGrammar();
+    private final LexerlessGrammar g = BslGrammar.create();
 
     @Test
     public void label() {

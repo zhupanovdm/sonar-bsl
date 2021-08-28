@@ -9,7 +9,7 @@ import static org.zhupanovdm.bsl.BslGrammar.PRIMARY_EXPRESSION;
 
 public class PrimaryExpressionTest {
 
-    private final LexerlessGrammar g = BslGrammar.createGrammar();
+    private final LexerlessGrammar g = BslGrammar.create();
 
     @Test
     public void primaryExpression() {

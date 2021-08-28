@@ -12,7 +12,7 @@ import static org.zhupanovdm.bsl.BslGrammar.PREPROCESSOR_INSTRUCTION;
 
 public class PreprocessorInstructionTest {
 
-    private final LexerlessGrammar g = BslGrammar.createGrammar();
+    private final LexerlessGrammar g = BslGrammar.create();
 
     @Test
     public void instruction() {

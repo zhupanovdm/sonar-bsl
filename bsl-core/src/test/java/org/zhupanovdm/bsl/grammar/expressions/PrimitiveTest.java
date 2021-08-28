@@ -9,7 +9,7 @@ import static org.zhupanovdm.bsl.BslGrammar.PRIMITIVE;
 
 public class PrimitiveTest {
 
-    private final LexerlessGrammar g = BslGrammar.createGrammar();
+    private final LexerlessGrammar g = BslGrammar.create();
 
     @Test
     public void primitive() {

@@ -4,24 +4,28 @@ import com.sonar.sslr.api.AstNode;
 import com.sonar.sslr.api.AstNodeType;
 import com.sonar.sslr.api.Token;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import javax.annotation.Nullable;
+import java.util.*;
 
 public abstract class BslAstVisitor {
+
+    private AstNode rootTree;
 
     private Set<AstNodeType> subscribedKinds = null;
 
     public abstract List<AstNodeType> subscribedTo();
 
     private Set<AstNodeType> subscribedKinds() {
-        /*
-        if (subscribedKinds == null)
-            subscribedKinds = ImmutableSet.copyOf(subscribedTo());
+        if (subscribedKinds == null) {
+            subscribedKinds = Collections.unmodifiableSet(new HashSet<>(subscribedTo()));
+        }
         return subscribedKinds;
-         */
+    }
 
-        return Collections.emptySet();
+    public void visitFile(@Nullable AstNode node) {
+    }
+
+    public void leaveFile(@Nullable AstNode node) {
     }
 
     public void visitNode(AstNode node) {
@@ -33,21 +37,36 @@ public abstract class BslAstVisitor {
     public void visitToken(Token token) {
     }
 
-    public void scan(AstNode node) {
+    public AstNode getRootTree() {
+        return rootTree;
+    }
+
+    public void scanFile(AstNode node) {
+        rootTree = node;
+        visitFile(node);
+        if (node != null) {
+            scanNode(node);
+        }
+        leaveFile(node);
+    }
+
+    public void scanNode(AstNode node) {
         boolean isSubscribedType = subscribedKinds().contains(node.getType());
 
-        if (isSubscribedType)
+        if (isSubscribedType) {
             visitNode(node);
+        }
 
         List<AstNode> children = node.getChildren();
         if (children.isEmpty()) {
             node.getTokens().forEach(this::visitToken);
         } else {
-            children.forEach(this::scan);
+            children.forEach(this::scanNode);
         }
 
-        if (isSubscribedType)
+        if (isSubscribedType) {
             leaveNode(node);
+        }
     }
 
 }

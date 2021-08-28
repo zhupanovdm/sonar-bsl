@@ -9,7 +9,7 @@ import static org.zhupanovdm.bsl.BslGrammar.ADD_HANDLER_STATEMENT;
 
 public class AddHandlerStatementTest {
 
-    private final LexerlessGrammar g = BslGrammar.createGrammar();
+    private final LexerlessGrammar g = BslGrammar.create();
 
     @Test
     public void test() {

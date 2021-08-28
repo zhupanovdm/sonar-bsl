@@ -9,7 +9,7 @@ import static org.zhupanovdm.bsl.BslGrammar.PP_CONDITION;
 
 public class PreprocessorConditionTest {
 
-    private final LexerlessGrammar g = BslGrammar.createGrammar();
+    private final LexerlessGrammar g = BslGrammar.create();
 
     @Test
     public void test() {

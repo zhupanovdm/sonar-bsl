@@ -10,7 +10,7 @@ import static org.zhupanovdm.bsl.BslGrammar.VAR_DEF;
 
 public class VarDefinitionTest {
 
-    private final LexerlessGrammar g = BslGrammar.createGrammar();
+    private final LexerlessGrammar g = BslGrammar.create();
 
     @Test
     public void definition() {

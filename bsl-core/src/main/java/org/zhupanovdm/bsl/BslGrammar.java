@@ -86,7 +86,7 @@ public enum BslGrammar implements GrammarRuleKey {
     DIRECTIVE,
     PREPROCESSOR_INSTRUCTION, PP_CONDITION;
 
-    public static LexerlessGrammar createGrammar() {
+    public static LexerlessGrammar create() {
         LexerlessGrammarBuilder b = LexerlessGrammarBuilder.create();
         b.setRootRule(MODULE);
 

@@ -6,23 +6,19 @@ import com.sonar.sslr.api.Token;
 import com.sonar.sslr.api.Trivia;
 import org.zhupanovdm.bsl.BslAstVisitor;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static com.sonar.sslr.api.GenericTokenType.EOF;
+import static org.zhupanovdm.bsl.utils.BslCommentAnalyser.*;
 
-public class LinesMetrics {
-    private static final String NOSONAR_FLAG = "NOSONAR";
-
+public class FileLinesVisitor extends BslAstVisitor {
     private final Set<Integer> linesOfCode = new HashSet<>();
     private final Set<Integer> linesOfComments = new HashSet<>();
     private final Set<Integer> linesNoSonar = new HashSet<>();
-
-    public LinesMetrics(AstNode tree) {
-        new TokenVisitor().scan(tree);
-    }
 
     public Set<Integer> getLinesOfCode() {
         return Collections.unmodifiableSet(linesOfCode);
@@ -36,36 +32,35 @@ public class LinesMetrics {
         return Collections.unmodifiableSet(linesNoSonar);
     }
 
-    private class TokenVisitor extends BslAstVisitor {
-        @Override
-        public List<AstNodeType> subscribedTo() {
-            return Collections.emptyList();
+    @Override
+    public List<AstNodeType> subscribedTo() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void visitFile(@Nullable AstNode node) {
+        linesOfCode.clear();
+        linesOfComments.clear();
+        linesNoSonar.clear();
+    }
+
+    @Override
+    public void visitToken(Token token) {
+        if (!token.getType().equals(EOF)) {
+            linesOfCode.add(token.getLine());
         }
 
-        @Override
-        public void visitToken(Token token) {
-            if (!token.getType().equals(EOF))
-                linesOfCode.add(token.getLine());
-
-            for (Trivia trivia : token.getTrivia()) {
-                if (!trivia.isComment())
-                    continue;
-                String content = trivia.getToken().getOriginalValue().substring(2);
+        for (Trivia trivia : token.getTrivia()) {
+            if (trivia.isComment()) {
+                String content = getContents(trivia.getToken().getOriginalValue());
                 int line = trivia.getToken().getLine();
-                if (content.contains(NOSONAR_FLAG)) {
+                if (isNoSonar(content)) {
                     linesOfComments.remove(line);
                     linesNoSonar.add(line);
-                } else if (!isBlank(content)) {
+                } else if (!isBlank(content) && !linesNoSonar.contains(line)) {
                     linesOfComments.add(line);
                 }
             }
-        }
-
-        private boolean isBlank(String line) {
-            for (int i = 0; i < line.length(); i++)
-                if (Character.isLetterOrDigit(line.charAt(i)))
-                    return false;
-            return true;
         }
     }
 

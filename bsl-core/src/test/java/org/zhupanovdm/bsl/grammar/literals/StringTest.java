@@ -9,7 +9,7 @@ import static org.zhupanovdm.bsl.BslGrammar.STRING;
 
 public class StringTest {
 
-    private final LexerlessGrammar g = BslGrammar.createGrammar();
+    private final LexerlessGrammar g = BslGrammar.create();
 
     @Test
     public void basic() {

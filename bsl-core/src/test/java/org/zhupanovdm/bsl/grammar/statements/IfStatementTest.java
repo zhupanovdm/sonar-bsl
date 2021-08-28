@@ -9,7 +9,7 @@ import static org.zhupanovdm.bsl.BslGrammar.IF_STATEMENT;
 
 public class IfStatementTest {
 
-    private final LexerlessGrammar g = BslGrammar.createGrammar();
+    private final LexerlessGrammar g = BslGrammar.create();
 
     @Test
     public void test() {

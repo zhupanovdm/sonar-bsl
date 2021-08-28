@@ -4,17 +4,8 @@ import com.sonar.sslr.api.AstNode;
 import com.sonar.sslr.api.TokenType;
 
 public enum BslTokenType implements TokenType {
-    WHITESPACE(""),
-    IDENTIFIER(""),
-    COMMENT(""),
-    STRING_LITERAL(""),
-    NUMBER_LITERAL(""),
-    DATE_LITERAL("");
-
-    BslTokenType(String regexp) {
-    }
-
-    private String regexp;
+    NUMERIC_LITERAL,
+    DATE_LITERAL;
 
     @Override
     public String getName() {
@@ -24,10 +15,6 @@ public enum BslTokenType implements TokenType {
     @Override
     public String getValue() {
         return name();
-    }
-
-    public String getRegexp() {
-        return regexp;
     }
 
     @Override

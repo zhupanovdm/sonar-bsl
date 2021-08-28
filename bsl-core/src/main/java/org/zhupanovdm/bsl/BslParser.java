@@ -12,7 +12,7 @@ public final class BslParser {
     }
 
     public static Parser<LexerlessGrammar> create(Charset charset) {
-        return new ParserAdapter<>(charset, BslGrammar.createGrammar());
+        return new ParserAdapter<>(charset, BslGrammar.create());
     }
 
 }

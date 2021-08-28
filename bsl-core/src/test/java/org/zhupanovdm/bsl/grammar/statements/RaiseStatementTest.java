@@ -9,7 +9,7 @@ import static org.zhupanovdm.bsl.BslGrammar.RAISE_STATEMENT;
 
 public class RaiseStatementTest {
 
-    private final LexerlessGrammar g = BslGrammar.createGrammar();
+    private final LexerlessGrammar g = BslGrammar.create();
 
     @Test
     public void test() {
