@@ -1,5 +1,6 @@
 package org.zhupanovdm.bsl.api;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,6 +71,7 @@ public enum BslKeyword implements BslWord {
         return BslWord.toValue(this);
     }
 
+    @CheckForNull
     @Override
     public String getValueAlt() {
         return valueAlt;

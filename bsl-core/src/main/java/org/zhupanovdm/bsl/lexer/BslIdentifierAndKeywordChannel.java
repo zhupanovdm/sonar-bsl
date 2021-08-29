@@ -24,7 +24,10 @@ public class BslIdentifierAndKeywordChannel extends Channel<Lexer> {
     public BslIdentifierAndKeywordChannel() {
         for (BslKeyword keyword : BslKeyword.values()) {
             tokenMap.put(keyword.getValue().toUpperCase(), keyword);
-            tokenMap.put(keyword.getValueAlt().toUpperCase(), keyword);
+            String valueAlt = keyword.getValueAlt();
+            if (valueAlt != null) {
+                tokenMap.put(valueAlt.toUpperCase(), keyword);
+            }
         }
     }
 
