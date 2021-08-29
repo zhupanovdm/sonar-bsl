@@ -104,7 +104,7 @@ public class BslSensor implements Sensor {
         } catch (RecognitionException e) {
             LOG.error("Unable to parse file: {}", file);
             LOG.error(e.getMessage());
-            return;
+            throw new IllegalStateException("Cannot parse " + file, e);
         }
 
         BiConsumer<BslCheck, Issue> issueConsumer = (check, issue) -> saveIssue(context, check, issue, file);

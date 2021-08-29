@@ -24,7 +24,7 @@ public class BslRulesDefinition implements RulesDefinition {
         RuleMetadataLoader ruleMetadataLoader = new RuleMetadataLoader(RESOURCE_BASE_PATH, BslProfile.SONAR_WAY_PROFILE_PATH);
         ruleMetadataLoader.addRulesByAnnotatedClass(repository, CheckList.getChecks());
 
-        TEMPLATE_RULE_KEYS.forEach(key -> Objects.requireNonNull(repository.rule(key)).setTemplate(true));
+        TEMPLATE_RULE_KEYS.forEach(key -> Objects.requireNonNull(repository.rule(key), "Rule key for check is required").setTemplate(true));
 
         repository.done();
     }
