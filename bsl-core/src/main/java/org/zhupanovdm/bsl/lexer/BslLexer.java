@@ -28,8 +28,7 @@ public final class BslLexer {
         return Lexer.builder()
                 .withCharset(charset)
                 .withFailIfNoChannelToConsumeOneCharacter(true)
-
-                .withChannel(new BlackHoleChannel("\\s*+"))
+                .withChannel(new BlackHoleChannel("\\s++"))
 
                 .withChannel(commentRegexp("//[^\\n\\r]*+"))
 
