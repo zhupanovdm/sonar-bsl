@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.zhupanovdm.bsl.BslGrammar.*;
+import static org.zhupanovdm.bsl.api.BslKeyword.ELSE;
+import static org.zhupanovdm.bsl.api.BslKeyword.ELSIF;
 
 public class ComplexityVisitor implements AstVisitor {
 
@@ -24,7 +26,7 @@ public class ComplexityVisitor implements AstVisitor {
                 FUNC_DEF,
                 PROC_DEF,
 
-                IF_STATEMENT,
+                IF_STATEMENT, ELSE, ELSIF,
                 WHILE_STATEMENT,
                 FOR_STATEMENT,
                 FOREACH_STATEMENT,
