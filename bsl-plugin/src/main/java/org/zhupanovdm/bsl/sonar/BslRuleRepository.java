@@ -6,13 +6,14 @@ import org.zhupanovdm.bsl.checks.CheckList;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
-public class BslRulesDefinition implements RulesDefinition {
+public class BslRuleRepository implements RulesDefinition {
 
     private static final String REPOSITORY_NAME = "SonarAnalyzer";
-    private static final String RESOURCE_BASE_PATH = "org/zhupanovdm/bsl/rules";
+
+    static final String RESOURCE_FOLDER = "org/zhupanovdm/bsl/rules";
+
     private static final Set<String> TEMPLATE_RULE_KEYS = new HashSet<>(Arrays.asList("XPath", "CommentRegularExpression"));
 
     @Override
@@ -21,10 +22,12 @@ public class BslRulesDefinition implements RulesDefinition {
                 .createRepository(CheckList.REPOSITORY_KEY, Bsl.KEY)
                 .setName(REPOSITORY_NAME);
 
-        RuleMetadataLoader ruleMetadataLoader = new RuleMetadataLoader(RESOURCE_BASE_PATH, BslProfile.SONAR_WAY_PROFILE_PATH);
-        ruleMetadataLoader.addRulesByAnnotatedClass(repository, CheckList.getChecks());
+        RuleMetadataLoader loader = new RuleMetadataLoader(RESOURCE_FOLDER, BslProfile.PROFILE_LOCATION);
+        loader.addRulesByAnnotatedClass(repository, CheckList.getChecks());
 
-        TEMPLATE_RULE_KEYS.forEach(key -> Objects.requireNonNull(repository.rule(key), "Rule key for check is required").setTemplate(true));
+        repository.rules().stream()
+                .filter(rule -> TEMPLATE_RULE_KEYS.contains(rule.key()))
+                .forEach(rule -> rule.setTemplate(true));
 
         repository.done();
     }

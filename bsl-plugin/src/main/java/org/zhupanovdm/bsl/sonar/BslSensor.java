@@ -28,7 +28,8 @@ import org.zhupanovdm.bsl.BslCheck;
 import org.zhupanovdm.bsl.BslParser;
 import org.zhupanovdm.bsl.Issue;
 import org.zhupanovdm.bsl.checks.CheckList;
-import org.zhupanovdm.bsl.metrics.ComplexityVisitor;
+import org.zhupanovdm.bsl.metrics.CognitiveComplexityVisitorStub;
+import org.zhupanovdm.bsl.metrics.CyclomaticComplexityVisitor;
 import org.zhupanovdm.bsl.metrics.FileLinesVisitor;
 import org.zhupanovdm.bsl.metrics.ModuleMetrics;
 
@@ -42,7 +43,6 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.sonar.api.batch.fs.InputFile.Type.MAIN;
 
 public class BslSensor implements Sensor {
 
@@ -61,9 +61,9 @@ public class BslSensor implements Sensor {
     @Override
     public void describe(SensorDescriptor descriptor) {
         descriptor
-                .name("BSL")
-                .onlyOnFileType(MAIN)
-                .onlyOnLanguage(Bsl.KEY);
+                .name("BSL Sensor")
+                .onlyOnLanguage(Bsl.KEY)
+                .onlyOnFileType(InputFile.Type.MAIN);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class BslSensor implements Sensor {
         FileSystem fs = context.fileSystem();
         FilePredicates predicates = fs.predicates();
         FilePredicate predicate = predicates.and(
-                predicates.hasType(MAIN),
+                predicates.hasType(InputFile.Type.MAIN),
                 predicates.hasLanguage(Bsl.KEY),
                 file -> !file.uri().getPath().endsWith("mxml"));
 
@@ -133,23 +133,26 @@ public class BslSensor implements Sensor {
     }
 
     private void saveMeasures(SensorContext context, InputFile file, AstNode tree) {
-        FileLinesVisitor fileLinesMetrics = new FileLinesVisitor();
-        ComplexityVisitor complexityMetrics = new ComplexityVisitor();
-        new AstWalker(fileLinesMetrics, complexityMetrics).walkAndVisit(tree);
+        FileLinesVisitor fileLines = new FileLinesVisitor();
+        CyclomaticComplexityVisitor cyclomaticComplexity = new CyclomaticComplexityVisitor();
+        CognitiveComplexityVisitorStub cognitiveComplexityStub = new CognitiveComplexityVisitorStub();
+
+        new AstWalker(fileLines, cyclomaticComplexity, cognitiveComplexityStub).walkAndVisit(tree);
 
         ModuleMetrics moduleMetrics = new ModuleMetrics(tree);
 
-        saveMeasure(context, file, CoreMetrics.NCLOC, fileLinesMetrics.getLinesOfCode().size());
-        saveMeasure(context, file, CoreMetrics.COMMENT_LINES, fileLinesMetrics.getLinesOfComments().size());
+        saveMeasure(context, file, CoreMetrics.NCLOC, fileLines.getLinesOfCode().size());
+        saveMeasure(context, file, CoreMetrics.COMMENT_LINES, fileLines.getLinesOfComments().size());
         saveMeasure(context, file, CoreMetrics.FUNCTIONS, moduleMetrics.getNumberOfFunctions());
         saveMeasure(context, file, CoreMetrics.STATEMENTS, moduleMetrics.getNumberOfStatements());
         saveMeasure(context, file, CoreMetrics.EXECUTABLE_LINES_DATA, moduleMetrics.getExecutableLines());
 
         FileLinesContext fileLinesContext = fileLinesContextFactory.createFor(file);
-        fileLinesMetrics.getLinesOfCode().forEach(line -> fileLinesContext.setIntValue(CoreMetrics.NCLOC_DATA_KEY, line, 1));
+        fileLines.getLinesOfCode().forEach(line -> fileLinesContext.setIntValue(CoreMetrics.NCLOC_DATA_KEY, line, 1));
         fileLinesContext.save();
 
-        saveMeasure(context, file, CoreMetrics.COMPLEXITY, complexityMetrics.getComplexity());
+        saveMeasure(context, file, CoreMetrics.COMPLEXITY, cyclomaticComplexity.getComplexity());
+        saveMeasure(context, file, CoreMetrics.COGNITIVE_COMPLEXITY, cyclomaticComplexity.getComplexity());
     }
 
     private static <T extends Serializable> void saveMeasure(SensorContext context, InputFile file, Metric<T> metric, T value) {

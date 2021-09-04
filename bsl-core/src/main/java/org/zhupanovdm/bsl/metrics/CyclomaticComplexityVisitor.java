@@ -12,7 +12,7 @@ import static org.zhupanovdm.bsl.BslGrammar.*;
 import static org.zhupanovdm.bsl.api.BslKeyword.ELSE;
 import static org.zhupanovdm.bsl.api.BslKeyword.ELSIF;
 
-public class ComplexityVisitor implements AstVisitor {
+public class CyclomaticComplexityVisitor implements AstVisitor {
 
     private int complexity;
 
@@ -30,11 +30,12 @@ public class ComplexityVisitor implements AstVisitor {
                 WHILE_STATEMENT,
                 FOR_STATEMENT,
                 FOREACH_STATEMENT,
-                TRY_STATEMENT,
 
                 OR_EXPRESSION,
                 AND_EXPRESSION,
-                NOT_EXPRESSION
+                NOT_EXPRESSION,
+
+                TERNARY_EXPRESSION
         );
     }
 
