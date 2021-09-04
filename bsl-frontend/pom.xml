@@ -10,10 +10,10 @@
         <version>0.1</version>
     </parent>
 
-    <artifactId>bsl-core</artifactId>
+    <artifactId>bsl-frontend</artifactId>
 
-    <name>BSL :: Core</name>
-    <description>BSL language core library</description>
+    <name>BSL :: Frontend</name>
+    <description>BSL language frontend</description>
 
     <dependencies>
         <dependency>

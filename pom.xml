@@ -18,7 +18,7 @@
     <name>1C:Enterprise 8 Language (BSL)</name>
 
     <modules>
-        <module>bsl-core</module>
+        <module>bsl-frontend</module>
         <module>bsl-plugin</module>
         <module>bsl-checks</module>
         <module>bsl-toolkit</module>
@@ -41,7 +41,7 @@
         <dependencies>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>bsl-core</artifactId>
+                <artifactId>bsl-frontend</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
