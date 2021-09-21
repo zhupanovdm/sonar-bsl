@@ -2,10 +2,10 @@ package org.zhupanovdm.bsl.grammar.statements;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.BslGrammar;
+import org.zhupanovdm.bsl.api.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.BslGrammar.CALL_STATEMENT;
+import static org.zhupanovdm.bsl.api.BslGrammar.CALL_STMT;
 
 public class CallStatementTest {
 
@@ -13,7 +13,7 @@ public class CallStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(CALL_STATEMENT))
+        assertThat(g.rule(CALL_STMT))
                 .matches("a()")
                 .matches("a(,1 + 1,, a,)")
                 .matches("a.b()")

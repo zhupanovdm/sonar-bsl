@@ -2,10 +2,10 @@ package org.zhupanovdm.bsl.grammar.statements;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.BslGrammar;
+import org.zhupanovdm.bsl.api.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.BslGrammar.TRY_STATEMENT;
+import static org.zhupanovdm.bsl.api.BslGrammar.TRY_STMT;
 
 public class TryStatementTest {
 
@@ -13,7 +13,7 @@ public class TryStatementTest {
 
     @Test
     public void test() {
-        assertThat(g.rule(TRY_STATEMENT))
+        assertThat(g.rule(TRY_STMT))
                 .matches("Try foo() Except EndTry")
                 .matches("Try foo() Except Raise \"\" EndTry");
     }

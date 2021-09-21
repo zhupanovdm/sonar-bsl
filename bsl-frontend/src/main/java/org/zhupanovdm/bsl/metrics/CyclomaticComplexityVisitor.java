@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.zhupanovdm.bsl.BslGrammar.*;
+import static org.zhupanovdm.bsl.api.BslGrammar.*;
 import static org.zhupanovdm.bsl.api.BslKeyword.ELSE;
 import static org.zhupanovdm.bsl.api.BslKeyword.ELSIF;
 
@@ -26,16 +26,16 @@ public class CyclomaticComplexityVisitor implements AstVisitor {
                 FUNC_DEF,
                 PROC_DEF,
 
-                IF_STATEMENT, ELSE, ELSIF,
-                WHILE_STATEMENT,
-                FOR_STATEMENT,
-                FOREACH_STATEMENT,
+                IF_STMT, ELSE, ELSIF,
+                WHILE_STMT,
+                FOR_STMT,
+                FOREACH_STMT,
 
-                OR_EXPRESSION,
-                AND_EXPRESSION,
-                NOT_EXPRESSION,
+                OR_EXPR,
+                AND_EXPR,
+                NOT_EXPR,
 
-                TERNARY_EXPRESSION
+                TERNARY_EXPR
         );
     }
 

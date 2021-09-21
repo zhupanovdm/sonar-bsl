@@ -2,10 +2,10 @@ package org.zhupanovdm.bsl.grammar.expressions;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.BslGrammar;
+import org.zhupanovdm.bsl.api.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.BslGrammar.PRIMARY_EXPRESSION;
+import static org.zhupanovdm.bsl.api.BslGrammar.PRIMARY_EXPR;
 
 public class PrimaryExpressionTest {
 
@@ -13,7 +13,7 @@ public class PrimaryExpressionTest {
 
     @Test
     public void primaryExpression() {
-        assertThat(g.rule(PRIMARY_EXPRESSION))
+        assertThat(g.rule(PRIMARY_EXPR))
                 .matches("1")
                 .matches("foo")
                 .matches("Null")

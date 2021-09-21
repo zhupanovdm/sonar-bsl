@@ -12,7 +12,7 @@ public class CyclomaticComplexityVisitorTest {
     public void test() {
         CyclomaticComplexityVisitor cyclomaticComplexityVisitor = new CyclomaticComplexityVisitor();
         AstWalker astWalker = new AstWalker(cyclomaticComplexityVisitor);
-        astWalker.walkAndVisit(TestUtils.parse("/samples/metrics/CyclomaticComplexity.bsl"));
+        astWalker.walkAndVisit(TestUtils.parseFile("/samples/metrics/CyclomaticComplexity.bsl"));
 
         assertThat(cyclomaticComplexityVisitor.getComplexity()).isEqualTo(3);
     }

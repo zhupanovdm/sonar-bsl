@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static org.zhupanovdm.bsl.BslGrammar.*;
+import static org.zhupanovdm.bsl.api.BslGrammar.*;
 
 public class ModuleMetrics {
 
@@ -18,22 +18,22 @@ public class ModuleMetrics {
     public ModuleMetrics(AstNode rootTree) {
         Objects.requireNonNull(rootTree, "Cannot compute metrics without a root tree");
         List<AstNode> statements = rootTree.getDescendants(
-                ASSIGNMENT_STATEMENT,
-                CALL_STATEMENT,
-                RETURN_STATEMENT,
-                IF_STATEMENT,
-                WHILE_STATEMENT,
-                FOREACH_STATEMENT,
-                FOR_STATEMENT,
-                BREAK_STATEMENT,
-                CONTINUE_STATEMENT,
-                TRY_STATEMENT,
-                RAISE_STATEMENT,
-                EXECUTE_STATEMENT,
-                ADD_HANDLER_STATEMENT,
-                REMOVE_HANDLER_STATEMENT,
-                GOTO_STATEMENT,
-                EMPTY_STATEMENT);
+                ASSIGN_STMT,
+                CALL_STMT,
+                RETURN_STMT,
+                IF_STMT,
+                WHILE_STMT,
+                FOREACH_STMT,
+                FOR_STMT,
+                BREAK_STMT,
+                CONTINUE_STMT,
+                TRY_STMT,
+                RAISE_STMT,
+                EXECUTE_STMT,
+                ADD_HANDLER_STMT,
+                REMOVE_HANDLER_STMT,
+                GOTO_STMT,
+                EMPTY_STMT);
 
         Set<Integer> alreadyMarked = new HashSet<>();
         StringBuilder sb = new StringBuilder();

@@ -8,6 +8,8 @@ public enum BslPunctuator implements TokenType, GrammarRuleKey {
     HASH("#"),
     AMP("&"),
     QUESTION("?"),
+    QUOTE("\""),
+    PIPE("|"),
     TILDA("~"),
     COLON(":"),
     SEMICOLON(";"),

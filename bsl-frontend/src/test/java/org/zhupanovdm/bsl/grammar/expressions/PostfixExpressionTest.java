@@ -2,10 +2,10 @@ package org.zhupanovdm.bsl.grammar.expressions;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.BslGrammar;
+import org.zhupanovdm.bsl.api.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.BslGrammar.*;
+import static org.zhupanovdm.bsl.api.BslGrammar.*;
 
 public class PostfixExpressionTest {
 
@@ -31,7 +31,7 @@ public class PostfixExpressionTest {
 
     @Test
     public void postfix() {
-        assertThat(g.rule(POSTFIX_EXPRESSION))
+        assertThat(g.rule(POSTFIX_EXPR))
                 .matches("foo[0]")
                 .matches("foo[1][2][3]")
                 .matches("a.b.c.d.e.f")
@@ -58,7 +58,7 @@ public class PostfixExpressionTest {
 
     @Test
     public void assignable() {
-        assertThat(g.rule(ASSIGNABLE_EXPRESSION))
+        assertThat(g.rule(ASSIGNABLE_EXPR))
                 .matches("a")
                 .matches("a[0]")
                 .matches("a.b.c")
@@ -73,7 +73,7 @@ public class PostfixExpressionTest {
 
     @Test
     public void callable() {
-        assertThat(g.rule(CALLABLE_EXPRESSION))
+        assertThat(g.rule(CALLABLE_EXPR))
                 .matches("a()")
                 .matches("a.b()")
                 .matches("a[0].b()")

@@ -2,10 +2,10 @@ package org.zhupanovdm.bsl.grammar.definitions;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.BslGrammar;
+import org.zhupanovdm.bsl.api.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.BslGrammar.*;
+import static org.zhupanovdm.bsl.api.BslGrammar.*;
 
 public class CallableDefinitionTest {
 
@@ -15,6 +15,7 @@ public class CallableDefinitionTest {
     public void function() {
         assertThat(g.rule(FUNC_DEF))
                 .matches("Function a() EndFunction")
+                .matches("Function a() Export EndFunction")
                 .matches("&AtServer Function a() EndFunction")
                 .notMatches("Function a() EndFunction;");
     }
@@ -23,6 +24,7 @@ public class CallableDefinitionTest {
     public void procedure() {
         assertThat(g.rule(PROC_DEF))
                 .matches("Procedure a() EndProcedure")
+                .matches("Procedure a() Export EndProcedure")
                 .matches("&AtServer Procedure a() EndProcedure")
                 .notMatches("Procedure a() EndProcedure;");
     }
@@ -31,7 +33,6 @@ public class CallableDefinitionTest {
     public void signature() {
         assertThat(g.rule(SIGNATURE))
                 .matches("a()")
-                .matches("a() Export")
                 .matches("a(a)")
                 .matches("a(a, b)")
                 .notMatches("a(a b)")

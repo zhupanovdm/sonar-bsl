@@ -2,12 +2,12 @@ package org.zhupanovdm.bsl.grammar.literals;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.BslGrammar;
+import org.zhupanovdm.bsl.api.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.BslGrammar.DATE;
+import static org.zhupanovdm.bsl.api.BslGrammar.DATE;
 
-public class DateTest {
+public class PrimitiveDateTest {
 
     private final LexerlessGrammar g = BslGrammar.create();
 
