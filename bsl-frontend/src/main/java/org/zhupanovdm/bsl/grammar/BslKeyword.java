@@ -1,4 +1,4 @@
-package org.zhupanovdm.bsl.api;
+package org.zhupanovdm.bsl.grammar;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;

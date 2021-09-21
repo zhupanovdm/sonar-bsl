@@ -1,4 +1,4 @@
-package org.zhupanovdm.bsl.api;
+package org.zhupanovdm.bsl.grammar;
 
 import org.sonar.sslr.grammar.GrammarRuleKey;
 import org.sonar.sslr.grammar.LexerlessGrammarBuilder;
@@ -9,15 +9,15 @@ import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 import static com.sonar.sslr.api.GenericTokenType.EOF;
-import static org.zhupanovdm.bsl.api.BslKeyword.*;
-import static org.zhupanovdm.bsl.api.BslPunctuator.*;
+import static org.zhupanovdm.bsl.grammar.BslKeyword.*;
+import static org.zhupanovdm.bsl.grammar.BslPunctuator.*;
 import static org.zhupanovdm.bsl.utils.BslGrammarUtils.word;
 
 public enum BslGrammar implements GrammarRuleKey {
     SPACING, SPACING_NO_LB, LB,
     KEYWORD,
 
-    MODULE, BLOCK,
+    MODULE, BODY,
 
     VAR_DEF, FUNC_DEF, PROC_DEF, LABEL_DEF,
 
@@ -113,12 +113,12 @@ public enum BslGrammar implements GrammarRuleKey {
     }
 
     private static void module(LexerlessGrammarBuilder b) {
-        b.rule(MODULE).is(b.optional(BLOCK), SPACING, b.token(EOF, b.endOfInput()));
-        b.rule(BLOCK).is(b.oneOrMore(b.firstOf(
-                b.sequence(b.sequence(REGION, IDENTIFIER), b.optional(BLOCK), END_REGION),
+        b.rule(MODULE).is(b.optional(BODY), SPACING, b.token(EOF, b.endOfInput()));
+        b.rule(BODY).is(b.oneOrMore(b.firstOf(
+                b.sequence(b.sequence(REGION, IDENTIFIER), b.optional(BODY), END_REGION),
                 b.sequence(
-                        PP_IF, PP_CONDITION, THEN, b.optional(BLOCK),
-                        b.zeroOrMore(PP_ELSIF, PP_CONDITION, THEN, b.optional(BLOCK)),
+                        PP_IF, PP_CONDITION, THEN, b.optional(BODY),
+                        b.zeroOrMore(PP_ELSIF, PP_CONDITION, THEN, b.optional(BODY)),
                         PP_END_IF),
                 b.firstOf(VAR_DEF, FUNC_DEF, PROC_DEF, COMPOUND_STMT))
         ));
@@ -240,24 +240,24 @@ public enum BslGrammar implements GrammarRuleKey {
 
         b.rule(IF_STMT).is(
                 IF, EXPRESSION, THEN,
-                b.optional(BLOCK),
-                b.zeroOrMore(ELSIF, EXPRESSION, THEN, b.optional(BLOCK)),
-                b.optional(ELSE, b.optional(BLOCK)),
+                b.optional(BODY),
+                b.zeroOrMore(ELSIF, EXPRESSION, THEN, b.optional(BODY)),
+                b.optional(ELSE, b.optional(BODY)),
                 END_IF);
 
         b.rule(WHILE_STMT).is(
                 WHILE, EXPRESSION, DO,
-                b.optional(BLOCK),
+                b.optional(BODY),
                 END_DO);
 
         b.rule(FOREACH_STMT).is(
                 FOR, EACH, IDENTIFIER, IN, EXPRESSION, DO,
-                b.optional(BLOCK),
+                b.optional(BODY),
                 END_DO);
 
         b.rule(FOR_STMT).is(
                 FOR, IDENTIFIER, EQ, EXPRESSION, TO, EXPRESSION, DO,
-                b.optional(BLOCK),
+                b.optional(BODY),
                 END_DO);
 
         b.rule(BREAK_STMT).is(BREAK);
@@ -265,9 +265,9 @@ public enum BslGrammar implements GrammarRuleKey {
 
         b.rule(TRY_STMT).is(
                 TRY,
-                BLOCK,
+                BODY,
                 EXCEPT,
-                b.optional(BLOCK),
+                b.optional(BODY),
                 END_TRY);
 
         b.rule(RAISE_STMT).is(RAISE, EXPRESSION);
@@ -315,14 +315,14 @@ public enum BslGrammar implements GrammarRuleKey {
                 b.optional(ASYNC),
                 FUNCTION, SIGNATURE,
                 b.optional(EXPORT),
-                b.optional(BLOCK),
+                b.optional(BODY),
                 END_FUNCTION);
         b.rule(PROC_DEF).is(
                 b.optional(DIRECTIVE),
                 b.optional(ASYNC),
                 PROCEDURE, SIGNATURE,
                 b.optional(EXPORT),
-                b.optional(BLOCK),
+                b.optional(BODY),
                 END_PROCEDURE);
         b.rule(SIGNATURE).is(IDENTIFIER, LPAREN, b.optional(PARAMETER, b.zeroOrMore(COMMA, PARAMETER)), RPAREN).skip();
         b.rule(PARAMETER).is(b.optional(VAL), IDENTIFIER, b.optional(EQ, PRIMITIVE));

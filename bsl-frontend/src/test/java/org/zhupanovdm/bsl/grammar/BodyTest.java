@@ -2,18 +2,17 @@ package org.zhupanovdm.bsl.grammar;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.api.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.api.BslGrammar.BLOCK;
+import static org.zhupanovdm.bsl.grammar.BslGrammar.BODY;
 
-public class BlockTest {
+public class BodyTest {
 
     private final LexerlessGrammar g = BslGrammar.create();
 
     @Test
     public void block() {
-        assertThat(g.rule(BLOCK))
+        assertThat(g.rule(BODY))
                 .matches("Var a; Function b() EndFunction a = b()")
                 .matches("Var a; Var b;")
                 .matches("Function b() EndFunction Procedure b() EndProcedure")
@@ -25,7 +24,7 @@ public class BlockTest {
 
     @Test
     public void preprocessor() {
-        assertThat(g.rule(BLOCK))
+        assertThat(g.rule(BODY))
                 .matches("#If Server Then #EndIf")
                 .matches("Var v; v = 3 #If Server Then f() #EndIf g() #If Server Then m() #EndIf")
                 .matches(
@@ -47,7 +46,7 @@ public class BlockTest {
 
     @Test
     public void region() {
-        assertThat(g.rule(BLOCK))
+        assertThat(g.rule(BODY))
                 .matches("#Region a #EndRegion")
                 .matches("#Region a ; #EndRegion")
                 .matches("#Region a #Region b #EndRegion #EndRegion")

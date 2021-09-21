@@ -3,9 +3,9 @@ package org.zhupanovdm.bsl;
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
 import org.sonar.sslr.tests.Assertions;
-import org.zhupanovdm.bsl.api.BslGrammar;
+import org.zhupanovdm.bsl.grammar.BslGrammar;
 
-import static org.zhupanovdm.bsl.api.BslGrammar.MODULE;
+import static org.zhupanovdm.bsl.grammar.BslGrammar.MODULE;
 
 public class SampleTest {
 

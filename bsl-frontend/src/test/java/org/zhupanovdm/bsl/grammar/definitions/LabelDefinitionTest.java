@@ -2,11 +2,11 @@ package org.zhupanovdm.bsl.grammar.definitions;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.api.BslGrammar;
+import org.zhupanovdm.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.api.BslGrammar.LABEL;
-import static org.zhupanovdm.bsl.api.BslGrammar.LABEL_DEF;
+import static org.zhupanovdm.bsl.grammar.BslGrammar.LABEL;
+import static org.zhupanovdm.bsl.grammar.BslGrammar.LABEL_DEF;
 
 public class LabelDefinitionTest {
 

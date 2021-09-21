@@ -11,7 +11,7 @@ import org.sonar.api.batch.sensor.cpd.NewCpdTokens;
 import org.sonar.api.batch.sensor.highlighting.NewHighlighting;
 import org.sonar.api.batch.sensor.highlighting.TypeOfText;
 import org.sonarsource.analyzer.commons.TokenLocation;
-import org.zhupanovdm.bsl.api.BslKeyword;
+import org.zhupanovdm.bsl.grammar.BslKeyword;
 import org.zhupanovdm.bsl.lexer.BslLexer;
 import org.zhupanovdm.bsl.lexer.BslTokenType;
 

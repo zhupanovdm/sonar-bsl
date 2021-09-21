@@ -2,13 +2,11 @@ package org.zhupanovdm.bsl.grammar;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.api.BslGrammar;
-import org.zhupanovdm.bsl.api.BslKeyword;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.api.BslKeyword.*;
-import static org.zhupanovdm.bsl.api.BslGrammar.KEYWORD;
+import static org.zhupanovdm.bsl.grammar.BslKeyword.*;
+import static org.zhupanovdm.bsl.grammar.BslGrammar.KEYWORD;
 
 public class KeywordTest {
 

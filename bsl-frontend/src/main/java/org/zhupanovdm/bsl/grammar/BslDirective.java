@@ -1,4 +1,4 @@
-package org.zhupanovdm.bsl.api;
+package org.zhupanovdm.bsl.grammar;
 
 public enum BslDirective implements BslWord {
     AT_CLIENT("НаКлиенте"),

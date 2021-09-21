@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static org.zhupanovdm.bsl.api.BslGrammar.*;
+import static org.zhupanovdm.bsl.grammar.BslGrammar.*;
 
 public class ModuleMetrics {
 

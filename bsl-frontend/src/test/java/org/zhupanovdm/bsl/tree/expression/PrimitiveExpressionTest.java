@@ -3,7 +3,7 @@ package org.zhupanovdm.bsl.tree.expression;
 import com.sonar.sslr.api.AstNode;
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.api.BslGrammar;
+import org.zhupanovdm.bsl.grammar.BslGrammar;
 import org.zhupanovdm.bsl.tree.BslTreeCreator;
 
 import static org.assertj.core.api.Assertions.assertThat;

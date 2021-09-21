@@ -9,7 +9,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 import org.sonar.sslr.toolkit.AbstractConfigurationModel;
 import org.sonar.sslr.toolkit.ConfigurationProperty;
 import org.zhupanovdm.bsl.BslParser;
-import org.zhupanovdm.bsl.api.BslKeyword;
+import org.zhupanovdm.bsl.grammar.BslKeyword;
 import org.zhupanovdm.bsl.toolkit.tokenizer.BslDirectiveTokenizer;
 
 import java.nio.charset.Charset;

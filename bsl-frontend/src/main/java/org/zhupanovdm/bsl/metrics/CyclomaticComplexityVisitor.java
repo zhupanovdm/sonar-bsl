@@ -8,9 +8,9 @@ import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.zhupanovdm.bsl.api.BslGrammar.*;
-import static org.zhupanovdm.bsl.api.BslKeyword.ELSE;
-import static org.zhupanovdm.bsl.api.BslKeyword.ELSIF;
+import static org.zhupanovdm.bsl.grammar.BslGrammar.*;
+import static org.zhupanovdm.bsl.grammar.BslKeyword.ELSE;
+import static org.zhupanovdm.bsl.grammar.BslKeyword.ELSIF;
 
 public class CyclomaticComplexityVisitor implements AstVisitor {
 

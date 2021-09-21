@@ -2,8 +2,8 @@ package org.zhupanovdm.bsl.tree.definition;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.api.BslGrammar;
-import org.zhupanovdm.bsl.api.BslDirective;
+import org.zhupanovdm.bsl.grammar.BslGrammar;
+import org.zhupanovdm.bsl.grammar.BslDirective;
 import org.zhupanovdm.bsl.tree.BslTreeCreator;
 import org.zhupanovdm.bsl.tree.expression.PrimitiveNumber;
 

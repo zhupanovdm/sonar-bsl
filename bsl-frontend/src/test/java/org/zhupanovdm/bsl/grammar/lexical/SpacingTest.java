@@ -2,10 +2,10 @@ package org.zhupanovdm.bsl.grammar.lexical;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.api.BslGrammar;
+import org.zhupanovdm.bsl.grammar.BslGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
-import static org.zhupanovdm.bsl.api.BslGrammar.SPACING;
+import static org.zhupanovdm.bsl.grammar.BslGrammar.SPACING;
 
 public class SpacingTest {
 

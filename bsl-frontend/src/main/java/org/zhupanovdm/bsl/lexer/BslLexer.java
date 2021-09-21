@@ -1,21 +1,16 @@
 package org.zhupanovdm.bsl.lexer;
 
 import com.sonar.sslr.api.GenericTokenType;
-import com.sonar.sslr.api.TokenType;
 import com.sonar.sslr.impl.Lexer;
 import com.sonar.sslr.impl.channel.BlackHoleChannel;
-import com.sonar.sslr.impl.channel.IdentifierAndKeywordChannel;
 import com.sonar.sslr.impl.channel.PunctuatorChannel;
 import com.sonar.sslr.impl.channel.UnknownCharacterChannel;
-import org.zhupanovdm.bsl.api.BslKeyword;
-import org.zhupanovdm.bsl.api.BslPunctuator;
+import org.zhupanovdm.bsl.grammar.BslPunctuator;
 
 import java.nio.charset.Charset;
 
 import static com.sonar.sslr.impl.channel.RegexpChannelBuilder.commentRegexp;
 import static com.sonar.sslr.impl.channel.RegexpChannelBuilder.regexp;
-import static org.zhupanovdm.bsl.api.BslPunctuator.AMP;
-import static org.zhupanovdm.bsl.api.BslPunctuator.HASH;
 import static org.zhupanovdm.bsl.lexer.BslTokenType.DATE_LITERAL;
 import static org.zhupanovdm.bsl.lexer.BslTokenType.NUMERIC_LITERAL;
 

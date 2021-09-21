@@ -4,7 +4,7 @@ import com.sonar.sslr.api.AstNode;
 import com.sonar.sslr.api.AstNodeType;
 import com.sonar.sslr.api.RecognitionException;
 import com.sonar.sslr.api.Token;
-import org.zhupanovdm.bsl.api.BslDirective;
+import org.zhupanovdm.bsl.grammar.BslDirective;
 import org.zhupanovdm.bsl.tree.definition.*;
 import org.zhupanovdm.bsl.tree.expression.*;
 import org.zhupanovdm.bsl.tree.module.Module;
@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static org.zhupanovdm.bsl.api.BslGrammar.*;
-import static org.zhupanovdm.bsl.api.BslKeyword.*;
-import static org.zhupanovdm.bsl.api.BslPunctuator.*;
+import static org.zhupanovdm.bsl.grammar.BslGrammar.*;
+import static org.zhupanovdm.bsl.grammar.BslKeyword.*;
+import static org.zhupanovdm.bsl.grammar.BslPunctuator.*;
 
 public class BslTreeCreator {
     private final Map<AstNodeType, Function<AstNode, Statement>> stmtRules = new HashMap<>();
@@ -50,7 +50,7 @@ public class BslTreeCreator {
             throw new IllegalArgumentException("Is not BSL module AST");
         }
         Module module = new Module();
-        body(module, tree.getFirstChild(BLOCK));
+        body(module, tree.getFirstChild(BODY));
         return module;
     }
 
@@ -72,20 +72,20 @@ public class BslTreeCreator {
 
             }  else if (cursor.checkThenNext(REGION)) { // ignoring region
                 cursor.next(); // skip identifier
-                body(parent, cursor.optional(BLOCK));
+                body(parent, cursor.optional(BODY));
                 cursor.next(); // skip #EndRegion
 
             } else if (cursor.check(PP_IF)) {
                 PreprocessorIf ppIf = new PreprocessorIf(parent, cursor.next().getToken());
                 ppIf.setCondition(expression(ppIf, cursor.next()));
                 cursor.next(); // skip Then
-                body(ppIf, cursor.optional(BLOCK));
+                body(ppIf, cursor.optional(BODY));
 
                 while (cursor.check(PP_ELSIF)) {
                     PreprocessorElsif ppElsIf = new PreprocessorElsif(ppIf, cursor.next().getToken());
                     ppElsIf.setCondition(expression(ppElsIf, cursor.next()));
                     cursor.next(); // skip Then
-                    body(ppElsIf, cursor.optional(BLOCK));
+                    body(ppElsIf, cursor.optional(BODY));
                 }
                 cursor.next(); // skip #EndIf
 
@@ -122,7 +122,7 @@ public class BslTreeCreator {
         }
         cursor.next(); // skip )
         callable.setExport(cursor.map(n -> new Export(callable, n.getToken()), EXPORT));
-        body(callable, cursor.optional(BLOCK));
+        body(callable, cursor.optional(BODY));
 
         return callable;
     }
@@ -205,17 +205,17 @@ public class BslTreeCreator {
         cursor.next(); // skip If
         stmt.setCondition(expression(stmt, cursor.next()));
         cursor.next(); // skip Then
-        body(stmt, cursor.optional(BLOCK));
+        body(stmt, cursor.optional(BODY));
 
         while (cursor.check(ELSIF)) {
             ElsIfBranch elsIfBranch = new ElsIfBranch(stmt, cursor.next().getToken());
             elsIfBranch.setCondition(expression(elsIfBranch, cursor.next()));
             cursor.next(); // skip Then
-            body(elsIfBranch, cursor.optional(BLOCK));
+            body(elsIfBranch, cursor.optional(BODY));
         }
         if (cursor.check(ELSE)) {
             ElseClause elseClause = new ElseClause(stmt, cursor.next().getToken());
-            body(elseClause, cursor.optional(BLOCK));
+            body(elseClause, cursor.optional(BODY));
         }
         return stmt;
     }
@@ -227,7 +227,7 @@ public class BslTreeCreator {
         cursor.next(); // skip While
         stmt.setCondition(expression(stmt, cursor.next()));
         cursor.next(); // skip Do
-        body(stmt, cursor.optional(BLOCK));
+        body(stmt, cursor.optional(BODY));
         return stmt;
     }
 
@@ -242,7 +242,7 @@ public class BslTreeCreator {
         cursor.next(); // skip To
         stmt.setCondition(expression(stmt, cursor.next()));
         cursor.next(); // skip Do
-        body(stmt, cursor.optional(BLOCK));
+        body(stmt, cursor.optional(BODY));
         return stmt;
     }
 
@@ -256,7 +256,7 @@ public class BslTreeCreator {
         cursor.next(); // skip In
         stmt.setCollection(expression(stmt, cursor.next()));
         cursor.next(); // skip Do
-        body(stmt, cursor.optional(BLOCK));
+        body(stmt, cursor.optional(BODY));
         return stmt;
     }
 
@@ -268,7 +268,7 @@ public class BslTreeCreator {
         body(stmt, cursor.next());
 
         ExceptClause exceptClause = new ExceptClause(stmt, cursor.next().getToken());
-        body(exceptClause, cursor.optional(BLOCK));
+        body(exceptClause, cursor.optional(BODY));
         return stmt;
     }
 

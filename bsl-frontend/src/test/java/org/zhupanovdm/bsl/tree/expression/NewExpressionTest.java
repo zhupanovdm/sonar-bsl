@@ -2,7 +2,7 @@ package org.zhupanovdm.bsl.tree.expression;
 
 import org.junit.Test;
 import org.sonar.sslr.parser.LexerlessGrammar;
-import org.zhupanovdm.bsl.api.BslGrammar;
+import org.zhupanovdm.bsl.grammar.BslGrammar;
 import org.zhupanovdm.bsl.tree.BslTreeCreator;
 
 import java.util.List;

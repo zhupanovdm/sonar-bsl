@@ -5,7 +5,7 @@ import com.sonar.sslr.api.TokenType;
 import com.sonar.sslr.impl.Lexer;
 import org.sonar.sslr.channel.Channel;
 import org.sonar.sslr.channel.CodeReader;
-import org.zhupanovdm.bsl.api.BslKeyword;
+import org.zhupanovdm.bsl.grammar.BslKeyword;
 
 import java.util.HashMap;
 import java.util.Map;
