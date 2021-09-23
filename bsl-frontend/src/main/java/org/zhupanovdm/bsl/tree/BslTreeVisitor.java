@@ -10,7 +10,6 @@ import org.zhupanovdm.bsl.tree.statement.*;
 import java.util.Collection;
 
 public abstract class BslTreeVisitor {
-
     protected void scan(BslTree tree) {
         if (tree != null) {
             tree.accept(this);
