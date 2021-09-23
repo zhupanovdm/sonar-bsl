@@ -28,6 +28,15 @@ public abstract class BslTree {
         return type.cast(this);
     }
 
+    public boolean is(Type ...types) {
+        for (Type t : types) {
+            if (type == t) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void addToken(Token token) {
         tokens.add(new BslToken(token));
     }

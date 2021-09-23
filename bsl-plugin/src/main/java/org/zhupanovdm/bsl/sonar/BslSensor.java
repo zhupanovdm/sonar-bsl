@@ -32,6 +32,8 @@ import org.zhupanovdm.bsl.metrics.CognitiveComplexityVisitorStub;
 import org.zhupanovdm.bsl.metrics.CyclomaticComplexityVisitor;
 import org.zhupanovdm.bsl.metrics.FileLinesVisitor;
 import org.zhupanovdm.bsl.metrics.ModuleMetrics;
+import org.zhupanovdm.bsl.tree.BslTreeCreator;
+import org.zhupanovdm.bsl.tree.module.Module;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -133,12 +135,9 @@ public class BslSensor implements Sensor {
     }
 
     private void saveMeasures(SensorContext context, InputFile file, AstNode tree) {
+        Module module = new BslTreeCreator().create(tree);
         FileLinesVisitor fileLines = new FileLinesVisitor();
-        CyclomaticComplexityVisitor cyclomaticComplexity = new CyclomaticComplexityVisitor();
-        CognitiveComplexityVisitorStub cognitiveComplexityStub = new CognitiveComplexityVisitorStub();
-
-        new AstWalker(fileLines, cyclomaticComplexity, cognitiveComplexityStub).walkAndVisit(tree);
-
+        new AstWalker(fileLines).walkAndVisit(tree);
         ModuleMetrics moduleMetrics = new ModuleMetrics(tree);
 
         saveMeasure(context, file, CoreMetrics.NCLOC, fileLines.getLinesOfCode().size());
@@ -151,8 +150,8 @@ public class BslSensor implements Sensor {
         fileLines.getLinesOfCode().forEach(line -> fileLinesContext.setIntValue(CoreMetrics.NCLOC_DATA_KEY, line, 1));
         fileLinesContext.save();
 
-        saveMeasure(context, file, CoreMetrics.COMPLEXITY, cyclomaticComplexity.getComplexity());
-        saveMeasure(context, file, CoreMetrics.COGNITIVE_COMPLEXITY, cyclomaticComplexity.getComplexity());
+        saveMeasure(context, file, CoreMetrics.COMPLEXITY, CyclomaticComplexityVisitor.complexity(module));
+        saveMeasure(context, file, CoreMetrics.COGNITIVE_COMPLEXITY, CognitiveComplexityVisitorStub.complexity(module));
     }
 
     private static <T extends Serializable> void saveMeasure(SensorContext context, InputFile file, Metric<T> metric, T value) {
