@@ -17,6 +17,6 @@ public class EmptyExpression extends BslTree {
 
     @Override
     public String toString() {
-        return "<default>";
+        return "<EMPTY EXPR>";
     }
 }

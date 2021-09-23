@@ -17,6 +17,6 @@ public class EmptyStatement extends BslTree {
 
     @Override
     public String toString() {
-        return "<empty>";
+        return "<EMPTY STMT>";
     }
 }
