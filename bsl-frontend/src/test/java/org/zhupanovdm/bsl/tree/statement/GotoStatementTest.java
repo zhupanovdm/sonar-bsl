@@ -7,6 +7,7 @@ import org.zhupanovdm.bsl.tree.BslTreeCreator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.zhupanovdm.bsl.TestUtils.parse;
+import static org.zhupanovdm.bsl.tree.BslTree.Type.GOTO_STMT;
 
 public class GotoStatementTest {
     private final LexerlessGrammar g = BslGrammar.create();
@@ -16,7 +17,9 @@ public class GotoStatementTest {
     public void test() {
         GotoStatement stmt = creator.gotoStmt(parse("Goto ~Label", g.rule(BslGrammar.GOTO_STMT)));
 
-        assertThat(stmt.getLabel().getIdentifier().getValue()).isEqualTo("Label");
+        assertThat(stmt.getType()).isEqualTo(GOTO_STMT);
+        assertThat(stmt.getLabel().getName()).isEqualTo("Label");
         assertThat(stmt.getBody()).isEmpty();
+        assertThat(stmt.getTokens()).hasSize(1);
     }
 }

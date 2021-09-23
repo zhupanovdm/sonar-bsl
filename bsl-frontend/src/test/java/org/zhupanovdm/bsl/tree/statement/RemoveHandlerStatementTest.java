@@ -8,6 +8,7 @@ import org.zhupanovdm.bsl.tree.expression.ReferenceExpression;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.zhupanovdm.bsl.TestUtils.parse;
+import static org.zhupanovdm.bsl.tree.BslTree.Type.REM_HANDLER_STMT;
 
 public class RemoveHandlerStatementTest {
     private final LexerlessGrammar g = BslGrammar.create();
@@ -17,8 +18,10 @@ public class RemoveHandlerStatementTest {
     public void test() {
         RemoveHandlerStatement stmt = creator.removeHandlerStmt(parse("RemoveHandler Event, Handler", g.rule(BslGrammar.REMOVE_HANDLER_STMT)));
 
+        assertThat(stmt.getType()).isEqualTo(REM_HANDLER_STMT);
+        assertThat(stmt.getEvent().as(ReferenceExpression.class).getName()).isEqualTo("Event");
+        assertThat(stmt.getHandler().as(ReferenceExpression.class).getName()).isEqualTo("Handler");
         assertThat(stmt.getBody()).isEmpty();
-        assertThat(stmt.getEvent().as(ReferenceExpression.class).getIdentifier().getValue()).isEqualTo("Event");
-        assertThat(stmt.getHandler().as(ReferenceExpression.class).getIdentifier().getValue()).isEqualTo("Handler");
+        assertThat(stmt.getTokens()).hasSize(2);
     }
 }

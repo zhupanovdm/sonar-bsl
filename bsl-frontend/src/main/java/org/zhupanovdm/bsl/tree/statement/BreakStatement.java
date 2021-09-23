@@ -1,24 +1,26 @@
 package org.zhupanovdm.bsl.tree.statement;
 
-import com.sonar.sslr.api.Token;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+
+import static org.zhupanovdm.bsl.tree.BslTree.Type.BREAK_STMT;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class BreakStatement extends Statement {
-    public BreakStatement(Token token) {
-        super(token);
-    }
-
-    @Override
-    public String toString() {
-        return "Break";
+public class BreakStatement extends BslTree {
+    public BreakStatement() {
+        super(null, BREAK_STMT);
     }
 
     @Override
     public void accept(BslTreeVisitor visitor) {
         visitor.visitBreakStatement(this);
+    }
+
+    @Override
+    public String toString() {
+        return "Break";
     }
 }

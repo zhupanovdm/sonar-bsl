@@ -1,24 +1,24 @@
 package org.zhupanovdm.bsl.tree.statement;
 
-import com.sonar.sslr.api.Token;
 import lombok.EqualsAndHashCode;
+import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeVisitor;
 
-@EqualsAndHashCode(callSuper = true)
-public class ElseClause extends Statement {
-    public ElseClause(IfStatement parent, Token token) {
-        super(token);
-        setParent(parent);
-        parent.setElseClause(this);
-    }
+import static org.zhupanovdm.bsl.tree.BslTree.Type.IF_STMT;
 
-    @Override
-    public String toString() {
-        return "Else {" + getBody().size() + "}";
+@EqualsAndHashCode(callSuper = true)
+public class ElseClause extends BslTree {
+    public ElseClause(IfStatement parent) {
+        super(parent, IF_STMT);
     }
 
     @Override
     public void accept(BslTreeVisitor visitor) {
         visitor.visitElseClause(this);
+    }
+
+    @Override
+    public String toString() {
+        return "Else {" + getBody().size() + "}";
     }
 }

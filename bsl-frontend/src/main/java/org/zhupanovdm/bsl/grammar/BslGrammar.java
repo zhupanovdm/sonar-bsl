@@ -153,13 +153,13 @@ public enum BslGrammar implements GrammarRuleKey {
         b.rule(ADDITIVE_OPERATOR).is(b.firstOf(PLUS, MINUS));
 
         b.rule(MULTIPLICATIVE_EXPR).is(UNARY_EXPR, b.optional(MULTIPLICATIVE_OPERATOR, MULTIPLICATIVE_EXPR)).skipIfOneChild();
-        b.rule(MULTIPLICATIVE_OPERATOR).is(b.firstOf(MUL, DIV, MOD));
+        b.rule(MULTIPLICATIVE_OPERATOR).is(b.firstOf(STAR, SLASH, PERCENT));
 
         b.rule(UNARY_EXPR).is(b.firstOf(b.sequence(UNARY_OPERATOR, POSTFIX_EXPR), POSTFIX_EXPR)).skipIfOneChild();
         b.rule(UNARY_OPERATOR).is(b.firstOf(PLUS, MINUS));
 
         b.rule(POSTFIX_EXPR).is(b.optional(AWAIT), b.firstOf(
-                b.sequence(b.sequence(b.next(IDENTIFIER), PRIMARY_EXPR), b.firstOf(INDEX_POSTFIX, DEREFERENCE_POSTFIX, CALL_POSTFIX)),
+                b.sequence(IDENTIFIER, b.firstOf(INDEX_POSTFIX, DEREFERENCE_POSTFIX, CALL_POSTFIX)),
                 PRIMARY_EXPR,
                 NEW_EXPR,
                 TERNARY_EXPR)
@@ -179,7 +179,7 @@ public enum BslGrammar implements GrammarRuleKey {
                 EXPRESSION, COMMA,
                 EXPRESSION, RPAREN);
 
-        b.rule(NEW_EXPR).is(NEW, b.next(IDENTIFIER), PRIMARY_EXPR, b.optional(CONSTRUCTOR_CALL_POSTFIX));
+        b.rule(NEW_EXPR).is(NEW, IDENTIFIER, b.optional(CONSTRUCTOR_CALL_POSTFIX));
         b.rule(CONSTRUCTOR_CALL_POSTFIX).is(CALL_OPERATOR);
 
         b.rule(PRIMARY_EXPR).is(b.firstOf(IDENTIFIER, PRIMITIVE, b.sequence(LPAREN, EXPRESSION, RPAREN)));
@@ -188,14 +188,14 @@ public enum BslGrammar implements GrammarRuleKey {
         b.rule(FIELD).is(SPACING, identifier(b));
         b.rule(PRIMITIVE).is(b.firstOf(UNDEFINED, NULL, TRUE, FALSE, STRING, NUMBER, DATE));
 
-        b.rule(ASSIGNABLE_EXPR).is(b.next(IDENTIFIER), PRIMARY_EXPR, b.optional(b.firstOf(ASSIGNABLE_INDEX_POSTFIX, ASSIGNABLE_DEREFERENCE_POSTFIX, ASSIGNABLE_CALL_POSTFIX)));
+        b.rule(ASSIGNABLE_EXPR).is(IDENTIFIER, b.optional(b.firstOf(ASSIGNABLE_INDEX_POSTFIX, ASSIGNABLE_DEREFERENCE_POSTFIX, ASSIGNABLE_CALL_POSTFIX)));
         b.rule(ASSIGNABLE_INDEX_POSTFIX).is(INDEX_OPERATOR, b.optional(b.firstOf(ASSIGNABLE_INDEX_POSTFIX, ASSIGNABLE_DEREFERENCE_POSTFIX)));
         b.rule(ASSIGNABLE_DEREFERENCE_POSTFIX).is(
                 DOT, FIELD,
                 b.optional(b.firstOf(ASSIGNABLE_INDEX_POSTFIX, ASSIGNABLE_DEREFERENCE_POSTFIX, ASSIGNABLE_CALL_POSTFIX)));
         b.rule(ASSIGNABLE_CALL_POSTFIX).is(CALL_OPERATOR, b.firstOf(ASSIGNABLE_INDEX_POSTFIX, ASSIGNABLE_DEREFERENCE_POSTFIX));
 
-        b.rule(CALLABLE_EXPR).is(b.optional(AWAIT), b.next(IDENTIFIER), PRIMARY_EXPR, b.firstOf(CALLABLE_CALL_POSTFIX, b.firstOf(CALLABLE_INDEX_POSTFIX, CALLABLE_DEREFERENCE_POSTFIX)));
+        b.rule(CALLABLE_EXPR).is(b.optional(AWAIT), IDENTIFIER, b.firstOf(CALLABLE_CALL_POSTFIX, b.firstOf(CALLABLE_INDEX_POSTFIX, CALLABLE_DEREFERENCE_POSTFIX)));
         b.rule(CALLABLE_INDEX_POSTFIX).is(INDEX_OPERATOR, CALLABLE_DEREFERENCE_POSTFIX);
         b.rule(CALLABLE_DEREFERENCE_POSTFIX).is(
                 DOT, FIELD,

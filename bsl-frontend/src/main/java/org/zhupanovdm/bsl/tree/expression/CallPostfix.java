@@ -9,15 +9,16 @@ import org.zhupanovdm.bsl.tree.BslTreeVisitor;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.zhupanovdm.bsl.tree.BslTree.Type.CALL;
 import static org.zhupanovdm.bsl.utils.StringUtils.collectionToString;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class CallPostfix extends Postfix {
-    private final List<Expression> arguments = new LinkedList<>();
+    private final List<BslTree> arguments = new LinkedList<>();
 
-    public CallPostfix(BslTree parent, Token token) {
-        super(parent, token);
+    public CallPostfix(BslTree parent) {
+        super(parent, CALL);
     }
 
     @Override
@@ -30,29 +31,12 @@ public class CallPostfix extends Postfix {
         StringBuilder builder = new StringBuilder();
 
         builder.append('(');
-        collectionToString(builder, arguments, Expression::toString, ", ");
+        collectionToString(builder, arguments, BslTree::toString, ", ");
         builder.append(')');
 
         if (getPostfix() != null) {
             builder.append(getPostfix());
         }
         return builder.toString();
-    }
-
-    public static class DefaultArgument extends Expression {
-        public DefaultArgument(CallPostfix parent, Token token) {
-            super(parent, token);
-            parent.getArguments().add(this);
-        }
-
-        @Override
-        public String toString() {
-            return "<default>";
-        }
-
-        @Override
-        public void accept(BslTreeVisitor visitor) {
-            visitor.visitDefaultArgument(this);
-        }
     }
 }

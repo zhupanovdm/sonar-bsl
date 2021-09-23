@@ -4,7 +4,6 @@ import com.sonar.sslr.api.AstNode;
 import com.sonar.sslr.api.AstNodeType;
 
 import java.util.Iterator;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class AstSiblingsCursor implements Iterator<AstNode>, Iterable<AstNode> {
@@ -35,12 +34,12 @@ public class AstSiblingsCursor implements Iterator<AstNode>, Iterable<AstNode> {
         return new AstSiblingsCursor(next().getFirstChild());
     }
 
-    public boolean check(AstNodeType... types) {
+    public boolean has(AstNodeType... types) {
         return node.is(types);
     }
 
-    public boolean checkThenNext(AstNodeType... types) {
-        if (check(types)) {
+    public boolean nextIf(AstNodeType... types) {
+        if (has(types)) {
             next();
             return true;
         }
@@ -48,25 +47,17 @@ public class AstSiblingsCursor implements Iterator<AstNode>, Iterable<AstNode> {
     }
 
     public <T> T map(Function<AstNode, T> mapper, AstNodeType... types) {
-        if (types.length == 0 || check(types)) {
+        if (types.length == 0 || has(types)) {
             return mapper.apply(next());
         }
         return null;
     }
 
     public AstNode optional(AstNodeType... types) {
-        if (types.length == 0 || check(types)) {
+        if (types.length == 0 || has(types)) {
             return next();
         }
         return null;
-    }
-
-    public boolean consume(Consumer<AstNode> consumer, AstNodeType... types) {
-        if (types.length == 0 || check(types)) {
-            consumer.accept(next());
-            return true;
-        }
-        return false;
     }
 
     @Override

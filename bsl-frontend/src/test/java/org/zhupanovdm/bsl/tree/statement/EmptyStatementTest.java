@@ -7,6 +7,7 @@ import org.zhupanovdm.bsl.tree.BslTreeCreator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.zhupanovdm.bsl.TestUtils.parse;
+import static org.zhupanovdm.bsl.tree.BslTree.Type.EMPTY_STMT;
 
 public class EmptyStatementTest {
     private final LexerlessGrammar g = BslGrammar.create();
@@ -16,7 +17,8 @@ public class EmptyStatementTest {
     public void test() {
         EmptyStatement stmt = creator.emptyStmt(parse(";", g.rule(BslGrammar.EMPTY_STMT)));
 
-        assertThat(stmt).isNotNull();
+        assertThat(stmt.getType()).isEqualTo(EMPTY_STMT);
         assertThat(stmt.getBody()).isEmpty();
+        assertThat(stmt.getTokens()).hasSize(1);
     }
 }

@@ -13,12 +13,13 @@ import java.util.List;
 @ToString(exclude = "parent")
 public abstract class BslTree {
     private BslTree parent;
-    private Token token;
+    private Type type;
+    private final List<BslToken> tokens = new LinkedList<>();
     private final List<BslTree> body = new LinkedList<>();
 
-    public BslTree(BslTree parent, Token token) {
+    public BslTree(BslTree parent, Type type) {
         this.parent = parent;
-        this.token = token;
+        this.type = type;
     }
 
     public abstract void accept(BslTreeVisitor visitor);
@@ -27,7 +28,47 @@ public abstract class BslTree {
         return type.cast(this);
     }
 
-    public boolean is(Class<? extends BslTree> type) {
-        return type.isAssignableFrom(getClass());
+    public void addToken(Token token) {
+        tokens.add(new BslToken(token));
+    }
+
+    public enum Type {
+        MODULE, PREPROCESSOR,
+
+        DIRECTIVE,
+        FUNCTION, PROCEDURE, PARAMETER,
+        VAR_DEF, VARIABLE,
+        LABEL_DEF, LABEL,
+
+        ASSIGN_STMT,
+        IF_STMT,
+        WHILE_STMT,
+        FOR_STMT,
+        FOREACH_STMT,
+        TRY_STMT,
+        CALL_STMT,
+        RETURN_STMT,
+        BREAK_STMT,
+        CONTINUE_STMT,
+        EMPTY_STMT,
+        GOTO_STMT,
+        EXECUTE_STMT,
+        RAISE_STMT,
+        ADD_HANDLER_STMT,
+        REM_HANDLER_STMT,
+
+        POSTFIX, INDEX, DEREFERENCE, CALL,
+        EMPTY,
+        TERNARY,
+        NEW,
+
+        ADD, SUB, MUL, DIV, MOD,
+        AND, OR, NOT,
+        MINUS,
+        EQ, NEQ, GT, GE, LT, LE,
+
+        REFERENCE, PARENTHESIS,
+
+        STRING, NUMBER, DATE, TRUE, FALSE, UNDEFINED, NULL
     }
 }

@@ -1,10 +1,8 @@
 package org.zhupanovdm.bsl.tree.definition;
 
-import com.sonar.sslr.api.Token;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -13,17 +11,20 @@ import static org.zhupanovdm.bsl.utils.StringUtils.collectionToString;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class CallableDefinition extends BslTree {
-    private Type type;
-    private Identifier identifier;
+public class CallableDefinition extends BslTree implements Named, Exportable, HasDirective {
+    private String name;
     private final List<Parameter> parameters = new LinkedList<>();
-    private CompilationDirective directive;
-    private Async async;
-    private Export export;
+    private Directive directive;
+    private boolean export;
+    private boolean async;
 
-    public CallableDefinition(Token token) {
-        super(null, token);
-        this.type = Type.FUNCTION;
+    public CallableDefinition(Type type) {
+        super(null, type);
+    }
+
+    @Override
+    public void accept(BslTreeVisitor visitor) {
+        visitor.visitCallableDefinition(this);
     }
 
     @Override
@@ -32,37 +33,15 @@ public class CallableDefinition extends BslTree {
         if (directive != null) {
             builder.append(directive).append(' ');
         }
-        if (async != null) {
-            builder.append(async).append(' ');
+        if (async) {
+            builder.append("Async ");
         }
-        builder.append(type).append(' ').append(identifier).append('(');
+        String type = getType() == Type.PROCEDURE ? "Procedure" : "Function";
+        builder.append(type).append(' ').append(name).append('(');
         collectionToString(builder, parameters, Parameter::toString, ", ").append(')');
-        if (export != null) {
-            builder.append(' ').append(export);
+        if (export) {
+            builder.append(" Export");
         }
         return builder.append(" {").append(getBody().size()).append('}').toString();
-    }
-
-    @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitCallableDefinition(this);
-    }
-
-    public enum Type { FUNCTION, PROCEDURE }
-
-    public static class Async extends BslTree {
-        public Async(CallableDefinition parent, Token token) {
-            super(parent, token);
-        }
-
-        @Override
-        public String toString() {
-            return "Async";
-        }
-
-        @Override
-        public void accept(BslTreeVisitor visitor) {
-            visitor.visitCallableAsync(this);
-        }
     }
 }

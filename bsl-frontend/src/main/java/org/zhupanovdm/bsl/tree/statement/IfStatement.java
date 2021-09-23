@@ -1,32 +1,34 @@
 package org.zhupanovdm.bsl.tree.statement;
 
-import com.sonar.sslr.api.Token;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.zhupanovdm.bsl.tree.expression.Expression;
+import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.HasCondition;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.zhupanovdm.bsl.tree.BslTree.Type.IF_STMT;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class IfStatement extends Statement {
-    private Expression condition;
+public class IfStatement extends BslTree implements HasCondition {
+    private BslTree condition;
     private final List<ElsIfBranch> elsIfBranches = new LinkedList<>();
     private ElseClause elseClause;
 
-    public IfStatement(Token token) {
-        super(token);
-    }
-
-    @Override
-    public String toString() {
-        return "If " + condition + " Then {" + getBody().size() + "}";
+    public IfStatement() {
+        super(null, IF_STMT);
     }
 
     @Override
     public void accept(BslTreeVisitor visitor) {
         visitor.visitIfStatement(this);
+    }
+
+    @Override
+    public String toString() {
+        return "If " + condition + " Then {" + getBody().size() + "}";
     }
 }

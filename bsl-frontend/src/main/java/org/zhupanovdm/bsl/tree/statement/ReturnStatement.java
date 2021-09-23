@@ -1,27 +1,28 @@
 package org.zhupanovdm.bsl.tree.statement;
 
-import com.sonar.sslr.api.Token;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.zhupanovdm.bsl.tree.expression.Expression;
+import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+
+import static org.zhupanovdm.bsl.tree.BslTree.Type.RETURN_STMT;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ReturnStatement extends Statement {
-    private Expression expression;
+public class ReturnStatement extends BslTree {
+    private BslTree expression;
 
-    public ReturnStatement(Token token) {
-        super(token);
-    }
-
-    @Override
-    public String toString() {
-        return "Return" + (expression == null ? "" : " " + expression);
+    public ReturnStatement() {
+        super(null, RETURN_STMT);
     }
 
     @Override
     public void accept(BslTreeVisitor visitor) {
         visitor.visitReturnStatement(this);
+    }
+
+    @Override
+    public String toString() {
+        return "Return" + (expression == null ? "" : " " + expression);
     }
 }

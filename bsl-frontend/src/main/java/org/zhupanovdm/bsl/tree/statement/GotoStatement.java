@@ -1,26 +1,28 @@
 package org.zhupanovdm.bsl.tree.statement;
 
-import com.sonar.sslr.api.Token;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+
+import static org.zhupanovdm.bsl.tree.BslTree.Type.GOTO_STMT;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class GotoStatement extends Statement {
+public class GotoStatement extends BslTree {
     private Label label;
 
-    public GotoStatement(Token token) {
-        super(token);
-    }
-
-    @Override
-    public String toString() {
-        return "Goto " + label;
+    public GotoStatement() {
+        super(null, GOTO_STMT);
     }
 
     @Override
     public void accept(BslTreeVisitor visitor) {
         visitor.visitGotoStatement(this);
+    }
+
+    @Override
+    public String toString() {
+        return "Goto " + label;
     }
 }

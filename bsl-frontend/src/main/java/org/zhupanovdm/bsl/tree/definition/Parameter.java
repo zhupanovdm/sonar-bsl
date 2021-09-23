@@ -1,27 +1,22 @@
 package org.zhupanovdm.bsl.tree.definition;
 
-import com.sonar.sslr.api.Token;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeVisitor;
-import org.zhupanovdm.bsl.tree.expression.PrimitiveExpression;
+import org.zhupanovdm.bsl.tree.Named;
+
+import static org.zhupanovdm.bsl.tree.BslTree.Type.PARAMETER;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Parameter extends BslTree {
-    private Identifier identifier;
-    private Val val;
-    private PrimitiveExpression defaultValue;
+public class Parameter extends BslTree implements Named {
+    private String name;
+    private boolean val;
+    private BslTree defaultValue;
 
-    public Parameter(CallableDefinition parent, Token token) {
-        super(parent, token);
-        parent.getParameters().add(this);
-    }
-
-    @Override
-    public String toString() {
-        return (val == null ? "" : val) + " " + identifier + (defaultValue == null ? "" : " = " + defaultValue);
+    public Parameter(CallableDefinition parent) {
+        super(parent, PARAMETER);
     }
 
     @Override
@@ -29,19 +24,8 @@ public class Parameter extends BslTree {
         visitor.visitParameter(this);
     }
 
-    public static class Val extends BslTree {
-        public Val(Parameter parent, Token token) {
-            super(parent, token);
-        }
-
-        @Override
-        public String toString() {
-            return "Val";
-        }
-
-        @Override
-        public void accept(BslTreeVisitor visitor) {
-            visitor.visitParameterVal(this);
-        }
+    @Override
+    public String toString() {
+        return (val ? "Val " : "") + name + (defaultValue == null ? "" : " = " + defaultValue);
     }
 }

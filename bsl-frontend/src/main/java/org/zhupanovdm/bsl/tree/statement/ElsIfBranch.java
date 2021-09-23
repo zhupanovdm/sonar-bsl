@@ -1,29 +1,29 @@
 package org.zhupanovdm.bsl.tree.statement;
 
-import com.sonar.sslr.api.Token;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.zhupanovdm.bsl.tree.expression.Expression;
+import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.HasCondition;
+
+import static org.zhupanovdm.bsl.tree.BslTree.Type.IF_STMT;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ElsIfBranch extends Statement {
-    private Expression condition;
+public class ElsIfBranch extends BslTree implements HasCondition {
+    private BslTree condition;
 
-    public ElsIfBranch(IfStatement parent, Token token) {
-        super(token);
-        setParent(parent);
-        parent.getElsIfBranches().add(this);
-    }
-
-    @Override
-    public String toString() {
-        return "ElsIf " + condition + " Then {" + getBody().size() + "}";
+    public ElsIfBranch(IfStatement parent) {
+        super(parent, IF_STMT);
     }
 
     @Override
     public void accept(BslTreeVisitor visitor) {
         visitor.visitElsIfBranch(this);
+    }
+
+    @Override
+    public String toString() {
+        return "ElsIf " + condition + " Then {" + getBody().size() + "}";
     }
 }

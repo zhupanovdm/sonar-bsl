@@ -23,11 +23,12 @@ import static org.zhupanovdm.bsl.grammar.BslKeyword.*;
 import static org.zhupanovdm.bsl.grammar.BslPunctuator.*;
 
 public class BslTreeCreator {
-    private final Map<AstNodeType, Function<AstNode, Statement>> stmtRules = new HashMap<>();
+    private final Map<AstNodeType, Function<AstNode, BslTree>> stmtRules = new HashMap<>();
+    private final Map<AstNodeType, BslTree.Type> binOpRules = new HashMap<>();
 
     public BslTreeCreator() {
-        stmtRules.put(ASSIGN_STMT,      this::assignmentStmt);
-        stmtRules.put(IF_STMT,          this::ifStatement);
+        stmtRules.put(ASSIGN_STMT,      this::assignStmt);
+        stmtRules.put(IF_STMT,          this::ifStmt);
         stmtRules.put(WHILE_STMT,       this::whileStmt);
         stmtRules.put(FOR_STMT,         this::forStmt);
         stmtRules.put(FOREACH_STMT,     this::forEachStmt);
@@ -43,14 +44,33 @@ public class BslTreeCreator {
         stmtRules.put(LABEL_DEF,        this::labelDef);
         stmtRules.put(GOTO_STMT,        this::gotoStmt);
         stmtRules.put(EMPTY_STMT,       this::emptyStmt);
+
+        binOpRules.put(PLUS,            BslTree.Type.ADD);
+        binOpRules.put(MINUS,           BslTree.Type.SUB);
+        binOpRules.put(STAR,            BslTree.Type.MUL);
+        binOpRules.put(SLASH,           BslTree.Type.DIV);
+        binOpRules.put(PERCENT,         BslTree.Type.MOD);
+
+        binOpRules.put(AND,             BslTree.Type.AND);
+        binOpRules.put(OR,              BslTree.Type.OR);
+        binOpRules.put(NOT,             BslTree.Type.NOT);
+
+        binOpRules.put(EQ,              BslTree.Type.EQ);
+        binOpRules.put(NEQ,             BslTree.Type.NEQ);
+        binOpRules.put(GT,              BslTree.Type.GT);
+        binOpRules.put(GE,              BslTree.Type.GE);
+        binOpRules.put(LT,              BslTree.Type.LT);
+        binOpRules.put(LE,              BslTree.Type.LE);
     }
 
     public Module create(AstNode tree) {
         if (!tree.is(MODULE)) {
             throw new IllegalArgumentException("Is not BSL module AST");
         }
+        AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
         Module module = new Module();
-        body(module, tree.getFirstChild(BODY));
+        body(module, cursor.optional(BODY));
+        module.addToken(cursor.next().getToken());
         return module;
     }
 
@@ -59,40 +79,53 @@ public class BslTreeCreator {
             return;
         }
 
-        List<BslTree> children = parent.getBody();
+        List<BslTree> body = parent.getBody();
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
         while (cursor.hasNext()) {
-            if (cursor.check(COMPOUND_STMT)) {
+            if (cursor.has(COMPOUND_STMT)) {
                 compoundStmt(parent, cursor.next());
 
-            }  else if (cursor.check(FUNC_DEF, PROC_DEF)) {
-                CallableDefinition callableDefinition = callableDef(cursor.next());
-                callableDefinition.setParent(parent);
-                children.add(callableDefinition);
+            }  else if (cursor.has(FUNC_DEF)) {
+                CallableDefinition definition = callableDef(cursor.next(), BslTree.Type.FUNCTION);
+                definition.setParent(parent);
+                body.add(definition);
 
-            }  else if (cursor.checkThenNext(REGION)) { // ignoring region
-                cursor.next(); // skip identifier
+            }  else if (cursor.has(PROC_DEF)) {
+                CallableDefinition definition = callableDef(cursor.next(), BslTree.Type.PROCEDURE);
+                definition.setParent(parent);
+                body.add(definition);
+
+            }  else if (cursor.has(REGION)) {
+                addTokens(parent, cursor.next()); // #Region
+                parent.addToken(cursor.next().getToken()); // name
                 body(parent, cursor.optional(BODY));
-                cursor.next(); // skip #EndRegion
+                addTokens(parent, cursor.next()); // #EndRegion
 
-            } else if (cursor.check(PP_IF)) {
-                PreprocessorIf ppIf = new PreprocessorIf(parent, cursor.next().getToken());
+            } else if (cursor.has(PP_IF)) {
+                PreprocessorIf ppIf = new PreprocessorIf(parent);
+                addTokens(ppIf, cursor.next()); // #If
                 ppIf.setCondition(expression(ppIf, cursor.next()));
-                cursor.next(); // skip Then
+                ppIf.addToken(cursor.next().getToken()); // Then
                 body(ppIf, cursor.optional(BODY));
 
-                while (cursor.check(PP_ELSIF)) {
-                    PreprocessorElsif ppElsIf = new PreprocessorElsif(ppIf, cursor.next().getToken());
+                while (cursor.has(PP_ELSIF)) {
+                    PreprocessorElsif ppElsIf = new PreprocessorElsif(ppIf);
+                    addTokens(ppElsIf, cursor.next()); // #ElsIf
                     ppElsIf.setCondition(expression(ppElsIf, cursor.next()));
-                    cursor.next(); // skip Then
+                    ppElsIf.addToken(cursor.next().getToken()); // Then
                     body(ppElsIf, cursor.optional(BODY));
-                }
-                cursor.next(); // skip #EndIf
 
-            }  else if (cursor.check(VAR_DEF)) {
-                VariablesDefinition variablesDefinition = variablesDef(cursor.next());
-                variablesDefinition.setParent(parent);
-                children.add(variablesDefinition);
+                    ppIf.getElsIfBranches().add(ppElsIf);
+                }
+                addTokens(ppIf, cursor.next()); // #EndIf
+
+                body.add(ppIf);
+
+            }  else if (cursor.has(VAR_DEF)) {
+                VariablesDefinition definition = variablesDef(cursor.next());
+                definition.setParent(parent);
+
+                body.add(definition);
 
             } else {
                 throw new IllegalStateException("Definition " + cursor.next().getType() + " not correctly translated to strongly typed AST");
@@ -101,76 +134,120 @@ public class BslTreeCreator {
         }
     }
 
-    public CallableDefinition callableDef(AstNode tree) {
+    public CallableDefinition callableDef(AstNode tree, BslTree.Type type) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        CallableDefinition callable = new CallableDefinition(tree.getToken());
-        if (tree.getType() == PROC_DEF) {
-            callable.setType(CallableDefinition.Type.PROCEDURE);
+        CallableDefinition callable = new CallableDefinition(type);
+
+        if (cursor.has(DIRECTIVE)) {
+            callable.setDirective(directive(callable, cursor.next()));
+        }
+        if (cursor.has(ASYNC)) {
+            callable.setAsync(true);
+            callable.addToken(cursor.next().getToken());
         }
 
-        callable.setDirective(compilationDirective(callable, cursor));
-        callable.setAsync(cursor.map(n -> new CallableDefinition.Async(callable, n.getToken()), ASYNC));
+        callable.addToken(cursor.next().getToken()); // Function / Procedure
 
-        cursor.next(); // skip Function / Procedure
-        callable.setIdentifier(new Identifier(callable, cursor.next().getToken()));
+        AstNode name = cursor.next().getFirstChild();
+        callable.setName(name.getTokenOriginalValue());
+        callable.addToken(name.getToken());
 
-        cursor.next(); // skip (
-        while (cursor.check(PARAMETER)) {
-            parameterDef(callable, cursor.next());
-            cursor.checkThenNext(COMMA); // skip ,
+        callable.addToken(cursor.next().getToken()); // (
+        List<Parameter> params = callable.getParameters();
+        while (cursor.has(PARAMETER)) {
+            params.add(parameter(callable, cursor.next()));
+            if (cursor.has(COMMA)) {
+                callable.addToken(cursor.next().getToken()); // ,
+            }
         }
-        cursor.next(); // skip )
-        callable.setExport(cursor.map(n -> new Export(callable, n.getToken()), EXPORT));
+        callable.addToken(cursor.next().getToken()); // )
+
+        if (cursor.has(EXPORT)) {
+            callable.setExport(true);
+            callable.addToken(cursor.next().getToken());
+        }
+
         body(callable, cursor.optional(BODY));
+        callable.addToken(cursor.next().getToken()); // EndFunction / EndProcedure
 
         return callable;
     }
 
-    private void parameterDef(CallableDefinition callable, AstNode tree) {
+    private Parameter parameter(CallableDefinition callable, AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        Parameter parameter = new Parameter(callable, tree.getToken());
-        parameter.setVal(cursor.map(n -> new Parameter.Val(parameter, n.getToken()), VAL));
-        parameter.setIdentifier(new Identifier(parameter, cursor.next().getToken()));
-        if (cursor.hasNext() && cursor.checkThenNext(EQ)) {
-            parameter.setDefaultValue(primitiveExpr(callable, cursor.next()));
+        Parameter parameter = new Parameter(callable);
+        if (cursor.has(VAL)) {
+            parameter.setVal(true);
+            parameter.addToken(cursor.next().getToken());
         }
+
+        AstNode name = cursor.next().getFirstChild();
+        parameter.setName(name.getTokenOriginalValue());
+        parameter.addToken(name.getToken());
+
+        if (cursor.hasNext()) {
+            parameter.addToken(cursor.next().getToken()); // =
+            parameter.setDefaultValue(primitiveExpr(parameter, cursor.next()));
+        }
+
+        return parameter;
     }
 
     public VariablesDefinition variablesDef(AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        VariablesDefinition varDef = new VariablesDefinition(tree.getToken());
-        varDef.setDirective(compilationDirective(varDef, cursor));
-        cursor.next(); // skip Var
-        while (cursor.check(VARIABLE)) {
-            variable(varDef, cursor.next());
-            cursor.checkThenNext(COMMA); // skip ,
+        VariablesDefinition varDef = new VariablesDefinition();
+        if (cursor.has(DIRECTIVE)) {
+            varDef.setDirective(directive(varDef, cursor.next()));
         }
+
+        varDef.addToken(cursor.next().getToken()); // Var
+        List<BslTree> variables = varDef.getBody();
+        while (cursor.has(VARIABLE)) {
+            variables.add(variable(varDef, cursor.next()));
+            if (cursor.has(COMMA)) {
+                varDef.addToken(cursor.next().getToken()); // ,
+            }
+        }
+        varDef.addToken(cursor.next().getToken()); // ;
+
         return varDef;
     }
 
-    private void variable(VariablesDefinition varDef, AstNode tree) {
+    private Variable variable(VariablesDefinition varDef, AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        Variable variable = new Variable(varDef, tree.getToken());
-        variable.setIdentifier(cursor.map(n -> new Identifier(variable, n.getToken())));
+        Variable variable = new Variable(varDef);
+
+        AstNode name = cursor.next().getFirstChild();
+        variable.setName(name.getTokenOriginalValue());
+        variable.addToken(name.getToken());
+
         if (cursor.hasNext()) {
-            variable.setExport(cursor.map(n -> new Export(variable, n.getToken()), EXPORT));
+            variable.setExport(true);
+            variable.addToken(cursor.next().getToken());
         }
+
+        return variable;
     }
 
-    private CompilationDirective compilationDirective(BslTree parent, AstSiblingsCursor cursor) {
-        return cursor.map(node -> {
-            AstSiblingsCursor c = new AstSiblingsCursor(node.getFirstChild());
-            c.next(); // skip &
-            return new CompilationDirective(parent, node.getToken(), (BslDirective) c.next().getType());
-        }, DIRECTIVE);
+    private Directive directive(BslTree parent, AstNode tree) {
+        AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
+
+        Directive directive = new Directive(parent);
+        directive.addToken(cursor.next().getToken()); // &
+
+        AstNode node = cursor.next();
+        directive.setValue((BslDirective) node.getType());
+        directive.addToken(node.getToken());
+
+        return directive;
     }
 
-    public Statement statement(AstNode tree) {
-        Function<AstNode, Statement> rule = stmtRules.get(tree.getType());
+    public BslTree statement(AstNode tree) {
+        Function<AstNode, BslTree> rule = stmtRules.get(tree.getType());
         if (rule == null) {
             throw new IllegalStateException("Statement " + tree.getType() + " not correctly translated to strongly typed AST");
         }
@@ -178,230 +255,299 @@ public class BslTreeCreator {
     }
 
     public void compoundStmt(BslTree parent, AstNode tree) {
+        BslTree stmt = null;
         for (AstNode node : new AstSiblingsCursor(tree.getFirstChild())) {
             if (node.is(SEMICOLON)) {
-                continue;
+                if (stmt == null) {
+                    Token token = node.getToken();
+                    int line = token.getLine();
+                    throw new RecognitionException(line, "Parse error at line " + line + ": Statements delimiter is not expected.");
+                }
+                stmt.addToken(node.getToken());
+            } else {
+                stmt = statement(node);
+                stmt.setParent(parent);
+                parent.getBody().add(stmt);
             }
-            Statement stmt = statement(node);
-            stmt.setParent(parent);
-            parent.getBody().add(stmt);
         }
     }
 
-    public AssignmentStatement assignmentStmt(AstNode tree) {
+    public AssignmentStatement assignStmt(AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        AssignmentStatement stmt = new AssignmentStatement(tree.getToken());
-        stmt.setTarget(postfixExpression(stmt, cursor.next()));
-        cursor.next(); // skip =
+        AssignmentStatement stmt = new AssignmentStatement();
+        stmt.setTarget(postfixExpr(stmt, cursor.next()));
+        stmt.addToken(cursor.next().getToken()); // =
         stmt.setExpression(expression(stmt, cursor.next()));
+
         return stmt;
     }
 
-    public IfStatement ifStatement(AstNode tree) {
+    public IfStatement ifStmt(AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        IfStatement stmt = new IfStatement(tree.getToken());
-        cursor.next(); // skip If
+        IfStatement stmt = new IfStatement();
+        stmt.addToken(cursor.next().getToken()); // If
         stmt.setCondition(expression(stmt, cursor.next()));
-        cursor.next(); // skip Then
+        stmt.addToken(cursor.next().getToken()); // Then
         body(stmt, cursor.optional(BODY));
 
-        while (cursor.check(ELSIF)) {
-            ElsIfBranch elsIfBranch = new ElsIfBranch(stmt, cursor.next().getToken());
+        List<ElsIfBranch> branches = stmt.getElsIfBranches();
+        while (cursor.has(ELSIF)) {
+            ElsIfBranch elsIfBranch = new ElsIfBranch(stmt);
+            elsIfBranch.addToken(cursor.next().getToken()); // ElsIf
             elsIfBranch.setCondition(expression(elsIfBranch, cursor.next()));
-            cursor.next(); // skip Then
+            elsIfBranch.addToken(cursor.next().getToken()); // Then
             body(elsIfBranch, cursor.optional(BODY));
+
+            branches.add(elsIfBranch);
         }
-        if (cursor.check(ELSE)) {
-            ElseClause elseClause = new ElseClause(stmt, cursor.next().getToken());
+
+        if (cursor.has(ELSE)) {
+            ElseClause elseClause = new ElseClause(stmt);
+            elseClause.addToken(cursor.next().getToken()); // Else
             body(elseClause, cursor.optional(BODY));
+
+            stmt.setElseClause(elseClause);
         }
+
+        stmt.addToken(cursor.next().getToken()); // EndIf
+
         return stmt;
     }
 
     public WhileStatement whileStmt(AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        WhileStatement stmt = new WhileStatement(tree.getToken());
-        cursor.next(); // skip While
+        WhileStatement stmt = new WhileStatement();
+        stmt.addToken(cursor.next().getToken()); // While
         stmt.setCondition(expression(stmt, cursor.next()));
-        cursor.next(); // skip Do
+        stmt.addToken(cursor.next().getToken()); // Do
         body(stmt, cursor.optional(BODY));
+        stmt.addToken(cursor.next().getToken()); // EndDo
+
         return stmt;
     }
 
     public ForStatement forStmt(AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        ForStatement stmt = new ForStatement(tree.getToken());
-        cursor.next(); // skip For
-        stmt.setIdentifier(cursor.map(n -> new Identifier(stmt, n.getToken())));
-        cursor.next(); // skip =
+        ForStatement stmt = new ForStatement();
+        stmt.addToken(cursor.next().getToken()); // For
+
+        AstNode name = cursor.next().getFirstChild();
+        stmt.setName(name.getTokenOriginalValue());
+        stmt.addToken(name.getToken());
+
+        stmt.addToken(cursor.next().getToken()); // =
         stmt.setInit(expression(stmt, cursor.next()));
-        cursor.next(); // skip To
+        stmt.addToken(cursor.next().getToken()); // To
         stmt.setCondition(expression(stmt, cursor.next()));
-        cursor.next(); // skip Do
+        stmt.addToken(cursor.next().getToken()); // Do
         body(stmt, cursor.optional(BODY));
+        stmt.addToken(cursor.next().getToken()); // EndDo
+
         return stmt;
     }
 
     public ForEachStatement forEachStmt(AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        ForEachStatement stmt = new ForEachStatement(tree.getToken());
-        cursor.next(); // skip For
-        cursor.next(); // skip each
-        stmt.setIdentifier(cursor.map(n -> new Identifier(stmt, n.getToken())));
-        cursor.next(); // skip In
+        ForEachStatement stmt = new ForEachStatement();
+        stmt.addToken(cursor.next().getToken()); // For
+        stmt.addToken(cursor.next().getToken()); // each
+
+        AstNode name = cursor.next().getFirstChild();
+        stmt.setName(name.getTokenOriginalValue());
+        stmt.addToken(name.getToken());
+
+        stmt.addToken(cursor.next().getToken()); // In
         stmt.setCollection(expression(stmt, cursor.next()));
-        cursor.next(); // skip Do
+        stmt.addToken(cursor.next().getToken()); // Do
         body(stmt, cursor.optional(BODY));
+        stmt.addToken(cursor.next().getToken()); // EndDo
+
         return stmt;
     }
 
     public TryStatement tryStmt(AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        TryStatement stmt = new TryStatement(tree.getToken());
-        cursor.next(); // skip Try
+        TryStatement stmt = new TryStatement();
+        stmt.addToken(cursor.next().getToken()); // Try
         body(stmt, cursor.next());
+        stmt.addToken(cursor.next().getToken()); // Except
 
-        ExceptClause exceptClause = new ExceptClause(stmt, cursor.next().getToken());
+        ExceptClause exceptClause = new ExceptClause(stmt);
+        stmt.setExceptClause(exceptClause);
         body(exceptClause, cursor.optional(BODY));
+        stmt.addToken(cursor.next().getToken()); // EndTry
+
         return stmt;
     }
 
     public CallStatement callStmt(AstNode tree) {
-        CallStatement stmt = new CallStatement(tree.getToken());
-        stmt.setExpression(postfixExpression(stmt, tree.getFirstChild()));
+        CallStatement stmt = new CallStatement();
+        stmt.setExpression(postfixExpr(stmt, tree.getFirstChild()));
         return stmt;
     }
 
     public ReturnStatement returnStmt(AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        ReturnStatement stmt = new ReturnStatement(tree.getToken());
-        cursor.next(); // skip Return
-        stmt.setExpression(cursor.map(n -> expression(stmt, n)));
+        ReturnStatement stmt = new ReturnStatement();
+        stmt.addToken(cursor.next().getToken()); // Return
+        if (cursor.hasNext()) {
+            stmt.setExpression(expression(stmt, cursor.next()));
+        }
+
         return stmt;
     }
 
     public BreakStatement breakStmt(AstNode tree) {
-        return new BreakStatement(tree.getToken());
+        BreakStatement stmt = new BreakStatement();
+        stmt.addToken(tree.getFirstChild().getToken());
+        return stmt;
     }
 
     public ContinueStatement continueStmt(AstNode tree) {
-        return new ContinueStatement(tree.getToken());
+        ContinueStatement stmt = new ContinueStatement();
+        stmt.addToken(tree.getFirstChild().getToken());
+        return stmt;
     }
 
     public EmptyStatement emptyStmt(AstNode tree) {
-        return new EmptyStatement(tree.getToken());
+        EmptyStatement stmt = new EmptyStatement();
+        stmt.addToken(tree.getFirstChild().getToken());
+        return stmt;
     }
 
     public GotoStatement gotoStmt(AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
-        cursor.next(); // skip Goto
-        GotoStatement stmt = new GotoStatement(tree.getToken());
+
+        GotoStatement stmt = new GotoStatement();
+        stmt.addToken(cursor.next().getToken()); // Goto
         stmt.setLabel(label(stmt, cursor.next()));
+
         return stmt;
     }
 
     public LabelDefinition labelDef(AstNode tree) {
-        LabelDefinition labelDefinition = new LabelDefinition(tree.getToken());
-        labelDefinition.setLabel(label(labelDefinition, tree));
-        return labelDefinition;
-    }
-
-    private Label label(Statement parent, AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        Label label = new Label(parent, tree.getFirstChild().getToken());
-        cursor.next(); // skip ~
-        label.setIdentifier(new Identifier(label, cursor.next().getToken()));
+        LabelDefinition def = new LabelDefinition();
+        def.setLabel(label(def, cursor.next()));
+        def.addToken(cursor.next().getToken()); // :
+
+        return def;
+    }
+
+    private Label label(BslTree parent, AstNode tree) {
+        AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
+
+        Label label = new Label(parent);
+        label.addToken(cursor.next().getToken()); // ~
+
+        AstNode name = cursor.next();
+        label.setName(name.getTokenOriginalValue());
+        label.addToken(name.getToken());
+
         return label;
     }
 
     public ExecuteStatement executeStmt(AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        ExecuteStatement stmt = new ExecuteStatement(tree.getToken());
-        cursor.next(); // skip Execute
-        cursor.next(); // skip (
+        ExecuteStatement stmt = new ExecuteStatement();
+        stmt.addToken(cursor.next().getToken()); // Execute
+        stmt.addToken(cursor.next().getToken()); // (
         stmt.setExpression(expression(stmt, cursor.next()));
+        stmt.addToken(cursor.next().getToken()); // )
+
         return stmt;
     }
 
     public RaiseStatement raiseStmt(AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        RaiseStatement stmt = new RaiseStatement(tree.getToken());
-        cursor.next(); // skip Raise
+        RaiseStatement stmt = new RaiseStatement();
+        stmt.addToken(cursor.next().getToken()); // Raise
         if (cursor.hasNext()) {
             stmt.setExpression(expression(stmt, cursor.next()));
         }
+
         return stmt;
     }
 
     public AddHandlerStatement addHandlerStmt(AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        AddHandlerStatement stmt = new AddHandlerStatement(tree.getToken());
-        cursor.next(); // skip AddHandler
+        AddHandlerStatement stmt = new AddHandlerStatement();
+        stmt.addToken(cursor.next().getToken()); // AddHandler
         stmt.setEvent(expression(stmt, cursor.next()));
-        cursor.next(); // skip ,
+        stmt.addToken(cursor.next().getToken()); // ,
         stmt.setHandler(expression(stmt, cursor.next()));
+
         return stmt;
     }
 
     public RemoveHandlerStatement removeHandlerStmt(AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        RemoveHandlerStatement stmt = new RemoveHandlerStatement(tree.getToken());
-        cursor.next(); // skip RemoveHandler
+        RemoveHandlerStatement stmt = new RemoveHandlerStatement();
+        stmt.addToken(cursor.next().getToken()); // RemoveHandler
         stmt.setEvent(expression(stmt, cursor.next()));
-        cursor.next(); // skip ,
+        stmt.addToken(cursor.next().getToken()); // ,
         stmt.setHandler(expression(stmt, cursor.next()));
+
         return stmt;
     }
 
-    public Expression expression(AstNode tree) {
+    public BslTree expression(AstNode tree) {
         return expression(null, tree);
     }
 
-    public Expression expression(BslTree parent, AstNode tree) {
+    public BslTree expression(BslTree parent, AstNode tree) {
         if (tree.is(PRIMARY_EXPR, PP_PRIMARY_EXPRESSION)) {
             return primaryExpr(parent, tree);
         }
         if (tree.is(POSTFIX_EXPR, ASSIGNABLE_EXPR, CALLABLE_EXPR)) {
-            return postfixExpression(parent, tree);
+            return postfixExpr(parent, tree);
         }
         if (tree.is(
                 OR_EXPR, AND_EXPR,
                 RELATIONAL_EXPR, ADDITIVE_EXPR, MULTIPLICATIVE_EXPR,
                 PP_AND_EXPRESSION, PP_OR_EXPRESSION)) {
-            return binaryExpression(parent, tree);
+            return binaryExpr(parent, tree);
         }
         if (tree.is(NOT_EXPR, PP_NOT_EXPRESSION, UNARY_EXPR)) {
-            return unaryExpression(parent, tree);
+            return unaryExpr(parent, tree);
         }
         if (tree.is(TERNARY_EXPR)) {
-            return ternaryExpression(parent, tree);
+            return ternaryExpr(parent, tree);
         }
         if (tree.is(NEW_EXPR)) {
-            return newExpression(parent, tree);
+            return newExpr(parent, tree);
         }
 
         throw new IllegalStateException("Expression " + tree.getType() + " not correctly translated to strongly typed AST");
     }
 
-    private PostfixExpression postfixExpression(BslTree parent, AstNode tree) {
+    private PostfixExpression postfixExpr(BslTree parent, AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        PostfixExpression expr = new PostfixExpression(parent, tree.getToken());
-        expr.setAwait(cursor.map(n -> new PostfixExpression.Await(expr, n.getToken()), AWAIT));
-        expr.setReference(primaryExpr(expr, cursor.next()).as(ReferenceExpression.class));
+        PostfixExpression expr = new PostfixExpression(parent);
+        if (cursor.has(AWAIT)) {
+            expr.setAwait(true);
+            expr.addToken(cursor.next().getToken());
+        }
+
+        AstNode name = cursor.next().getFirstChild();
+        expr.setName(name.getTokenOriginalValue());
+        expr.addToken(name.getToken());
+
         expr.setPostfix(postfix(expr, cursor));
+
         return expr;
     }
 
@@ -415,44 +561,56 @@ public class BslTreeCreator {
         if (node.is(INDEX_POSTFIX, ASSIGNABLE_INDEX_POSTFIX, CALLABLE_INDEX_POSTFIX)) {
             AstSiblingsCursor c = cursor.descend();
 
-            IndexPostfix postfix = new IndexPostfix(parent, node.getToken());
-            c.next(); // skip [
+            IndexPostfix postfix = new IndexPostfix(parent);
+            postfix.addToken(c.next().getToken()); // [
             postfix.setIndex(expression(postfix, c.next()));
+            postfix.addToken(c.next().getToken()); // ]
             postfix.setPostfix(postfix(postfix, cursor));
+
             return postfix;
         }
 
         if (node.is(DEREFERENCE_POSTFIX, ASSIGNABLE_DEREFERENCE_POSTFIX, CALLABLE_DEREFERENCE_POSTFIX)) {
-            DereferencePostfix postfix = new DereferencePostfix(parent, node.getToken());
+            DereferencePostfix postfix = new DereferencePostfix(parent);
+            postfix.addToken(cursor.next().getToken()); // .
 
-            cursor.next(); // skip .
-            postfix.setIdentifier(new Identifier(postfix, cursor.next().getToken()));
+            AstNode name = cursor.next().getFirstChild();
+            postfix.setName(name.getTokenOriginalValue());
+            postfix.addToken(name.getToken());
+
             postfix.setPostfix(postfix(postfix, cursor));
+
             return postfix;
         }
 
         if (node.is(CALL_POSTFIX, ASSIGNABLE_CALL_POSTFIX, CALLABLE_CALL_POSTFIX, CONSTRUCTOR_CALL_POSTFIX)) {
-            CallPostfix postfix = new CallPostfix(parent, node.getToken());
-
-            List<Expression> arguments = postfix.getArguments();
             AstSiblingsCursor c = cursor.descend();
-            c.next(); // skip (
+
+            CallPostfix postfix = new CallPostfix(parent);
+            postfix.addToken(c.next().getToken()); // (
+
             boolean addTail = false;
-            while (!c.check(RPAREN)) {
-                if (c.check(COMMA)) {
-                    new CallPostfix.DefaultArgument(postfix, c.next().getToken());
-                    addTail = c.check(RPAREN);
+            List<BslTree> arguments = postfix.getArguments();
+            while (!c.has(RPAREN)) {
+                if (c.has(COMMA)) {
+                    postfix.addToken(c.next().getToken());
+                    arguments.add(new EmptyExpression(postfix));
+                    addTail = c.has(RPAREN);
                 } else {
                     arguments.add(expression(postfix, c.next()));
-                    if (c.checkThenNext(COMMA)) {
-                        addTail = c.check(RPAREN);
+                    if (c.has(COMMA)) {
+                        postfix.addToken(c.next().getToken());
+                        addTail = c.has(RPAREN);
                     }
                 }
             }
+            postfix.addToken(c.next().getToken()); // )
             if (addTail) {
-                new CallPostfix.DefaultArgument(postfix, c.next().getToken());
+                arguments.add(new EmptyExpression(postfix));
             }
+
             postfix.setPostfix(postfix(postfix, cursor));
+
             return postfix;
         }
 
@@ -461,126 +619,103 @@ public class BslTreeCreator {
         throw new RecognitionException(line, "Parse error at line " + line + ": Postfix expected. Got: " + token);
     }
 
-    private BinaryExpression binaryExpression(BslTree parent, AstNode tree) {
+    private BinaryExpression binaryExpr(BslTree parent, AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        BinaryExpression expr = new BinaryExpression(parent, tree.getToken());
+        BinaryExpression expr = new BinaryExpression(parent);
         expr.setLeft(expression(expr, cursor.next()));
-        expr.setOperator(binaryOperator(expr, cursor.next()));
+
+        AstNode node = cursor.next().getFirstChild();
+        BslTree.Type op = binOpRules.get(node.getType());
+        if (op == null) {
+            Token token = node.getToken();
+            int line = token.getLine();
+            throw new RecognitionException(line, "Parse error at line " + line + ": Unknown binary operator: " + token);
+        }
+        expr.setType(op);
+        expr.addToken(node.getToken());
+
         expr.setRight(expression(expr, cursor.next()));
+
         return expr;
     }
 
-    private Expression unaryExpression(BslTree parent, AstNode tree) {
+    private UnaryExpression unaryExpr(BslTree parent, AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        UnaryExpression unaryExpression = new UnaryExpression(parent, tree.getToken());
-        unaryExpression.setOperator(unaryOperator(unaryExpression, cursor.next()));
-        unaryExpression.setExpression(expression(unaryExpression, cursor.next()));
+        UnaryExpression expr = new UnaryExpression(parent);
 
-        return unaryExpression;
-    }
-
-    private Expression ternaryExpression(BslTree parent, AstNode tree) {
-        AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
-        cursor.next(); // skip ?
-        cursor.next(); // skip (
-
-        TernaryExpression ternaryExpression = new TernaryExpression(parent, tree.getToken());
-
-        ternaryExpression.setCondition(expression(ternaryExpression, cursor.next()));
-
-        cursor.next(); // skip ,
-
-        ternaryExpression.setTrueExpression(expression(ternaryExpression, cursor.next()));
-
-        cursor.next(); // skip ,
-
-        ternaryExpression.setFalseExpression(expression(ternaryExpression, cursor.next()));
-
-        return ternaryExpression;
-    }
-
-    private Expression newExpression(BslTree parent, AstNode tree) {
-        AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
-        cursor.next(); // skip new
-
-        NewExpression expr = new NewExpression(parent, tree.getToken());
-        expr.setObject(primaryExpr(expr, cursor.next()).as(ReferenceExpression.class));
-        expr.setPostfix(postfix(expr, cursor));
-        return expr;
-    }
-
-    private UnaryOperator unaryOperator(UnaryExpression parent, AstNode tree) {
-        AstNode node = tree.getFirstChild();
-
-        UnaryOperator operator = new UnaryOperator(parent, tree.getToken());
+        AstNode node = cursor.next().getFirstChild();
         if (node.is(MINUS)) {
-            operator.setValue(UnaryOperator.Type.MINUS);
+            expr.setType(BslTree.Type.MINUS);
         } else if (node.is(NOT)) {
-            operator.setValue(UnaryOperator.Type.NOT);
+            expr.setType(BslTree.Type.NOT);
         } else {
             Token token = node.getToken();
             int line = token.getLine();
             throw new RecognitionException(line, "Parse error at line " + line + ": Unary operator expected. Got: " + token);
         }
-        return operator;
+        expr.addToken(node.getToken());
+
+        expr.setExpression(expression(expr, cursor.next()));
+
+        return expr;
     }
 
-    private BinaryOperator binaryOperator(BinaryExpression parent, AstNode tree) {
-        AstNode node = tree.getFirstChild();
-
-        BinaryOperator operator = new BinaryOperator(parent, tree.getToken());
-        if (node.is(EQ)) {
-            operator.setValue(BinaryOperator.Type.EQ);
-        } else if (node.is(OR)) {
-            operator.setValue(BinaryOperator.Type.OR);
-        } else if (node.is(AND)) {
-            operator.setValue(BinaryOperator.Type.AND);
-        } else if (node.is(PLUS)) {
-            operator.setValue(BinaryOperator.Type.ADD);
-        } else if (node.is(MINUS)) {
-            operator.setValue(BinaryOperator.Type.SUB);
-        } else if (node.is(MUL)) {
-            operator.setValue(BinaryOperator.Type.MUL);
-        } else if (node.is(DIV)) {
-            operator.setValue(BinaryOperator.Type.DIV);
-        } else if (node.is(MOD)) {
-            operator.setValue(BinaryOperator.Type.MOD);
-        } else if (node.is(GT)) {
-            operator.setValue(BinaryOperator.Type.GT);
-        } else if (node.is(GE)) {
-            operator.setValue(BinaryOperator.Type.GE);
-        } else if (node.is(LT)) {
-            operator.setValue(BinaryOperator.Type.LT);
-        } else if (node.is(LE)) {
-            operator.setValue(BinaryOperator.Type.LE);
-        } else if (node.is(NEQ)) {
-            operator.setValue(BinaryOperator.Type.NEQ);
-        } else {
-            Token token = node.getToken();
-            int line = token.getLine();
-            throw new RecognitionException(line, "Parse error at line " + line + ": Unknown binary operator: " + token);
-        }
-        return operator;
-    }
-
-    private Expression primaryExpr(BslTree parent, AstNode tree) {
+    private TernaryExpression ternaryExpr(BslTree parent, AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        if (cursor.check(IDENTIFIER)) {
-            ReferenceExpression expr = new ReferenceExpression(parent, tree.getToken());
-            expr.setIdentifier(new Identifier(expr, cursor.next().getToken()));
+        TernaryExpression expr = new TernaryExpression(parent);
+        expr.addToken(cursor.next().getToken()); // ?
+        expr.addToken(cursor.next().getToken()); // (
+        expr.setCondition(expression(expr, cursor.next()));
+        expr.addToken(cursor.next().getToken()); // ,
+        expr.setTrueExpression(expression(expr, cursor.next()));
+        expr.addToken(cursor.next().getToken()); // ,
+        expr.setFalseExpression(expression(expr, cursor.next()));
+        expr.addToken(cursor.next().getToken()); // )
+
+        return expr;
+    }
+
+    private BslTree newExpr(BslTree parent, AstNode tree) {
+        AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
+
+        NewExpression expr = new NewExpression(parent);
+        expr.addToken(cursor.next().getToken()); // new
+
+        AstNode name = cursor.next().getFirstChild();
+        expr.setName(name.getTokenOriginalValue());
+        expr.addToken(name.getToken());
+
+        expr.setPostfix(postfix(expr, cursor));
+
+        return expr;
+    }
+
+    private BslTree primaryExpr(BslTree parent, AstNode tree) {
+        AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
+
+        if (cursor.has(IDENTIFIER)) {
+            ReferenceExpression expr = new ReferenceExpression(parent);
+
+            AstNode name = cursor.next().getFirstChild();
+            expr.setName(name.getTokenOriginalValue());
+            expr.addToken(name.getToken());
+
             return expr;
         }
 
-        if (cursor.check(PRIMITIVE)) {
+        if (cursor.has(PRIMITIVE)) {
             return primitiveExpr(parent, cursor.next());
         }
 
-        if (cursor.check(LPAREN)) {
-            ParenthesisExpression expr = new ParenthesisExpression(parent, cursor.next().getToken());
+        if (cursor.has(LPAREN)) {
+            ParenthesisExpression expr = new ParenthesisExpression(parent);
+            expr.addToken(cursor.next().getToken()); // (
             expr.setExpression(expression(expr, cursor.next()));
+            expr.addToken(cursor.next().getToken()); // )
+
             return expr;
         }
 
@@ -592,30 +727,55 @@ public class BslTreeCreator {
     private PrimitiveExpression primitiveExpr(BslTree parent, AstNode tree) {
         AstNode node = tree.getFirstChild();
         if (node.is(STRING)) {
-            PrimitiveString primitiveString = new PrimitiveString(parent, node.getToken());
-            List<BslTree> body = primitiveString.getBody();
+            StringBuilder builder = new StringBuilder();
+            PrimitiveExpression expr = new PrimitiveExpression(parent, BslTree.Type.STRING);
+            List<BslTree> body = expr.getBody();
             for (AstNode n : new AstSiblingsCursor(node.getFirstChild())) {
-                body.add(primitiveStr(primitiveString, n));
+                PrimitiveExpression literal = stringLiteral(expr, n);
+                builder.append(literal.getValue());
+                body.add(literal);
             }
-            return primitiveString;
+            expr.setValue(builder.toString());
+            return expr;
         }
         if (node.is(NUMBER)) {
-            return new PrimitiveNumber(parent, node.getToken());
+            PrimitiveExpression expr = new PrimitiveExpression(parent, BslTree.Type.NUMBER);
+            expr.addToken(node.getToken());
+            expr.setValue(node.getTokenOriginalValue());
+            return expr;
         }
         if (node.is(TRUE)) {
-            return new PrimitiveTrue(parent, node.getToken());
+            PrimitiveExpression expr = new PrimitiveExpression(parent, BslTree.Type.TRUE);
+            expr.addToken(node.getToken());
+            expr.setValue(node.getTokenOriginalValue());
+            return expr;
         }
         if (node.is(FALSE)) {
-            return new PrimitiveFalse(parent, node.getToken());
+            PrimitiveExpression expr = new PrimitiveExpression(parent, BslTree.Type.FALSE);
+            expr.addToken(node.getToken());
+            expr.setValue(node.getTokenOriginalValue());
+            return expr;
         }
         if (node.is(UNDEFINED)) {
-            return new PrimitiveUndefined(parent, node.getToken());
+            PrimitiveExpression expr = new PrimitiveExpression(parent, BslTree.Type.UNDEFINED);
+            expr.addToken(node.getToken());
+            expr.setValue(node.getTokenOriginalValue());
+            return expr;
         }
         if (node.is(DATE)) {
-            return new PrimitiveDate(parent, node.getToken());
+            PrimitiveExpression expr = new PrimitiveExpression(parent, BslTree.Type.DATE);
+            expr.addToken(node.getToken());
+
+            String value = node.getTokenOriginalValue();
+            expr.setValue(value.substring(1).substring(0, value.length() - 2));
+
+            return expr;
         }
         if (node.is(NULL)) {
-            return new PrimitiveNull(parent, node.getToken());
+            PrimitiveExpression expr = new PrimitiveExpression(parent, BslTree.Type.NULL);
+            expr.addToken(node.getToken());
+            expr.setValue(node.getTokenOriginalValue());
+            return expr;
         }
 
         Token token = node.getToken();
@@ -623,21 +783,37 @@ public class BslTreeCreator {
         throw new RecognitionException(line, "Parse error at line " + line + ": Unknown literal token: " + token);
     }
 
-    private StringLiteral primitiveStr(PrimitiveString parent, AstNode tree) {
+    private PrimitiveExpression stringLiteral(PrimitiveExpression parent, AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
-        cursor.next(); // skip "
         StringBuilder builder = new StringBuilder();
-        while (!cursor.check(QUOTE)) {
-            if (cursor.check(STRING_CONTENT)) {
-                builder.append(cursor.next().getTokenOriginalValue());
-            } else if (cursor.checkThenNext(PIPE)) {
+
+        PrimitiveExpression literal = new PrimitiveExpression(parent, BslTree.Type.STRING);
+        literal.addToken(cursor.next().getToken()); // "
+        while (!cursor.has(QUOTE)) {
+            if (cursor.has(STRING_CONTENT)) {
+                AstNode node = cursor.next();
+                literal.addToken(node.getToken());
+                builder.append(node.getTokenOriginalValue());
+            } else if (cursor.has(PIPE)) {
                 builder.append('\n');
+                literal.addToken(cursor.next().getToken());
             } else {
                 Token token = cursor.next().getToken();
                 int line = token.getLine();
                 throw new RecognitionException(line, "Parse error at line " + line + ": Unknown string literal token: " + token);
             }
         }
-        return new StringLiteral(parent, tree.getToken(), builder.toString());
+        literal.addToken(cursor.next().getToken()); // "
+
+        literal.setValue(builder.toString());
+
+        return literal;
     }
+
+    private static void addTokens(BslTree target, AstNode tree) {
+        for (AstNode n : new AstSiblingsCursor(tree.getFirstChild())) {
+            target.addToken(n.getToken());
+        }
+    }
+
 }

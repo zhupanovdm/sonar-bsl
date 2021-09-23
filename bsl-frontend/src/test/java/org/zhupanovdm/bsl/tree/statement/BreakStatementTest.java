@@ -7,6 +7,7 @@ import org.zhupanovdm.bsl.tree.BslTreeCreator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.zhupanovdm.bsl.TestUtils.parse;
+import static org.zhupanovdm.bsl.tree.BslTree.Type.BREAK_STMT;
 
 public class BreakStatementTest {
     private final LexerlessGrammar g = BslGrammar.create();
@@ -16,7 +17,8 @@ public class BreakStatementTest {
     public void test() {
         BreakStatement stmt = creator.breakStmt(parse("Break", g.rule(BslGrammar.BREAK_STMT)));
 
-        assertThat(stmt).isNotNull();
+        assertThat(stmt.getType()).isEqualTo(BREAK_STMT);
         assertThat(stmt.getBody()).isEmpty();
+        assertThat(stmt.getTokens()).hasSize(1);
     }
 }

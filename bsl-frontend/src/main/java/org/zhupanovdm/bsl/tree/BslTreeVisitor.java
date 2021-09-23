@@ -31,10 +31,7 @@ public abstract class BslTreeVisitor {
 
     public void visitCallableDefinition(CallableDefinition callableDefinition) {
         scan(callableDefinition.getDirective());
-        scan(callableDefinition.getAsync());
-        scan(callableDefinition.getIdentifier());
         scan(callableDefinition.getParameters());
-        scan(callableDefinition.getExport());
         scan(callableDefinition.getBody());
     }
 
@@ -74,14 +71,12 @@ public abstract class BslTreeVisitor {
     }
 
     public void visitForStatement(ForStatement forStatement) {
-        scan(forStatement.getIdentifier());
         scan(forStatement.getInit());
         scan(forStatement.getCondition());
         scan(forStatement.getBody());
     }
 
     public void visitForEachStatement(ForEachStatement forEachStatement) {
-        scan(forEachStatement.getIdentifier());
         scan(forEachStatement.getCollection());
         scan(forEachStatement.getBody());
     }
@@ -137,39 +132,20 @@ public abstract class BslTreeVisitor {
         scan(removeHandlerStatement.getHandler());
     }
 
-    public void visitIdentifier(Identifier identifier) {
-        // nothing to visit for identifier
-    }
-
     public void visitVariable(Variable variable) {
-        scan(variable.getIdentifier());
-        scan(variable.getExport());
+        // nothing to visit for variable
     }
 
     public void visitParameter(Parameter parameter) {
-        scan(parameter.getVal());
-        scan(parameter.getIdentifier());
         scan(parameter.getDefaultValue());
     }
 
-    public void visitParameterVal(Parameter.Val val) {
-        // nothing to visit for parameter val
-    }
-
     public void visitLabel(Label label) {
-        scan(label.getIdentifier());
+        // nothing to visit for label
     }
 
-    public void visitCompilationDirective(CompilationDirective compilationDirective) {
+    public void visitCompilationDirective(Directive directive) {
         // nothing to visit for compilation directive
-    }
-
-    public void visitCallableAsync(CallableDefinition.Async async) {
-        // nothing to visit for callable async
-    }
-
-    public void visitExport(Export export) {
-        // nothing to visit for export
     }
 
     public void visitPreprocessorIf(PreprocessorIf preprocessorIf) {
@@ -184,32 +160,19 @@ public abstract class BslTreeVisitor {
     }
 
     public void visitBinaryExpression(BinaryExpression binaryExpression) {
-        scan(binaryExpression.getOperator());
         scan(binaryExpression.getLeft());
         scan(binaryExpression.getRight());
     }
 
-    public void visitBinaryOperator(BinaryOperator binaryOperator) {
-        // nothing to visit for binary operator
-    }
-
     public void visitUnaryExpression(UnaryExpression unaryExpression) {
-        scan(unaryExpression.getOperator());
         scan(unaryExpression.getExpression());
     }
 
-    public void visitUnaryOperator(UnaryOperator unaryOperator) {
-        // nothing to visit for unary operator
-    }
-
     public void visitNewExpression(NewExpression newExpression) {
-        scan(newExpression.getObject());
         scan(newExpression.getPostfix());
     }
 
     public void visitPostfixExpression(PostfixExpression postfixExpression) {
-        scan(postfixExpression.getAwait());
-        scan(postfixExpression.getReference());
         scan(postfixExpression.getPostfix());
     }
 
@@ -219,7 +182,6 @@ public abstract class BslTreeVisitor {
     }
 
     public void visitDereferencePostfix(DereferencePostfix dereferencePostfix) {
-        scan(dereferencePostfix.getIdentifier());
         scan(dereferencePostfix.getPostfix());
     }
 
@@ -229,7 +191,7 @@ public abstract class BslTreeVisitor {
     }
 
     public void visitReferenceExpression(ReferenceExpression referenceExpression) {
-        scan(referenceExpression.getIdentifier());
+        // nothing to visit for reference
     }
 
     public void visitParenthesisExpression(ParenthesisExpression parenthesisExpression) {
@@ -242,43 +204,11 @@ public abstract class BslTreeVisitor {
         scan(ternaryExpression.getFalseExpression());
     }
 
-    public void visitPrimitiveUndefined(PrimitiveUndefined primitiveUndefined) {
-        // nothing to visit for primitive
+    public void visitEmptyExpression(EmptyExpression emptyExpression) {
+        // nothing to visit for empty expression
     }
 
-    public void visitPrimitiveNull(PrimitiveNull aPrimitiveNull) {
-        // nothing to visit for primitive
-    }
-
-    public void visitPrimitiveTrue(PrimitiveTrue aPrimitiveTrue) {
-        // nothing to visit for primitive
-    }
-
-    public void visitPrimitiveFalse(PrimitiveFalse aPrimitiveFalse) {
-        // nothing to visit for primitive
-    }
-
-    public void visitPrimitiveNumber(PrimitiveNumber primitiveNumber) {
-        // nothing to visit for primitive
-    }
-
-    public void visitPrimitiveString(PrimitiveString primitiveString) {
-        scan(primitiveString.getBody());
-    }
-
-    public void visitPrimitiveDate(PrimitiveDate primitiveDate) {
-        // nothing to visit for primitive
-    }
-
-    public void visitStringLiteral(StringLiteral stringLiteral) {
-        // nothing to visit for primitive
-    }
-
-    public void visitDefaultArgument(CallPostfix.DefaultArgument defaultArgument) {
-        // nothing to visit for default argument
-    }
-
-    public void visitAwait(PostfixExpression.Await await) {
-        // nothing to visit for await
+    public void visitPrimitiveExpression(PrimitiveExpression primitiveExpression) {
+        scan(primitiveExpression.getBody());
     }
 }

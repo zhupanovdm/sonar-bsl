@@ -1,28 +1,29 @@
 package org.zhupanovdm.bsl.tree.expression;
 
-import com.sonar.sslr.api.Token;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeVisitor;
-import org.zhupanovdm.bsl.tree.definition.Identifier;
+import org.zhupanovdm.bsl.tree.Named;
+
+import static org.zhupanovdm.bsl.tree.BslTree.Type.DEREFERENCE;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class DereferencePostfix extends Postfix {
-    private Identifier identifier;
+public class DereferencePostfix extends Postfix implements Named {
+    private String name;
 
-    public DereferencePostfix(BslTree parent, Token token) {
-        super(parent, token);
-    }
-
-    @Override
-    public String toString() {
-        return "." + identifier + (getPostfix() == null ? "" : getPostfix());
+    public DereferencePostfix(BslTree parent) {
+        super(parent, DEREFERENCE);
     }
 
     @Override
     public void accept(BslTreeVisitor visitor) {
         visitor.visitDereferencePostfix(this);
+    }
+
+    @Override
+    public String toString() {
+        return "." + name + (getPostfix() == null ? "" : getPostfix());
     }
 }

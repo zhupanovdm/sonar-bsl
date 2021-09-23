@@ -7,6 +7,8 @@ import org.zhupanovdm.bsl.tree.BslTreeCreator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.zhupanovdm.bsl.TestUtils.parse;
+import static org.zhupanovdm.bsl.grammar.BslGrammar.EXPRESSION;
+import static org.zhupanovdm.bsl.tree.BslTree.Type.PARENTHESIS;
 
 public class ParenthesisExpressionTest {
     private final LexerlessGrammar g = BslGrammar.create();
@@ -14,8 +16,10 @@ public class ParenthesisExpressionTest {
 
     @Test
     public void test() {
-        ParenthesisExpression stmt = creator.expression(parse("(Foo)", g.rule(BslGrammar.EXPRESSION)).getFirstChild()).as(ParenthesisExpression.class);
+        ParenthesisExpression stmt = creator.expression(parse("(Foo)", g.rule(EXPRESSION)).getFirstChild()).as(ParenthesisExpression.class);
 
-        assertThat(stmt.getExpression().as(ReferenceExpression.class).getIdentifier().getValue()).isEqualTo("Foo");
+        assertThat(stmt.getType()).isEqualTo(PARENTHESIS);
+        assertThat(stmt.getExpression().as(ReferenceExpression.class).getName()).isEqualTo("Foo");
+        assertThat(stmt.getTokens()).hasSize(2);
     }
 }
