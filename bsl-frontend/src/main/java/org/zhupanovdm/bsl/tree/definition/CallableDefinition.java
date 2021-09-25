@@ -23,8 +23,8 @@ public class CallableDefinition extends BslTree implements Named, Exportable, Ha
     }
 
     @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitCallableDefinition(this);
+    public void accept(BslTreeSubscriber subscriber) {
+        subscriber.onVisitCallableDefinition(this);
     }
 
     @Override

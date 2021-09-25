@@ -3,7 +3,7 @@ package org.zhupanovdm.bsl.tree.statement;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 import org.zhupanovdm.bsl.tree.HasCondition;
 import org.zhupanovdm.bsl.tree.Named;
 
@@ -21,8 +21,8 @@ public class ForStatement extends BslTree implements Named, HasCondition {
     }
 
     @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitForStatement(this);
+    public void accept(BslTreeSubscriber subscriber) {
+        subscriber.onVisitForStatement(this);
     }
 
     @Override

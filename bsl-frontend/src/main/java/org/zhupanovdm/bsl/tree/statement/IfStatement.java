@@ -3,7 +3,7 @@ package org.zhupanovdm.bsl.tree.statement;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 import org.zhupanovdm.bsl.tree.HasCondition;
 
 import java.util.LinkedList;
@@ -23,8 +23,8 @@ public class IfStatement extends BslTree implements HasCondition {
     }
 
     @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitIfStatement(this);
+    public void accept(BslTreeSubscriber subscriber) {
+        subscriber.onVisitIfStatement(this);
     }
 
     @Override

@@ -3,7 +3,7 @@ package org.zhupanovdm.bsl.tree.expression;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 import org.zhupanovdm.bsl.tree.HasCondition;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.TERNARY;
@@ -20,8 +20,8 @@ public class TernaryExpression extends BslTree implements HasCondition {
     }
 
     @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitTernaryExpression(this);
+    public void accept(BslTreeSubscriber subscriber) {
+        subscriber.onVisitTernaryExpression(this);
     }
 
     @Override

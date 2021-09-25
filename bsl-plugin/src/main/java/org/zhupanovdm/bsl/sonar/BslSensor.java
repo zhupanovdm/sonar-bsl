@@ -33,6 +33,7 @@ import org.zhupanovdm.bsl.metrics.CyclomaticComplexityVisitor;
 import org.zhupanovdm.bsl.metrics.FileLinesVisitor;
 import org.zhupanovdm.bsl.metrics.ModuleMetrics;
 import org.zhupanovdm.bsl.tree.BslTreeCreator;
+import org.zhupanovdm.bsl.tree.BslTreePublisher;
 import org.zhupanovdm.bsl.tree.module.Module;
 
 import java.io.IOException;
@@ -136,22 +137,30 @@ public class BslSensor implements Sensor {
 
     private void saveMeasures(SensorContext context, InputFile file, AstNode tree) {
         Module module = new BslTreeCreator().create(tree);
+
+        CognitiveComplexityVisitorStub cognitiveComplexity = new CognitiveComplexityVisitorStub();
+        CyclomaticComplexityVisitor cyclomaticComplexity = new CyclomaticComplexityVisitor();
         FileLinesVisitor fileLines = new FileLinesVisitor();
-        new AstWalker(fileLines).walkAndVisit(tree);
-        ModuleMetrics moduleMetrics = new ModuleMetrics(tree);
+        ModuleMetrics moduleMetrics = new ModuleMetrics();
+
+        new BslTreePublisher()
+                .subscribe(cyclomaticComplexity)
+                .subscribe(cognitiveComplexity)
+                .subscribe(fileLines)
+                .subscribe(moduleMetrics)
+                .publish(module);
 
         saveMeasure(context, file, CoreMetrics.NCLOC, fileLines.getLinesOfCode().size());
         saveMeasure(context, file, CoreMetrics.COMMENT_LINES, fileLines.getLinesOfComments().size());
         saveMeasure(context, file, CoreMetrics.FUNCTIONS, moduleMetrics.getNumberOfFunctions());
         saveMeasure(context, file, CoreMetrics.STATEMENTS, moduleMetrics.getNumberOfStatements());
         saveMeasure(context, file, CoreMetrics.EXECUTABLE_LINES_DATA, moduleMetrics.getExecutableLines());
+        saveMeasure(context, file, CoreMetrics.COMPLEXITY, cyclomaticComplexity.getComplexity());
+        saveMeasure(context, file, CoreMetrics.COGNITIVE_COMPLEXITY, cognitiveComplexity.getComplexity());
 
         FileLinesContext fileLinesContext = fileLinesContextFactory.createFor(file);
         fileLines.getLinesOfCode().forEach(line -> fileLinesContext.setIntValue(CoreMetrics.NCLOC_DATA_KEY, line, 1));
         fileLinesContext.save();
-
-        saveMeasure(context, file, CoreMetrics.COMPLEXITY, CyclomaticComplexityVisitor.complexity(module));
-        saveMeasure(context, file, CoreMetrics.COGNITIVE_COMPLEXITY, CognitiveComplexityVisitorStub.complexity(module));
     }
 
     private static <T extends Serializable> void saveMeasure(SensorContext context, InputFile file, Metric<T> metric, T value) {

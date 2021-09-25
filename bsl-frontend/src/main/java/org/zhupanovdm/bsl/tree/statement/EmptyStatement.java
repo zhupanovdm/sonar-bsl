@@ -1,7 +1,7 @@
 package org.zhupanovdm.bsl.tree.statement;
 
 import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.EMPTY_STMT;
 
@@ -11,8 +11,8 @@ public class EmptyStatement extends BslTree {
     }
 
     @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitEmptyStatement(this);
+    public void accept(BslTreeSubscriber subscriber) {
+        subscriber.onVisitEmptyStatement(this);
     }
 
     @Override

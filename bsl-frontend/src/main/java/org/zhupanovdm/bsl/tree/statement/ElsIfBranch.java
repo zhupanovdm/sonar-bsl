@@ -3,7 +3,7 @@ package org.zhupanovdm.bsl.tree.statement;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 import org.zhupanovdm.bsl.tree.HasCondition;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.IF_STMT;
@@ -18,8 +18,8 @@ public class ElsIfBranch extends BslTree implements HasCondition {
     }
 
     @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitElsIfBranch(this);
+    public void accept(BslTreeSubscriber subscriber) {
+        subscriber.onVisitElsIfBranch(this);
     }
 
     @Override

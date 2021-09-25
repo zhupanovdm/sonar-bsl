@@ -1,7 +1,7 @@
 package org.zhupanovdm.bsl.tree.statement;
 
 import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.TRY_STMT;
 
@@ -11,8 +11,8 @@ public class ExceptClause extends BslTree {
     }
 
     @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitExceptClause(this);
+    public void accept(BslTreeSubscriber subscriber) {
+        subscriber.onVisitExceptClause(this);
     }
 
     @Override

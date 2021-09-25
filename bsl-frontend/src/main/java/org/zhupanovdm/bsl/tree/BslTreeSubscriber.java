@@ -1,31 +1,59 @@
 package org.zhupanovdm.bsl.tree;
 
-import java.util.*;
-import java.util.function.Consumer;
+import org.zhupanovdm.bsl.tree.definition.*;
+import org.zhupanovdm.bsl.tree.expression.*;
+import org.zhupanovdm.bsl.tree.module.Module;
+import org.zhupanovdm.bsl.tree.module.PreprocessorElsif;
+import org.zhupanovdm.bsl.tree.module.PreprocessorIf;
+import org.zhupanovdm.bsl.tree.statement.*;
 
-public abstract class BslTreeSubscriber {
-    protected final Map<BslTree.Type, List<Consumer<BslTree>>> subscribers = new HashMap<>();
+public interface BslTreeSubscriber {
+    default void onEnterNode(BslTree node) {}
+    default void onLeaveNode(BslTree node) {}
 
-    public void scan(BslTree tree) {
-        if (tree == null) {
-            return;
-        }
-        publish(tree);
-        for (BslTree child : tree.getBody()) {
-            publish(child);
-        }
-    }
+    default void onVisitModule(Module module) {}
+    default void onVisitPreprocessorIf(PreprocessorIf pp) {}
+    default void onVisitPreprocessorElsif(PreprocessorElsif pp) {}
 
-    protected void publish(BslTree tree) {
-        for (Consumer<BslTree> subscriber :
-                subscribers.getOrDefault(tree.getType(), Collections.emptyList())) {
-            subscriber.accept(tree);
-        }
-    }
+    default void onVisitCallableDefinition(CallableDefinition def) {}
+    default void onVisitVariablesDefinition(VariablesDefinition def) {}
 
-    public void register(Consumer<BslTree> subscriber, BslTree.Type ...types) {
-        for (BslTree.Type type : types) {
-            subscribers.computeIfAbsent(type, t -> new LinkedList<>()).add(subscriber);
-        }
-    }
+    default void onVisitAssignmentStatement(AssignmentStatement stmt) {}
+    default void onVisitCallStatement(CallStatement stmt) {}
+    default void onVisitIfStatement(IfStatement stmt) {}
+    default void onVisitElsIfBranch(ElsIfBranch branch) {}
+    default void onVisitElseClause(ElseClause clause) {}
+    default void onVisitWhileStatement(WhileStatement stmt) {}
+    default void onVisitForStatement(ForStatement stmt) {}
+    default void onVisitForEachStatement(ForEachStatement stmt) {}
+    default void onVisitReturnStatement(ReturnStatement stmt) {}
+    default void onVisitContinueStatement(ContinueStatement stmt) {}
+    default void onVisitBreakStatement(BreakStatement stmt) {}
+    default void onVisitRaiseStatement(RaiseStatement stmt) {}
+    default void onVisitEmptyStatement(EmptyStatement stmt) {}
+    default void onVisitTryStatement(TryStatement stmt) {}
+    default void onVisitExceptClause(ExceptClause clause) {}
+    default void onVisitExecuteStatement(ExecuteStatement stmt) {}
+    default void onVisitGotoStatement(GotoStatement stmt) {}
+    default void onVisitAddHandlerStatement(AddHandlerStatement stmt) {}
+    default void onVisitRemoveHandlerStatement(RemoveHandlerStatement stmt) {}
+    default void onVisitLabelDefinition(LabelDefinition def) {}
+
+    default void onVisitBinaryExpression(BinaryExpression expr) {}
+    default void onVisitUnaryExpression(UnaryExpression expr) {}
+    default void onVisitNewExpression(NewExpression expr) {}
+    default void onVisitPostfixExpression(PostfixExpression expr) {}
+    default void onVisitCallPostfix(CallPostfix postfix) {}
+    default void onVisitDereferencePostfix(DereferencePostfix postfix) {}
+    default void onVisitIndexPostfix(IndexPostfix postfix) {}
+    default void onVisitReferenceExpression(ReferenceExpression expr) {}
+    default void onVisitParenthesisExpression(ParenthesisExpression expr) {}
+    default void onVisitTernaryExpression(TernaryExpression expr) {}
+    default void onVisitEmptyExpression(EmptyExpression expr) {}
+    default void onVisitPrimitiveExpression(PrimitiveExpression expr) {}
+
+    default void onVisitVariable(Variable variable) {}
+    default void onVisitParameter(Parameter parameter) {}
+    default void onVisitCompilationDirective(Directive directive) {}
+    default void onVisitLabel(Label label) {}
 }

@@ -3,7 +3,7 @@ package org.zhupanovdm.bsl.tree.definition;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 import org.zhupanovdm.bsl.tree.HasDirective;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.VAR_DEF;
@@ -19,8 +19,8 @@ public class VariablesDefinition extends BslTree implements HasDirective {
     }
 
     @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitVariablesDefinition(this);
+    public void accept(BslTreeSubscriber subscriber) {
+        subscriber.onVisitVariablesDefinition(this);
     }
 
     @Override

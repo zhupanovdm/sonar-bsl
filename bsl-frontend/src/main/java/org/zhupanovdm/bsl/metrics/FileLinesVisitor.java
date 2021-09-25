@@ -1,17 +1,18 @@
 package org.zhupanovdm.bsl.metrics;
 
-import com.sonar.sslr.api.*;
+import org.zhupanovdm.bsl.tree.BslToken;
+import org.zhupanovdm.bsl.tree.BslTree;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
+import org.zhupanovdm.bsl.tree.BslTrivia;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static com.sonar.sslr.api.GenericTokenType.EOF;
-import static org.zhupanovdm.bsl.utils.BslCommentAnalyser.*;
 
-public class FileLinesVisitor implements AstAndTokenVisitor {
+public class FileLinesVisitor implements BslTreeSubscriber {
+    private static final String NOSONAR = "NOSONAR";
 
     private final Set<Integer> linesOfCode = new HashSet<>();
     private final Set<Integer> linesOfComments = new HashSet<>();
@@ -20,57 +21,51 @@ public class FileLinesVisitor implements AstAndTokenVisitor {
     public Set<Integer> getLinesOfCode() {
         return Collections.unmodifiableSet(linesOfCode);
     }
-
     public Set<Integer> getLinesOfComments() {
         return Collections.unmodifiableSet(linesOfComments);
     }
-
     public Set<Integer> getLinesNoSonar() {
         return Collections.unmodifiableSet(linesNoSonar);
     }
 
     @Override
-    public List<AstNodeType> getAstNodeTypesToVisit() {
-        return Collections.emptyList();
+    public void onEnterNode(BslTree node) {
+        for (BslToken token : node.getTokens()) {
+            visitToken(token);
+        }
     }
 
-    @Override
-    public void visitFile(@Nullable AstNode ast) {
-        linesOfCode.clear();
-        linesOfComments.clear();
-        linesNoSonar.clear();
-    }
-
-    @Override
-    public void leaveFile(@Nullable AstNode ast) {
-    }
-
-    @Override
-    public void visitNode(AstNode ast) {
-    }
-
-    @Override
-    public void leaveNode(AstNode ast) {
-    }
-
-    @Override
-    public void visitToken(Token token) {
+    private void visitToken(BslToken token) {
         if (!token.getType().equals(EOF)) {
             linesOfCode.add(token.getLine());
         }
 
-        for (Trivia trivia : token.getTrivia()) {
-            if (trivia.isComment()) {
-                String content = getContents(trivia.getToken().getOriginalValue());
-                int line = trivia.getToken().getLine();
-                if (isNoSonar(content)) {
-                    linesOfComments.remove(line);
-                    linesNoSonar.add(line);
-                } else if (!isBlank(content) && !linesNoSonar.contains(line)) {
-                    linesOfComments.add(line);
-                }
+        for (BslTrivia trivia : token.getComments()) {
+            String content = getContents(trivia.getValue());
+            int line = trivia.getTokens().get(0).getLine();
+            if (isNoSonar(content)) {
+                linesOfComments.remove(line);
+                linesNoSonar.add(line);
+            } else if (!isBlank(content) && !linesNoSonar.contains(line)) {
+                linesOfComments.add(line);
             }
         }
     }
 
+    public static boolean isBlank(String line) {
+        for (int i = 0; i < line.length(); i++) {
+            if (Character.isLetterOrDigit(line.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static String getContents(String comment) {
+        return comment.substring(2);
+    }
+
+    public static boolean isNoSonar(String content) {
+        return content.contains(NOSONAR);
+    }
 }

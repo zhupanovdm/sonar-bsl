@@ -2,8 +2,9 @@ package org.zhupanovdm.bsl.tree.statement;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.zhupanovdm.bsl.tree.BslToken;
 import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 import org.zhupanovdm.bsl.tree.expression.PostfixExpression;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.CALL_STMT;
@@ -18,8 +19,13 @@ public class CallStatement extends BslTree {
     }
 
     @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitCallStatement(this);
+    public void accept(BslTreeSubscriber subscriber) {
+        subscriber.onVisitCallStatement(this);
+    }
+
+    @Override
+    public BslToken getFirstToken() {
+        return expression.getFirstToken();
     }
 
     @Override

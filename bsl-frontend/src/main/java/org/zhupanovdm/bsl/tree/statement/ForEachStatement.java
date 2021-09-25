@@ -3,7 +3,7 @@ package org.zhupanovdm.bsl.tree.statement;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 import org.zhupanovdm.bsl.tree.Named;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.FOREACH_STMT;
@@ -19,8 +19,8 @@ public class ForEachStatement extends BslTree implements Named {
     }
 
     @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitForEachStatement(this);
+    public void accept(BslTreeSubscriber subscriber) {
+        subscriber.onVisitForEachStatement(this);
     }
 
     @Override

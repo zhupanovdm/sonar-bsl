@@ -3,7 +3,7 @@ package org.zhupanovdm.bsl.tree.statement;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.LABEL_DEF;
 
@@ -17,8 +17,8 @@ public class LabelDefinition extends BslTree {
     }
 
     @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitLabelDefinition(this);
+    public void accept(BslTreeSubscriber subscriber) {
+        subscriber.onVisitLabelDefinition(this);
     }
 
     @Override

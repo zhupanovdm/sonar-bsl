@@ -22,7 +22,7 @@ public abstract class BslTree {
         this.type = type;
     }
 
-    public abstract void accept(BslTreeVisitor visitor);
+    public abstract void accept(BslTreeSubscriber subscriber);
 
     public <T extends BslTree> T as(Class<T> type) {
         return type.cast(this);
@@ -39,6 +39,13 @@ public abstract class BslTree {
 
     public void addToken(Token token) {
         tokens.add(new BslToken(token));
+    }
+
+    public BslToken getFirstToken() {
+        if (tokens.isEmpty()) {
+            return null;
+        }
+        return tokens.get(0);
     }
 
     public enum Type {

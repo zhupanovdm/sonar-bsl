@@ -3,7 +3,7 @@ package org.zhupanovdm.bsl.tree.definition;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 import org.zhupanovdm.bsl.tree.Exportable;
 import org.zhupanovdm.bsl.tree.Named;
 
@@ -20,8 +20,8 @@ public class Variable extends BslTree implements Named, Exportable {
     }
 
     @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitVariable(this);
+    public void accept(BslTreeSubscriber subscriber) {
+        subscriber.onVisitVariable(this);
     }
 
     @Override

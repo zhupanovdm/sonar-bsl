@@ -1,7 +1,7 @@
 package org.zhupanovdm.bsl.tree.module;
 
 import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.MODULE;
 
@@ -11,8 +11,8 @@ public class Module extends BslTree {
     }
 
     @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitModule(this);
+    public void accept(BslTreeSubscriber subscriber) {
+        subscriber.onVisitModule(this);
     }
 
     @Override

@@ -3,7 +3,7 @@ package org.zhupanovdm.bsl.tree.expression;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 import org.zhupanovdm.bsl.tree.Named;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.POSTFIX;
@@ -19,8 +19,8 @@ public class PostfixExpression extends Postfix implements Named {
     }
 
     @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitPostfixExpression(this);
+    public void accept(BslTreeSubscriber subscriber) {
+        subscriber.onVisitPostfixExpression(this);
     }
 
     @Override

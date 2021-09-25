@@ -2,7 +2,7 @@ package org.zhupanovdm.bsl.tree.statement;
 
 import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.IF_STMT;
 
@@ -13,8 +13,8 @@ public class ElseClause extends BslTree {
     }
 
     @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitElseClause(this);
+    public void accept(BslTreeSubscriber subscriber) {
+        subscriber.onVisitElseClause(this);
     }
 
     @Override

@@ -1,14 +1,9 @@
 package org.zhupanovdm.bsl.metrics;
 
-import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import lombok.Getter;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 
-public class CognitiveComplexityVisitorStub extends BslTreeVisitor {
+public class CognitiveComplexityVisitorStub implements BslTreeSubscriber {
+    @Getter
     private int complexity;
-
-    public static int complexity(BslTree tree) {
-        CognitiveComplexityVisitorStub visitor = new CognitiveComplexityVisitorStub();
-        visitor.scan(tree);
-        return visitor.complexity;
-    }
 }

@@ -3,7 +3,7 @@ package org.zhupanovdm.bsl.tree.statement;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.REM_HANDLER_STMT;
 
@@ -18,8 +18,8 @@ public class RemoveHandlerStatement extends BslTree {
     }
 
     @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitRemoveHandlerStatement(this);
+    public void accept(BslTreeSubscriber subscriber) {
+        subscriber.onVisitRemoveHandlerStatement(this);
     }
 
     @Override

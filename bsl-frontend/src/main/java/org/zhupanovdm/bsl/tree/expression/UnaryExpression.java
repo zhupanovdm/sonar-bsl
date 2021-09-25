@@ -3,7 +3,7 @@ package org.zhupanovdm.bsl.tree.expression;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.BslTreeVisitor;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -15,8 +15,8 @@ public class UnaryExpression extends BslTree {
     }
 
     @Override
-    public void accept(BslTreeVisitor visitor) {
-        visitor.visitUnaryExpression(this);
+    public void accept(BslTreeSubscriber subscriber) {
+        subscriber.onVisitUnaryExpression(this);
     }
 
     @Override
