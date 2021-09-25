@@ -816,4 +816,7 @@ public class BslTreeCreator {
         }
     }
 
+    public static Module module(AstNode tree) {
+        return new BslTreeCreator().create(tree);
+    }
 }

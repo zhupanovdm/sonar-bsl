@@ -28,13 +28,11 @@ import org.zhupanovdm.bsl.BslCheck;
 import org.zhupanovdm.bsl.BslParser;
 import org.zhupanovdm.bsl.Issue;
 import org.zhupanovdm.bsl.checks.CheckList;
-import org.zhupanovdm.bsl.metrics.CognitiveComplexityVisitorStub;
-import org.zhupanovdm.bsl.metrics.CyclomaticComplexityVisitor;
-import org.zhupanovdm.bsl.metrics.FileLinesVisitor;
+import org.zhupanovdm.bsl.metrics.CognitiveComplexity;
+import org.zhupanovdm.bsl.metrics.CyclomaticComplexity;
 import org.zhupanovdm.bsl.metrics.ModuleMetrics;
 import org.zhupanovdm.bsl.tree.BslTreeCreator;
 import org.zhupanovdm.bsl.tree.BslTreePublisher;
-import org.zhupanovdm.bsl.tree.module.Module;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -136,35 +134,26 @@ public class BslSensor implements Sensor {
     }
 
     private void saveMeasures(SensorContext context, InputFile file, AstNode tree) {
-        Module module = new BslTreeCreator().create(tree);
+        CognitiveComplexity cognitiveComplexity = new CognitiveComplexity();
+        CyclomaticComplexity cyclomaticComplexity = new CyclomaticComplexity();
+        ModuleMetrics metrics = new ModuleMetrics();
 
-        CognitiveComplexityVisitorStub cognitiveComplexity = new CognitiveComplexityVisitorStub();
-        CyclomaticComplexityVisitor cyclomaticComplexity = new CyclomaticComplexityVisitor();
-        FileLinesVisitor fileLines = new FileLinesVisitor();
-        ModuleMetrics moduleMetrics = new ModuleMetrics();
+        BslTreePublisher.publish(BslTreeCreator.module(tree), cyclomaticComplexity, cognitiveComplexity, metrics);
 
-        new BslTreePublisher()
-                .subscribe(cyclomaticComplexity)
-                .subscribe(cognitiveComplexity)
-                .subscribe(fileLines)
-                .subscribe(moduleMetrics)
-                .publish(module);
-
-        saveMeasure(context, file, CoreMetrics.NCLOC, fileLines.getLinesOfCode().size());
-        saveMeasure(context, file, CoreMetrics.COMMENT_LINES, fileLines.getLinesOfComments().size());
-        saveMeasure(context, file, CoreMetrics.FUNCTIONS, moduleMetrics.getNumberOfFunctions());
-        saveMeasure(context, file, CoreMetrics.STATEMENTS, moduleMetrics.getNumberOfStatements());
-        saveMeasure(context, file, CoreMetrics.EXECUTABLE_LINES_DATA, moduleMetrics.getExecutableLines());
+        saveMeasure(context, file, CoreMetrics.NCLOC, metrics.getLinesOfCode().size());
+        saveMeasure(context, file, CoreMetrics.COMMENT_LINES, metrics.getLinesOfComments().size());
+        saveMeasure(context, file, CoreMetrics.FUNCTIONS, metrics.getNumberOfFunctions());
+        saveMeasure(context, file, CoreMetrics.STATEMENTS, metrics.getNumberOfStatements());
+        saveMeasure(context, file, CoreMetrics.EXECUTABLE_LINES_DATA, metrics.getExecutableLines());
         saveMeasure(context, file, CoreMetrics.COMPLEXITY, cyclomaticComplexity.getComplexity());
         saveMeasure(context, file, CoreMetrics.COGNITIVE_COMPLEXITY, cognitiveComplexity.getComplexity());
 
         FileLinesContext fileLinesContext = fileLinesContextFactory.createFor(file);
-        fileLines.getLinesOfCode().forEach(line -> fileLinesContext.setIntValue(CoreMetrics.NCLOC_DATA_KEY, line, 1));
+        metrics.getLinesOfCode().forEach(line -> fileLinesContext.setIntValue(CoreMetrics.NCLOC_DATA_KEY, line, 1));
         fileLinesContext.save();
     }
 
     private static <T extends Serializable> void saveMeasure(SensorContext context, InputFile file, Metric<T> metric, T value) {
         context.<T>newMeasure().on(file).forMetric(metric).withValue(value).save();
     }
-
 }

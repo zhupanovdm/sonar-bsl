@@ -6,10 +6,10 @@ import org.zhupanovdm.bsl.tree.BslTreePublisher;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.zhupanovdm.bsl.TestUtils.moduleFile;
 
-public class CognitiveComplexityVisitorStubTest {
+public class CognitiveComplexityTest {
     @Test
     public void test() {
-        CognitiveComplexityVisitorStub subscriber = new CognitiveComplexityVisitorStub();
+        CognitiveComplexity subscriber = new CognitiveComplexity();
 
         new BslTreePublisher().subscribe(subscriber).publish(moduleFile("/samples/metrics/CognitiveComplexity.bsl"));
 

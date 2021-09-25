@@ -6,10 +6,10 @@ import org.zhupanovdm.bsl.tree.BslTreePublisher;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.zhupanovdm.bsl.TestUtils.moduleFile;
 
-public class CyclomaticComplexityVisitorTest {
+public class CyclomaticComplexityTest {
     @Test
     public void test() {
-        CyclomaticComplexityVisitor subscriber = new CyclomaticComplexityVisitor();
+        CyclomaticComplexity subscriber = new CyclomaticComplexity();
 
         new BslTreePublisher().subscribe(subscriber).publish(moduleFile("/samples/metrics/CyclomaticComplexity.bsl"));
 

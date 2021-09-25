@@ -8,6 +8,8 @@ import org.zhupanovdm.bsl.tree.module.PreprocessorIf;
 import org.zhupanovdm.bsl.tree.statement.*;
 
 public interface BslTreeSubscriber {
+    default void init() {}
+
     default void onEnterNode(BslTree node) {}
     default void onLeaveNode(BslTree node) {}
 

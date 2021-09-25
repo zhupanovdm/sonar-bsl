@@ -48,4 +48,23 @@ public class ModuleMetricsTest {
         assertThat(subscriber.getExecutableLines())
                 .isEqualTo("2=1;4=1;6=1;7=1;8=1;12=1;13=1;16=1;17=1;20=1;21=1;23=1;26=1;27=1;29=1;31=1;33=1;");
     }
+
+    @Test
+    public void comments() {
+        ModuleMetrics subscriber = new ModuleMetrics();
+
+        new BslTreePublisher().subscribe(subscriber).publish(moduleFile("/samples/metrics/Comments.bsl"));
+
+        assertThat(subscriber.getLinesOfComments()).containsOnly(2, 7, 13);
+        assertThat(subscriber.getLinesNoSonar()).containsOnly(9);
+    }
+
+    @Test
+    public void linesOfCode() {
+        ModuleMetrics subscriber = new ModuleMetrics();
+
+        new BslTreePublisher().subscribe(subscriber).publish(moduleFile("/samples/metrics/LinesOfCode.bsl"));
+
+        assertThat(subscriber.getLinesOfCode()).containsOnly(5, 8, 10, 11, 13, 15, 17, 19);
+    }
 }

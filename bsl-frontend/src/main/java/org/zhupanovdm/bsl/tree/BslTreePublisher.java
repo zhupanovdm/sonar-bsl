@@ -10,7 +10,6 @@ import org.zhupanovdm.bsl.tree.statement.*;
 import java.util.*;
 
 public class BslTreePublisher implements BslTreeSubscriber {
-    protected final Map<BslTree.Type, List<BslTreeSubscriber>> subscribersByType = new HashMap<>();
     protected final List<BslTreeSubscriber> subscribers = new LinkedList<>();
 
     public void publish(BslTree node) {
@@ -19,46 +18,27 @@ public class BslTreePublisher implements BslTreeSubscriber {
         }
     }
 
-    public void publish(Collection<? extends BslTree> nodes) {
-        for (BslTree node : nodes) {
-            publish(node);
-        }
-    }
-
-    public BslTreePublisher subscribe(BslTreeSubscriber subscriber) {
-        subscribers.add(subscriber);
+    public BslTreePublisher subscribe(BslTreeSubscriber ...subscribers) {
+        this.subscribers.addAll(Arrays.asList(subscribers));
         return this;
     }
 
-    public BslTreePublisher subscribe(BslTreeSubscriber subscriber, BslTree.Type ...types) {
-        for (BslTree.Type type : types) {
-            subscribersByType.computeIfAbsent(type, t -> new LinkedList<>()).add(subscriber);
-        }
-        return this;
+    @Override
+    public void init() {
+        subscribers.forEach(BslTreeSubscriber::init);
     }
 
     @Override
     public void onEnterNode(BslTree node) {
-        for (BslTreeSubscriber subscriber : subscribers) {
+        subscribers.forEach(subscriber -> {
             subscriber.onEnterNode(node);
             node.accept(subscriber);
-        }
-        List<BslTreeSubscriber> list = subscribersByType.getOrDefault(node.getType(), Collections.emptyList());
-        for (BslTreeSubscriber subscriber : list) {
-            subscriber.onEnterNode(node);
-            node.accept(subscriber);
-        }
+        });
     }
 
     @Override
     public void onLeaveNode(BslTree node) {
-        for (BslTreeSubscriber subscriber : subscribers) {
-            subscriber.onLeaveNode(node);
-        }
-        List<BslTreeSubscriber> list = subscribersByType.getOrDefault(node.getType(), Collections.emptyList());
-        for (BslTreeSubscriber subscriber : list) {
-            subscriber.onLeaveNode(node);
-        }
+        subscribers.forEach(subscriber -> subscriber.onLeaveNode(node));
     }
 
     @Override
@@ -361,5 +341,15 @@ public class BslTreePublisher implements BslTreeSubscriber {
         onEnterNode(expr);
         publish(expr.getBody());
         onLeaveNode(expr);
+    }
+
+    private void publish(Collection<? extends BslTree> nodes) {
+        nodes.forEach(this::publish);
+    }
+
+    public static void publish(BslTree tree, BslTreeSubscriber ...subscribers) {
+        BslTreePublisher publisher = new BslTreePublisher().subscribe(subscribers);
+        publisher.init();
+        publisher.publish(tree);
     }
 }

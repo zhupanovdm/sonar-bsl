@@ -10,9 +10,14 @@ import org.zhupanovdm.bsl.tree.statement.*;
 import static org.zhupanovdm.bsl.tree.BslTree.Type.AND;
 import static org.zhupanovdm.bsl.tree.BslTree.Type.OR;
 
-public class CyclomaticComplexityVisitor implements BslTreeSubscriber {
+public class CyclomaticComplexity implements BslTreeSubscriber {
     @Getter
     private int complexity;
+
+    @Override
+    public void init() {
+        complexity = 0;
+    }
 
     @Override
     public void onVisitCallableDefinition(CallableDefinition def) {
