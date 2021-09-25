@@ -7,7 +7,6 @@ import org.zhupanovdm.bsl.checks.CheckList;
 import static org.zhupanovdm.bsl.sonar.BslRuleRepository.RESOURCE_FOLDER;
 
 public class BslProfile implements BuiltInQualityProfilesDefinition {
-
     public static final String PROFILE_NAME = "Sonar way";
 
     public static final String PROFILE_LOCATION = RESOURCE_FOLDER + "/Sonar_way_profile.json";
@@ -18,5 +17,4 @@ public class BslProfile implements BuiltInQualityProfilesDefinition {
         BuiltInQualityProfileJsonLoader.load(profile, CheckList.REPOSITORY_KEY, PROFILE_LOCATION);
         profile.done();
     }
-
 }

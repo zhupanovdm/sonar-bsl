@@ -21,7 +21,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class BslLexScanner {
-
     private static final String NORMALIZED_CHARACTER_LITERAL = "$CHARS";
     private static final String NORMALIZED_NUMERIC_LITERAL = "$NUMBER";
     private static final Set<TokenType> KEYWORDS = Arrays.stream(BslKeyword.values()).collect(Collectors.toSet());
@@ -84,5 +83,4 @@ public class BslLexScanner {
     private static TokenLocation location(Token token) {
         return new TokenLocation(token.getLine(), token.getColumn(), token.getOriginalValue());
     }
-
 }

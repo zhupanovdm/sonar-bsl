@@ -5,7 +5,6 @@ import org.sonar.api.config.PropertyDefinition;
 import org.sonar.api.resources.Qualifiers;
 
 public class BslPlugin implements Plugin {
-
     public static final String FILE_SUFFIXES_KEY = "sonar.bsl.file.suffixes";
 
     private static final String BSL_CATEGORY = "BSL";
@@ -33,5 +32,4 @@ public class BslPlugin implements Plugin {
                 BslProfile.class
         );
     }
-
 }

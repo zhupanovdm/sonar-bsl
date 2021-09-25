@@ -4,17 +4,16 @@ import org.sonar.api.server.rule.RulesDefinition;
 import org.sonarsource.analyzer.commons.RuleMetadataLoader;
 import org.zhupanovdm.bsl.checks.CheckList;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 public class BslRuleRepository implements RulesDefinition {
-
     private static final String REPOSITORY_NAME = "SonarAnalyzer";
 
     static final String RESOURCE_FOLDER = "org/zhupanovdm/bsl/rules";
 
-    private static final Set<String> TEMPLATE_RULE_KEYS = new HashSet<>(Arrays.asList("XPath", "CommentRegularExpression"));
+    private static final Set<String> TEMPLATE_RULE_KEYS = new HashSet<>(Collections.singletonList("XPath"));
 
     @Override
     public void define(Context context) {
@@ -31,5 +30,4 @@ public class BslRuleRepository implements RulesDefinition {
 
         repository.done();
     }
-
 }

@@ -19,7 +19,6 @@ import static org.zhupanovdm.bsl.checks.utils.StringUtils.isNullOrEmpty;
 
 @Rule(key = "CommentRegularExpression")
 public class CommentRegularExpressionCheck extends BslCheck {
-
   private static final String DEFAULT_MESSAGE = "The regular expression matches this comment.";
 
   @RuleProperty(
@@ -81,5 +80,4 @@ public class CommentRegularExpressionCheck extends BslCheck {
     }
     return pattern;
   }
-
 }

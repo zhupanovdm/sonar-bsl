@@ -1,6 +1,6 @@
 package org.zhupanovdm.bsl.checks;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public final class CheckList {
@@ -11,8 +11,7 @@ public final class CheckList {
     }
 
     public static List<Class<?>> getChecks() {
-        return Arrays.asList(
-                XPathCheck.class,
+        return Collections.singletonList(
                 CommentRegularExpressionCheck.class
         );
     }

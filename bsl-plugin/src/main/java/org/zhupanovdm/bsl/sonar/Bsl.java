@@ -16,5 +16,4 @@ public class Bsl extends AbstractLanguage {
     public String[] getFileSuffixes() {
         return new String[] {FILE_SUFFIX};
     }
-
 }

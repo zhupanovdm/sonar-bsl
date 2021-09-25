@@ -46,7 +46,6 @@ import java.util.stream.Collectors;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class BslSensor implements Sensor {
-
     private static final Logger LOG = Loggers.get(BslSensor.class);
 
     private final Checks<BslCheck> checks;
