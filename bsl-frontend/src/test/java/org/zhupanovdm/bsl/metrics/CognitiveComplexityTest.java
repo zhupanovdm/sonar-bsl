@@ -11,7 +11,7 @@ public class CognitiveComplexityTest {
     public void test() {
         CognitiveComplexity subscriber = new CognitiveComplexity();
 
-        new BslTreePublisher().subscribe(subscriber).publish(moduleFile("/samples/metrics/CognitiveComplexity.bsl"));
+        BslTreePublisher.publish(moduleFile("/samples/metrics/CognitiveComplexity.bsl"), subscriber);
 
         assertThat(subscriber.getComplexity()).isEqualTo(0);
     }

@@ -11,7 +11,7 @@ public class CyclomaticComplexityTest {
     public void test() {
         CyclomaticComplexity subscriber = new CyclomaticComplexity();
 
-        new BslTreePublisher().subscribe(subscriber).publish(moduleFile("/samples/metrics/CyclomaticComplexity.bsl"));
+        BslTreePublisher.publish(moduleFile("/samples/metrics/CyclomaticComplexity.bsl"), subscriber);
 
         assertThat(subscriber.getComplexity()).isEqualTo(3);
     }
