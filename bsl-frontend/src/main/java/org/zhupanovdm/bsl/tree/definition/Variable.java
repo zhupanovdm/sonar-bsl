@@ -15,7 +15,7 @@ public class Variable extends BslTree implements Named, Exportable {
     private String name;
     private boolean export;
 
-    public Variable(VariablesDefinition parent) {
+    public Variable(BslTree parent) {
         super(parent, VARIABLE);
     }
 

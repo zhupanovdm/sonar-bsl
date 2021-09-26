@@ -133,6 +133,7 @@ public class BslTreePublisher implements BslTreeSubscriber {
     @Override
     public void onVisitForStatement(ForStatement stmt) {
         onEnterNode(stmt);
+        publish(stmt.getVariable());
         publish(stmt.getInit());
         publish(stmt.getCondition());
         publish(stmt.getBody());
@@ -142,6 +143,7 @@ public class BslTreePublisher implements BslTreeSubscriber {
     @Override
     public void onVisitForEachStatement(ForEachStatement stmt) {
         onEnterNode(stmt);
+        publish(stmt.getVariable());
         publish(stmt.getCollection());
         publish(stmt.getBody());
         onLeaveNode(stmt);
@@ -281,6 +283,7 @@ public class BslTreePublisher implements BslTreeSubscriber {
     @Override
     public void onVisitPostfixExpression(PostfixExpression expr) {
         onEnterNode(expr);
+        publish(expr.getReference());
         publish(expr.getPostfix());
         onLeaveNode(expr);
     }

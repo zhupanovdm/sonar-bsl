@@ -5,13 +5,14 @@ import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 import org.zhupanovdm.bsl.tree.Named;
+import org.zhupanovdm.bsl.tree.definition.Variable;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.FOREACH_STMT;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ForEachStatement extends BslTree implements Named {
-    private String name;
+public class ForEachStatement extends BslTree {
+    private Variable variable;
     private BslTree collection;
 
     public ForEachStatement() {
@@ -25,6 +26,6 @@ public class ForEachStatement extends BslTree implements Named {
 
     @Override
     public String toString() {
-        return "For each " + name + " In " + collection + " Do {" + getBody().size() + "}";
+        return "For each " + variable + " In " + collection + " Do {" + getBody().size() + "}";
     }
 }

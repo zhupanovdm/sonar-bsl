@@ -5,14 +5,13 @@ import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslToken;
 import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
-import org.zhupanovdm.bsl.tree.expression.PostfixExpression;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.ASSIGN_STMT;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class AssignmentStatement extends BslTree {
-    private PostfixExpression target;
+    private BslTree target;
     private BslTree expression;
 
     public AssignmentStatement() {

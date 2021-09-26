@@ -23,8 +23,8 @@ public class PostfixExpressionTest {
         PostfixExpression stmt = creator.expression(parse("Foo.Bar", g.rule(EXPRESSION)).getFirstChild()).as(PostfixExpression.class);
 
         assertThat(stmt.getType()).isEqualTo(POSTFIX);
-        assertThat(stmt.getName()).isEqualTo("Foo");
-        assertThat(stmt.getTokens()).hasSize(1);
+        assertThat(stmt.getReference().getName()).isEqualTo("Foo");
+        assertThat(stmt.getTokens()).isEmpty();
 
         assertThat(stmt.getPostfix().getType()).isEqualTo(DEREFERENCE);
         assertThat(stmt.getPostfix(DereferencePostfix.class).getName()).isEqualTo("Bar");
@@ -36,8 +36,8 @@ public class PostfixExpressionTest {
         PostfixExpression stmt = creator.expression(parse("Foo[Bar]", g.rule(EXPRESSION)).getFirstChild()).as(PostfixExpression.class);
 
         assertThat(stmt.getType()).isEqualTo(POSTFIX);
-        assertThat(stmt.getName()).isEqualTo("Foo");
-        assertThat(stmt.getTokens()).hasSize(1);
+        assertThat(stmt.getReference().getName()).isEqualTo("Foo");
+        assertThat(stmt.getTokens()).isEmpty();
 
         assertThat(stmt.getPostfix().getType()).isEqualTo(INDEX);
         assertThat(stmt.getPostfix(IndexPostfix.class).getIndex().as(ReferenceExpression.class).getName()).isEqualTo("Bar");
@@ -49,8 +49,8 @@ public class PostfixExpressionTest {
         PostfixExpression stmt = creator.expression(parse("Foo()", g.rule(EXPRESSION)).getFirstChild()).as(PostfixExpression.class);
 
         assertThat(stmt.getType()).isEqualTo(POSTFIX);
-        assertThat(stmt.getName()).isEqualTo("Foo");
-        assertThat(stmt.getTokens()).hasSize(1);
+        assertThat(stmt.getReference().getName()).isEqualTo("Foo");
+        assertThat(stmt.getTokens()).isEmpty();
 
         assertThat(stmt.getPostfix().getType()).isEqualTo(CALL);
         assertThat(stmt.getPostfix(CallPostfix.class).getArguments()).isEmpty();

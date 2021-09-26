@@ -216,10 +216,10 @@ public class BslTreeCreator {
         return varDef;
     }
 
-    private Variable variable(VariablesDefinition varDef, AstNode tree) {
+    private Variable variable(BslTree parent, AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
-        Variable variable = new Variable(varDef);
+        Variable variable = new Variable(parent);
 
         AstNode name = cursor.next().getFirstChild();
         variable.setName(name.getTokenOriginalValue());
@@ -276,7 +276,7 @@ public class BslTreeCreator {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
         AssignmentStatement stmt = new AssignmentStatement();
-        stmt.setTarget(postfixExpr(stmt, cursor.next()));
+        stmt.setTarget(expression(stmt, cursor.next()));
         stmt.addToken(cursor.next().getToken()); // =
         stmt.setExpression(expression(stmt, cursor.next()));
 
@@ -334,11 +334,7 @@ public class BslTreeCreator {
 
         ForStatement stmt = new ForStatement();
         stmt.addToken(cursor.next().getToken()); // For
-
-        AstNode name = cursor.next().getFirstChild();
-        stmt.setName(name.getTokenOriginalValue());
-        stmt.addToken(name.getToken());
-
+        stmt.setVariable(variable(stmt, cursor.next()));
         stmt.addToken(cursor.next().getToken()); // =
         stmt.setInit(expression(stmt, cursor.next()));
         stmt.addToken(cursor.next().getToken()); // To
@@ -356,11 +352,7 @@ public class BslTreeCreator {
         ForEachStatement stmt = new ForEachStatement();
         stmt.addToken(cursor.next().getToken()); // For
         stmt.addToken(cursor.next().getToken()); // each
-
-        AstNode name = cursor.next().getFirstChild();
-        stmt.setName(name.getTokenOriginalValue());
-        stmt.addToken(name.getToken());
-
+        stmt.setVariable(variable(stmt, cursor.next()));
         stmt.addToken(cursor.next().getToken()); // In
         stmt.setCollection(expression(stmt, cursor.next()));
         stmt.addToken(cursor.next().getToken()); // Do
@@ -511,7 +503,13 @@ public class BslTreeCreator {
         if (tree.is(PRIMARY_EXPR, PP_PRIMARY_EXPRESSION)) {
             return primaryExpr(parent, tree);
         }
-        if (tree.is(POSTFIX_EXPR, ASSIGNABLE_EXPR, CALLABLE_EXPR)) {
+        if (tree.is(POSTFIX_EXPR, CALLABLE_EXPR)) {
+            return postfixExpr(parent, tree);
+        }
+        if (tree.is(ASSIGNABLE_EXPR)) {
+            if (tree.getFirstChild().is(VARIABLE_LOCAL)) {
+                return variable(parent, tree.getFirstChild());
+            }
             return postfixExpr(parent, tree);
         }
         if (tree.is(
@@ -541,13 +539,8 @@ public class BslTreeCreator {
             expr.setAwait(true);
             expr.addToken(cursor.next().getToken());
         }
-
-        AstNode name = cursor.next().getFirstChild();
-        expr.setName(name.getTokenOriginalValue());
-        expr.addToken(name.getToken());
-
+        expr.setReference(primaryExpr(expr, cursor.next()).as(ReferenceExpression.class));
         expr.setPostfix(postfix(expr, cursor));
-
         return expr;
     }
 

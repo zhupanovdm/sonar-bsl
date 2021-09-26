@@ -25,7 +25,7 @@ public class CallStatementTest {
         assertThat(stmt.getExpression().getPostfix().getType()).isEqualTo(CALL);
         assertThat(stmt.getExpression().getPostfix()).isInstanceOf(CallPostfix.class);
         assertThat(stmt.getExpression().getPostfix(CallPostfix.class).getArguments()).isEmpty();
-        assertThat(stmt.getExpression().getName()).isEqualTo("Foo");
+        assertThat(stmt.getExpression().getReference().getName()).isEqualTo("Foo");
         assertThat(stmt.getBody()).isEmpty();
         assertThat(stmt.getTokens()).isEmpty();
     }

@@ -2,16 +2,16 @@ package org.zhupanovdm.bsl.tree.expression;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.zhupanovdm.bsl.tree.BslToken;
 import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
-import org.zhupanovdm.bsl.tree.Named;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.POSTFIX;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class PostfixExpression extends Postfix implements Named {
-    private String name;
+public class PostfixExpression extends Postfix {
+    private ReferenceExpression reference;
     private boolean await;
 
     public PostfixExpression(BslTree parent) {
@@ -24,7 +24,15 @@ public class PostfixExpression extends Postfix implements Named {
     }
 
     @Override
+    public BslToken getFirstToken() {
+        if (getTokens().isEmpty()) {
+            return reference.getFirstToken();
+        }
+        return getTokens().get(0);
+    }
+
+    @Override
     public String toString() {
-        return (await ? "Await " : "") + name + (getPostfix() == null ? "" : getPostfix());
+        return (await ? "Await " : "") + reference + (getPostfix() == null ? "" : getPostfix());
     }
 }

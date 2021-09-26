@@ -22,6 +22,7 @@ public enum BslGrammar implements GrammarRuleKey {
     VAR_DEF, FUNC_DEF, PROC_DEF, LABEL_DEF,
 
     VARIABLE,
+    VARIABLE_LOCAL,
     SIGNATURE,
     PARAMETER,
     LABEL,
@@ -159,7 +160,7 @@ public enum BslGrammar implements GrammarRuleKey {
         b.rule(UNARY_OPERATOR).is(b.firstOf(PLUS, MINUS));
 
         b.rule(POSTFIX_EXPR).is(b.optional(AWAIT), b.firstOf(
-                b.sequence(IDENTIFIER, b.firstOf(INDEX_POSTFIX, DEREFERENCE_POSTFIX, CALL_POSTFIX)),
+                b.sequence(b.next(IDENTIFIER), PRIMARY_EXPR, b.firstOf(INDEX_POSTFIX, DEREFERENCE_POSTFIX, CALL_POSTFIX)),
                 PRIMARY_EXPR,
                 NEW_EXPR,
                 TERNARY_EXPR)
@@ -188,14 +189,17 @@ public enum BslGrammar implements GrammarRuleKey {
         b.rule(FIELD).is(SPACING, identifier(b));
         b.rule(PRIMITIVE).is(b.firstOf(UNDEFINED, NULL, TRUE, FALSE, STRING, NUMBER, DATE));
 
-        b.rule(ASSIGNABLE_EXPR).is(IDENTIFIER, b.optional(b.firstOf(ASSIGNABLE_INDEX_POSTFIX, ASSIGNABLE_DEREFERENCE_POSTFIX, ASSIGNABLE_CALL_POSTFIX)));
+        b.rule(ASSIGNABLE_EXPR).is(b.firstOf(
+                b.sequence(b.next(IDENTIFIER), PRIMARY_EXPR, b.firstOf(ASSIGNABLE_INDEX_POSTFIX, ASSIGNABLE_DEREFERENCE_POSTFIX, ASSIGNABLE_CALL_POSTFIX)),
+                VARIABLE_LOCAL
+                ));
         b.rule(ASSIGNABLE_INDEX_POSTFIX).is(INDEX_OPERATOR, b.optional(b.firstOf(ASSIGNABLE_INDEX_POSTFIX, ASSIGNABLE_DEREFERENCE_POSTFIX)));
         b.rule(ASSIGNABLE_DEREFERENCE_POSTFIX).is(
                 DOT, FIELD,
                 b.optional(b.firstOf(ASSIGNABLE_INDEX_POSTFIX, ASSIGNABLE_DEREFERENCE_POSTFIX, ASSIGNABLE_CALL_POSTFIX)));
         b.rule(ASSIGNABLE_CALL_POSTFIX).is(CALL_OPERATOR, b.firstOf(ASSIGNABLE_INDEX_POSTFIX, ASSIGNABLE_DEREFERENCE_POSTFIX));
 
-        b.rule(CALLABLE_EXPR).is(b.optional(AWAIT), IDENTIFIER, b.firstOf(CALLABLE_CALL_POSTFIX, b.firstOf(CALLABLE_INDEX_POSTFIX, CALLABLE_DEREFERENCE_POSTFIX)));
+        b.rule(CALLABLE_EXPR).is(b.optional(AWAIT), b.next(IDENTIFIER), PRIMARY_EXPR, b.firstOf(CALLABLE_CALL_POSTFIX, b.firstOf(CALLABLE_INDEX_POSTFIX, CALLABLE_DEREFERENCE_POSTFIX)));
         b.rule(CALLABLE_INDEX_POSTFIX).is(INDEX_OPERATOR, CALLABLE_DEREFERENCE_POSTFIX);
         b.rule(CALLABLE_DEREFERENCE_POSTFIX).is(
                 DOT, FIELD,
@@ -251,12 +255,12 @@ public enum BslGrammar implements GrammarRuleKey {
                 END_DO);
 
         b.rule(FOREACH_STMT).is(
-                FOR, EACH, IDENTIFIER, IN, EXPRESSION, DO,
+                FOR, EACH, VARIABLE_LOCAL, IN, EXPRESSION, DO,
                 b.optional(BODY),
                 END_DO);
 
         b.rule(FOR_STMT).is(
-                FOR, IDENTIFIER, EQ, EXPRESSION, TO, EXPRESSION, DO,
+                FOR, VARIABLE_LOCAL, EQ, EXPRESSION, TO, EXPRESSION, DO,
                 b.optional(BODY),
                 END_DO);
 
@@ -309,6 +313,7 @@ public enum BslGrammar implements GrammarRuleKey {
     private static void definitions(LexerlessGrammarBuilder b) {
         b.rule(VAR_DEF).is(b.optional(DIRECTIVE), VAR, VARIABLE, b.zeroOrMore(COMMA, VARIABLE), SEMICOLON);
         b.rule(VARIABLE).is(IDENTIFIER, b.optional(EXPORT));
+        b.rule(VARIABLE_LOCAL).is(IDENTIFIER);
 
         b.rule(FUNC_DEF).is(
                 b.optional(DIRECTIVE),

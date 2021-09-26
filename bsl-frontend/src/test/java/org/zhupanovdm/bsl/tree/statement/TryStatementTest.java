@@ -18,8 +18,8 @@ public class TryStatementTest {
         TryStatement stmt = creator.tryStmt(parse("Try Foo() Except Bar() EndTry", g.rule(BslGrammar.TRY_STMT)));
 
         assertThat(stmt.getType()).isEqualTo(TRY_STMT);
-        assertThat(stmt.getBody().get(0).as(CallStatement.class).getExpression().getName()).isEqualTo("Foo");
-        assertThat(stmt.getExceptClause().getBody().get(0).as(CallStatement.class).getExpression().getName()).isEqualTo("Bar");
+        assertThat(stmt.getBody().get(0).as(CallStatement.class).getExpression().getReference().getName()).isEqualTo("Foo");
+        assertThat(stmt.getExceptClause().getBody().get(0).as(CallStatement.class).getExpression().getReference().getName()).isEqualTo("Bar");
         assertThat(stmt.getTokens()).hasSize(3);
     }
 }
