@@ -13,7 +13,7 @@ public class BslRuleRepository implements RulesDefinition {
 
     static final String RESOURCE_FOLDER = "org/zhupanovdm/bsl/rules";
 
-    private static final Set<String> TEMPLATE_RULE_KEYS = new HashSet<>(Collections.singletonList("XPath"));
+    private static final Set<String> TEMPLATE_RULE_KEYS = new HashSet<>(Collections.singletonList("CommentRegularExpression"));
 
     @Override
     public void define(Context context) {
