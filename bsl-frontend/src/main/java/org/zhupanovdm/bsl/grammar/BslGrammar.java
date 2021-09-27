@@ -28,7 +28,7 @@ public enum BslGrammar implements GrammarRuleKey {
     LABEL,
 
     STATEMENT,
-    STATEMENT_NO_EMPTY,
+    STATEMENT_NOT_EMPTY,
     COMPOUND_STMT,
     ASSIGN_STMT,
     CALL_STMT,
@@ -223,20 +223,20 @@ public enum BslGrammar implements GrammarRuleKey {
                 EXECUTE_STMT,
                 ADD_HANDLER_STMT,
                 REMOVE_HANDLER_STMT,
-                LABEL_DEF,
                 GOTO_STMT,
                 EMPTY_STMT)
         ).skipIfOneChild();
 
         b.rule(COMPOUND_STMT).is(b.oneOrMore(b.firstOf(
-                b.sequence(STATEMENT_NO_EMPTY, b.oneOrMore(EMPTY_STMT), b.nextNot(STATEMENT_NO_EMPTY)),
-                b.sequence(STATEMENT_NO_EMPTY, SEMICOLON, b.next(STATEMENT)),
-                b.sequence(STATEMENT_NO_EMPTY, b.nextNot(STATEMENT_NO_EMPTY)),
+                LABEL_DEF,
+                b.sequence(STATEMENT_NOT_EMPTY, b.oneOrMore(EMPTY_STMT), b.nextNot(STATEMENT_NOT_EMPTY)),
+                b.sequence(STATEMENT_NOT_EMPTY, SEMICOLON, b.next(STATEMENT)),
+                b.sequence(STATEMENT_NOT_EMPTY, b.nextNot(STATEMENT_NOT_EMPTY)),
                 EMPTY_STMT
         )));
 
         b.rule(EMPTY_STMT).is(SEMICOLON);
-        b.rule(STATEMENT_NO_EMPTY).is(b.nextNot(EMPTY_STMT), STATEMENT).skip();
+        b.rule(STATEMENT_NOT_EMPTY).is(b.nextNot(EMPTY_STMT), STATEMENT).skip();
         b.rule(ASSIGN_STMT).is(ASSIGNABLE_EXPR, EQ, EXPRESSION);
         b.rule(CALL_STMT).is(CALLABLE_EXPR);
 

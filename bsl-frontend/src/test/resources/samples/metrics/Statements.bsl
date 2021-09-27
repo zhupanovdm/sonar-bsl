@@ -3,6 +3,10 @@ Function foo()
 
     a = 1 + 1; // +1 assignment statement
 
+    If a > 10 Then // +1 if statement
+        Goto ~label // +1 goto statement
+    EndIf;
+
     While a < 100 Do // +1 while statement
         If a = 10 Then // +1 if statement
             Break // +1 break statement
@@ -26,8 +30,7 @@ Function foo()
     AddHandler expr.Event, expr.Handler; // +1 add handler statement
     RemoveHandler expr.Event, expr.Handler; // +1 remove handler statement
 
-    Goto ~label; // +1 goto statement
-
+    ~label:
     a = 1 + 1; b = 7; // +2 assignment statement
 
     return a // +1 return statement
