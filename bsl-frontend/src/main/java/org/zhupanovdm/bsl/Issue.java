@@ -38,5 +38,4 @@ public class Issue {
   public static Issue lineIssue(int line, String message, double cost) {
     return new Issue(line, message, cost);
   }
-
 }

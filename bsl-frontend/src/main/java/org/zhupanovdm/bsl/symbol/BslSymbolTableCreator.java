@@ -48,7 +48,7 @@ public class BslSymbolTableCreator implements BslTreeSubscriber {
 
     @Override
     public void onVisitReferenceExpression(ReferenceExpression expr) {
-        createSymbol(expr, expr.getName());
+        createReference(expr, expr.getName());
     }
 
     @Override
@@ -77,5 +77,13 @@ public class BslSymbolTableCreator implements BslTreeSubscriber {
         }
         Scope scope = scopes.getFirst();
         scope.getSymbols().add(new Symbol(scope, owner, name));
+    }
+
+    private void createReference(BslTree owner, String name) {
+        if (scopes.isEmpty()) {
+            createGlobalScope(null);
+        }
+        Scope scope = scopes.getFirst();
+        scope.getRefs().add(new Symbol(scope, owner, name));
     }
 }

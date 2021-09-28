@@ -1,17 +1,13 @@
 package org.zhupanovdm.bsl.checks;
 
-import com.sonar.sslr.api.AstNode;
-import com.sonar.sslr.api.AstNodeType;
-import com.sonar.sslr.api.Token;
-import com.sonar.sslr.api.Trivia;
 import org.sonar.check.Rule;
 import org.sonar.check.RuleProperty;
 import org.zhupanovdm.bsl.BslCheck;
 import org.zhupanovdm.bsl.Issue;
+import org.zhupanovdm.bsl.tree.BslToken;
+import org.zhupanovdm.bsl.tree.BslTree;
+import org.zhupanovdm.bsl.tree.BslTrivia;
 
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -35,36 +31,21 @@ public class CommentRegularExpressionCheck extends BslCheck {
   private Pattern pattern = null;
 
   @Override
-  public List<AstNodeType> getAstNodeTypesToVisit() {
-    return Collections.emptyList();
-  }
-
-  @Override
-  public void visitToken(Token token) {
-    Pattern regexp = pattern();
-    if (regexp != null) {
-      for (Trivia trivia : token.getTrivia()) {
-        if (trivia.isComment() && regexp.matcher(trivia.getToken().getOriginalValue()).matches()) {
-          saveIssue(Issue.lineIssue(trivia.getToken().getLine(), message));
-        }
-      }
+  public void onEnterNode(BslTree node) {
+    for (BslToken token : node.getTokens()) {
+      visitToken(token);
     }
   }
 
-  @Override
-  public void visitFile(@Nullable AstNode ast) {
-  }
-
-  @Override
-  public void leaveFile(@Nullable AstNode ast) {
-  }
-
-  @Override
-  public void visitNode(AstNode ast) {
-  }
-
-  @Override
-  public void leaveNode(AstNode ast) {
+  private void visitToken(BslToken token) {
+    Pattern regexp = pattern();
+    if (regexp != null) {
+      for (BslTrivia comment : token.getComments()) {
+        if (regexp.matcher(comment.getValue()).matches()) {
+          saveIssue(Issue.lineIssue(comment.getTokens().get(0).getLine(), message));
+        }
+      }
+    }
   }
 
   private Pattern pattern() {

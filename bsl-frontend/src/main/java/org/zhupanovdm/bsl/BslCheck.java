@@ -1,10 +1,10 @@
 package org.zhupanovdm.bsl;
 
-import com.sonar.sslr.api.AstAndTokenVisitor;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 
 import java.util.function.BiConsumer;
 
-public abstract class BslCheck implements AstAndTokenVisitor {
+public abstract class BslCheck implements BslTreeSubscriber {
     private BiConsumer<BslCheck, Issue> issueConsumer;
 
     public void setIssueConsumer(BiConsumer<BslCheck, Issue> issueConsumer) {

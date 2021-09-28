@@ -1,9 +1,5 @@
 package org.zhupanovdm.bsl.sonar;
 
-import com.sonar.sslr.api.AstNode;
-import com.sonar.sslr.api.RecognitionException;
-import com.sonar.sslr.impl.Parser;
-import com.sonar.sslr.impl.ast.AstWalker;
 import org.sonar.api.batch.fs.FilePredicate;
 import org.sonar.api.batch.fs.FilePredicates;
 import org.sonar.api.batch.fs.FileSystem;
@@ -22,21 +18,16 @@ import org.sonar.api.measures.Metric;
 import org.sonar.api.rule.RuleKey;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
-import org.sonar.sslr.parser.LexerlessGrammar;
 import org.sonarsource.analyzer.commons.ProgressReport;
 import org.zhupanovdm.bsl.BslCheck;
-import org.zhupanovdm.bsl.BslParser;
 import org.zhupanovdm.bsl.Issue;
 import org.zhupanovdm.bsl.checks.CheckList;
 import org.zhupanovdm.bsl.metrics.CognitiveComplexity;
 import org.zhupanovdm.bsl.metrics.CyclomaticComplexity;
 import org.zhupanovdm.bsl.metrics.ModuleMetrics;
-import org.zhupanovdm.bsl.tree.BslTreeCreator;
 import org.zhupanovdm.bsl.tree.BslTreePublisher;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -82,43 +73,36 @@ public class BslSensor implements Sensor {
         List<String> filenames = files.stream().map(InputFile::toString).collect(Collectors.toList());
         report.start(filenames);
         for (InputFile file : files) {
-            analyseFile(context, file);
+            analyseFile(context, new BslModuleContext(file));
             report.nextFile();
         }
         report.stop();
     }
 
-    private void analyseFile(SensorContext context, InputFile file) {
-        String contents;
-        try {
-            contents = file.contents();
-        } catch (IOException e) {
-            throw new IllegalStateException("Cannot read " + file, e);
-        }
+    private void analyseFile(SensorContext context, BslModuleContext module) {
+        BslTreePublisher publisher = new BslTreePublisher();
 
-        Charset charset = file.charset();
-        Parser<LexerlessGrammar> parser = BslParser.create(charset);
-        AstNode tree;
-        try {
-            tree = parser.parse(contents);
-        } catch (RecognitionException e) {
-            LOG.error("Unable to parse file: {}", file);
-            LOG.error(e.getMessage());
-            throw new IllegalStateException("Cannot parse " + file, e);
-        }
+        BiConsumer<BslCheck, Issue> issueConsumer = (check, issue) -> saveIssue(context, check, issue, module);
+        checks.all().forEach(check -> {
+            publisher.subscribe(check);
+            check.setIssueConsumer(issueConsumer);
+        });
 
-        BiConsumer<BslCheck, Issue> issueConsumer = (check, issue) -> saveIssue(context, check, issue, file);
+        ModuleMetrics metrics = new ModuleMetrics();
+        CyclomaticComplexity cyclomaticComplexity = new CyclomaticComplexity();
+        CognitiveComplexity cognitiveComplexity = new CognitiveComplexity();
 
-        List<BslCheck> allChecks = new LinkedList<>(checks.all());
-        allChecks.forEach(check -> check.setIssueConsumer(issueConsumer));
-        new AstWalker(allChecks).walkAndVisit(tree);
+        publisher.subscribe(metrics, cyclomaticComplexity, cognitiveComplexity);
+        publisher.init();
+        publisher.publish(module.getEntry());
 
-        saveMeasures(context, file, tree);
-        new BslLexScanner(context).scan(file, contents);
+        saveMeasures(context, module, metrics, cyclomaticComplexity, cognitiveComplexity);
+        new BslLexScanner(context).scan(module);
     }
 
-    private void saveIssue(SensorContext context, BslCheck check, Issue checkIssue, InputFile file) {
+    private void saveIssue(SensorContext context, BslCheck check, Issue checkIssue, BslModuleContext module) {
         RuleKey ruleKey = Objects.requireNonNull(checks.ruleKey(check), "Rule key for check is required");
+        InputFile file = module.getFile();
         NewIssue issue = context.newIssue();
         NewIssueLocation location = issue.newLocation().on(file).message(checkIssue.message());
         Integer line = checkIssue.line();
@@ -132,27 +116,26 @@ public class BslSensor implements Sensor {
         issue.at(location).forRule(ruleKey).save();
     }
 
-    private void saveMeasures(SensorContext context, InputFile file, AstNode tree) {
-        CognitiveComplexity cognitiveComplexity = new CognitiveComplexity();
-        CyclomaticComplexity cyclomaticComplexity = new CyclomaticComplexity();
-        ModuleMetrics metrics = new ModuleMetrics();
+    private void saveMeasures(SensorContext context,
+                              BslModuleContext module,
+                              ModuleMetrics metrics,
+                              CyclomaticComplexity cyclomaticComplexity,
+                              CognitiveComplexity cognitiveComplexity) {
 
-        BslTreePublisher.publish(BslTreeCreator.module(tree), cyclomaticComplexity, cognitiveComplexity, metrics);
+        saveMeasure(context, module, CoreMetrics.NCLOC, metrics.getLinesOfCode().size());
+        saveMeasure(context, module, CoreMetrics.COMMENT_LINES, metrics.getLinesOfComments().size());
+        saveMeasure(context, module, CoreMetrics.FUNCTIONS, metrics.getNumberOfFunctions());
+        saveMeasure(context, module, CoreMetrics.STATEMENTS, metrics.getNumberOfStatements());
+        saveMeasure(context, module, CoreMetrics.EXECUTABLE_LINES_DATA, metrics.getExecutableLines());
+        saveMeasure(context, module, CoreMetrics.COMPLEXITY, cyclomaticComplexity.getComplexity());
+        saveMeasure(context, module, CoreMetrics.COGNITIVE_COMPLEXITY, cognitiveComplexity.getComplexity());
 
-        saveMeasure(context, file, CoreMetrics.NCLOC, metrics.getLinesOfCode().size());
-        saveMeasure(context, file, CoreMetrics.COMMENT_LINES, metrics.getLinesOfComments().size());
-        saveMeasure(context, file, CoreMetrics.FUNCTIONS, metrics.getNumberOfFunctions());
-        saveMeasure(context, file, CoreMetrics.STATEMENTS, metrics.getNumberOfStatements());
-        saveMeasure(context, file, CoreMetrics.EXECUTABLE_LINES_DATA, metrics.getExecutableLines());
-        saveMeasure(context, file, CoreMetrics.COMPLEXITY, cyclomaticComplexity.getComplexity());
-        saveMeasure(context, file, CoreMetrics.COGNITIVE_COMPLEXITY, cognitiveComplexity.getComplexity());
-
-        FileLinesContext fileLinesContext = fileLinesContextFactory.createFor(file);
+        FileLinesContext fileLinesContext = fileLinesContextFactory.createFor(module.getFile());
         metrics.getLinesOfCode().forEach(line -> fileLinesContext.setIntValue(CoreMetrics.NCLOC_DATA_KEY, line, 1));
         fileLinesContext.save();
     }
 
-    private static <T extends Serializable> void saveMeasure(SensorContext context, InputFile file, Metric<T> metric, T value) {
-        context.<T>newMeasure().on(file).forMetric(metric).withValue(value).save();
+    private static <T extends Serializable> void saveMeasure(SensorContext context, BslModuleContext module, Metric<T> metric, T value) {
+        context.<T>newMeasure().on(module.getFile()).forMetric(metric).withValue(value).save();
     }
 }

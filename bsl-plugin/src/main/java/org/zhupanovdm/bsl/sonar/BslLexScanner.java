@@ -31,8 +31,9 @@ public class BslLexScanner {
         this.context = context;
     }
 
-    public void scan(InputFile inputFile, String contents) {
-        Lexer lexer = BslLexer.create(inputFile.charset());
+    public void scan(BslModuleContext module) {
+        Lexer lexer = BslLexer.create(module.getCharset());
+        InputFile inputFile = module.getFile();
 
         NewHighlighting highlighting = context.newHighlighting();
         highlighting.onFile(inputFile);
@@ -40,7 +41,7 @@ public class BslLexScanner {
         NewCpdTokens cpdTokens = context.newCpdTokens();
         cpdTokens.onFile(inputFile);
 
-        List<Token> tokens = lexer.lex(contents);
+        List<Token> tokens = lexer.lex(module.getContents());
         for (Token token : tokens) {
             TokenType tokenType = token.getType();
 
