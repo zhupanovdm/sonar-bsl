@@ -1,11 +1,11 @@
 {
-  "title": "Track comments matching a regular expression",
+  "title": "Cancel parameter check",
   "type": "CODE_SMELL",
   "status": "ready",
   "tags": [
   ],
   "defaultSeverity": "Major",
-  "ruleSpecification": "SPEC-001",
-  "sqKey": "S001",
+  "ruleSpecification": "SPEC-002",
+  "sqKey": "S002",
   "scope": "Main"
 }

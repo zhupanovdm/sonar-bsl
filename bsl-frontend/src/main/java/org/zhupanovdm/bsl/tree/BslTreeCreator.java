@@ -155,8 +155,9 @@ public class BslTreeCreator {
 
         callable.addToken(cursor.next().getToken()); // (
         List<Parameter> params = callable.getParameters();
+        int index = 0;
         while (cursor.has(PARAMETER)) {
-            params.add(parameter(callable, cursor.next()));
+            params.add(parameter(callable, index++, cursor.next()));
             if (cursor.has(COMMA)) {
                 callable.addToken(cursor.next().getToken()); // ,
             }
@@ -174,10 +175,12 @@ public class BslTreeCreator {
         return callable;
     }
 
-    private Parameter parameter(CallableDefinition callable, AstNode tree) {
+    private Parameter parameter(CallableDefinition callable, int index, AstNode tree) {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
         Parameter parameter = new Parameter(callable);
+        parameter.setIndex(index);
+
         if (cursor.has(VAL)) {
             parameter.setVal(true);
             parameter.addToken(cursor.next().getToken());

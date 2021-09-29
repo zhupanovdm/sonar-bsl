@@ -1,7 +1,5 @@
 package org.zhupanovdm.bsl;
 
-import javax.annotation.CheckForNull;
-
 public class Issue {
   private final Integer line;
   private final String message;
@@ -13,7 +11,6 @@ public class Issue {
     this.cost = cost;
   }
 
-  @CheckForNull
   public Integer line() {
     return line;
   }
@@ -22,7 +19,6 @@ public class Issue {
     return message;
   }
 
-  @CheckForNull
   public Double cost() {
     return cost;
   }

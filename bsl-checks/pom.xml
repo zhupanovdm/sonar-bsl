@@ -32,6 +32,16 @@
             <artifactId>sslr-xpath</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.sonarsource.analyzer-commons</groupId>
+            <artifactId>sonar-analyzer-test-commons</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

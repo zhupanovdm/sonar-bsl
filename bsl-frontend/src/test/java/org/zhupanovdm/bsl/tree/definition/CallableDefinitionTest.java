@@ -107,24 +107,32 @@ public class CallableDefinitionTest {
 
         assertThat(param.getType()).isEqualTo(PARAMETER);
         assertThat(param.getName()).isEqualTo("A");
+        assertThat(param.getIndex()).isEqualTo(0);
         assertThat(param.getTokens()).hasSize(1);
     }
 
     @Test
     public void params() {
-        List<Parameter> params = creator.callableDef(parse("Function Foo(A, Val B = 0) EndFunction", g.rule(FUNC_DEF)), FUNCTION)
+        List<Parameter> params = creator.callableDef(parse("Function Foo(A, Val B = 0, C) EndFunction", g.rule(FUNC_DEF)), FUNCTION)
                 .getParameters();
 
         Parameter param1 = params.get(0);
         assertThat(param1.getName()).isEqualTo("A");
+        assertThat(param1.getIndex()).isEqualTo(0);
         assertThat(param1.isVal()).isFalse();
         assertThat(param1.getDefaultValue()).isNull();
 
         Parameter param2 = params.get(1);
         assertThat(param2.getName()).isEqualTo("B");
+        assertThat(param2.getIndex()).isEqualTo(1);
         assertThat(param2.isVal()).isTrue();
         assertThat(param2.getDefaultValue().as(PrimitiveExpression.class).getValue()).isEqualTo("0");
-
         assertThat(param2.getTokens()).hasSize(3);
+
+        Parameter param3 = params.get(2);
+        assertThat(param3.getName()).isEqualTo("C");
+        assertThat(param3.getIndex()).isEqualTo(2);
+
+        assertThat(params).hasSize(3);
     }
 }

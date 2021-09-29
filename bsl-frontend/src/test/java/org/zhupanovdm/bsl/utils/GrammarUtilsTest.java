@@ -7,12 +7,11 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 
 import static org.sonar.sslr.tests.Assertions.assertThat;
 
-public class BslGrammarUtilsTest {
-
+public class GrammarUtilsTest {
     @Test
     public void word() {
         LexerlessGrammarBuilder b = LexerlessGrammarBuilder.create();
-        b.rule(SampleGrammar.WORD).is(BslGrammarUtils.word(b, "Word", "Слово"));
+        b.rule(SampleGrammar.WORD).is(GrammarUtils.bilingual(b, "Word", "Слово"));
         LexerlessGrammar g = b.build();
 
         assertThat(g.rule(SampleGrammar.WORD))
@@ -28,5 +27,4 @@ public class BslGrammarUtilsTest {
     private enum SampleGrammar implements GrammarRuleKey {
         WORD
     }
-
 }

@@ -37,6 +37,26 @@ public abstract class BslTree {
         return false;
     }
 
+    public boolean isChildOf(BslTree node) {
+        if (parent == null) {
+            return false;
+        }
+        if (parent.equals(node)) {
+            return true;
+        }
+        return parent.isChildOf(node);
+    }
+
+    public boolean isParentOf(BslTree node) {
+        if (node == null) {
+            return false;
+        }
+        if (node.parent != null && node.parent.equals(this)) {
+            return true;
+        }
+        return isParentOf(node.parent);
+    }
+
     public void addToken(Token token) {
         tokens.add(new BslToken(token));
     }

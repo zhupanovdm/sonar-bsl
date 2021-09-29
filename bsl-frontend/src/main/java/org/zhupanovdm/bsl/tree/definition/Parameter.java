@@ -13,6 +13,7 @@ import static org.zhupanovdm.bsl.tree.BslTree.Type.PARAMETER;
 public class Parameter extends BslTree implements Named {
     private String name;
     private boolean val;
+    private int index;
     private BslTree defaultValue;
 
     public Parameter(CallableDefinition parent) {

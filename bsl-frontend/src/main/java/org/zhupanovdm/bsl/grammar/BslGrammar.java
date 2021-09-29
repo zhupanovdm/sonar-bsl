@@ -11,7 +11,7 @@ import java.util.function.Function;
 import static com.sonar.sslr.api.GenericTokenType.EOF;
 import static org.zhupanovdm.bsl.grammar.BslKeyword.*;
 import static org.zhupanovdm.bsl.grammar.BslPunctuator.*;
-import static org.zhupanovdm.bsl.utils.BslGrammarUtils.word;
+import static org.zhupanovdm.bsl.utils.GrammarUtils.bilingual;
 
 public enum BslGrammar implements GrammarRuleKey {
     SPACING, SPACING_NO_LB, LB,
@@ -294,12 +294,12 @@ public enum BslGrammar implements GrammarRuleKey {
     }
 
     private static void preprocessor(LexerlessGrammarBuilder b) {
-        b.rule(PP_IF).is(HASH, SPACING_NO_LB, word(b, IF.getValue(), IF.getValueAlt()));
-        b.rule(PP_ELSIF).is(HASH, SPACING_NO_LB, word(b, ELSIF.getValue(), ELSIF.getValueAlt()));
-        b.rule(PP_END_IF).is(HASH, SPACING_NO_LB, word(b, END_IF.getValue(), END_IF.getValueAlt()));
+        b.rule(PP_IF).is(HASH, SPACING_NO_LB, bilingual(b, IF.getValue(), IF.getValueAlt()));
+        b.rule(PP_ELSIF).is(HASH, SPACING_NO_LB, bilingual(b, ELSIF.getValue(), ELSIF.getValueAlt()));
+        b.rule(PP_END_IF).is(HASH, SPACING_NO_LB, bilingual(b, END_IF.getValue(), END_IF.getValueAlt()));
 
-        b.rule(REGION).is(HASH, SPACING_NO_LB, word(b, "Region", "Область"));
-        b.rule(END_REGION).is(HASH, SPACING_NO_LB, word(b, "EndRegion", "КонецОбласти"));
+        b.rule(REGION).is(HASH, SPACING_NO_LB, bilingual(b, "Region", "Область"));
+        b.rule(END_REGION).is(HASH, SPACING_NO_LB, bilingual(b, "EndRegion", "КонецОбласти"));
 
         b.rule(PP_CONDITION).is(PP_OR_EXPRESSION).skip();
 
@@ -307,7 +307,6 @@ public enum BslGrammar implements GrammarRuleKey {
         b.rule(PP_AND_EXPRESSION).is(PP_NOT_EXPRESSION, b.optional(b.sequence(b.next(AND), LOGIC_OPERATOR), PP_AND_EXPRESSION)).skipIfOneChild();
         b.rule(PP_NOT_EXPRESSION).is(b.firstOf(b.sequence(b.next(NOT), LOGIC_OPERATOR, PP_PRIMARY_EXPRESSION), PP_PRIMARY_EXPRESSION)).skipIfOneChild();
         b.rule(PP_PRIMARY_EXPRESSION).is(IDENTIFIER);
-
     }
 
     private static void definitions(LexerlessGrammarBuilder b) {
@@ -353,7 +352,7 @@ public enum BslGrammar implements GrammarRuleKey {
     }
 
     private static Object keyword(LexerlessGrammarBuilder b, String value, String valueAlt) {
-        return b.sequence(word(b, value, valueAlt), b.nextNot(b.regexp("[\\p{javaJavaIdentifierPart}&&[^$]]")));
+        return b.sequence(bilingual(b, value, valueAlt), b.nextNot(b.regexp("[\\p{javaJavaIdentifierPart}&&[^$]]")));
     }
 
     private static Object keyword(LexerlessGrammarBuilder b, BslWord bslWord) {

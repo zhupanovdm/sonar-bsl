@@ -11,7 +11,7 @@ import org.zhupanovdm.bsl.tree.BslTrivia;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import static org.zhupanovdm.bsl.checks.utils.StringUtils.isNullOrEmpty;
+import static org.zhupanovdm.bsl.utils.StringUtils.isNullOrEmpty;
 
 @Rule(key = "CommentRegularExpression")
 public class CommentRegularExpressionCheck extends BslCheck {
