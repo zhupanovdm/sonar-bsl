@@ -10,8 +10,6 @@ import org.zhupanovdm.bsl.tree.definition.Parameter;
 import org.zhupanovdm.bsl.tree.definition.Variable;
 import org.zhupanovdm.bsl.tree.statement.AssignmentStatement;
 
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.regex.Pattern;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.*;
@@ -24,25 +22,22 @@ public class CancelParameterCheck extends BslCheck {
 
     private static final Pattern CANCEL_PATTERN = Pattern.compile(caseInsensitiveBilingualRegexpString("Cancel", "Отмена"));
 
-    private final Deque<BslTree> nesting = new LinkedList<>();
     private boolean hasCancelParam;
 
     @Override
     public void init() {
         hasCancelParam = false;
-        nesting.clear();
     }
 
     @Override
     public void onVisitCallableDefinition(CallableDefinition def) {
         hasCancelParam = false;
-        nesting.push(def);
     }
 
     @Override
     public void onLeaveNode(BslTree node) {
         if (node.is(FUNCTION, PROCEDURE)) {
-            nesting.pop();
+            hasCancelParam = false;
         }
     }
 
@@ -60,7 +55,6 @@ public class CancelParameterCheck extends BslCheck {
     @Override
     public void onVisitAssignmentStatement(AssignmentStatement stmt) {
         if (hasCancelParam &&
-                stmt.isChildOf(nesting.peek()) &&
                 stmt.getTarget().is(VARIABLE) &&
                 isCancel(stmt.getTarget().as(Variable.class)) &&
                 !stmt.getExpression().is(TRUE)
