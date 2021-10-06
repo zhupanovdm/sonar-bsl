@@ -1,0 +1,12 @@
+{
+  "title": "Работа с параметром \"Отказ\" в обработчиках событий",
+  "type": "CODE_SMELL",
+  "status": "ready",
+  "tags": [
+    "std-1c"
+  ],
+  "defaultSeverity": "Major",
+  "ruleSpecification": "#std68",
+  "sqKey": "STD68",
+  "scope": "Main"
+}

@@ -1,6 +1,6 @@
 {
   "name": "Sonar way",
   "ruleKeys": [
-    "CancelParameter"
+    "STD68"
   ]
 }
