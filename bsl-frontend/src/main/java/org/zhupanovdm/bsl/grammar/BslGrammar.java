@@ -274,7 +274,7 @@ public enum BslGrammar implements GrammarRuleKey {
                 b.optional(BODY),
                 END_TRY);
 
-        b.rule(RAISE_STMT).is(RAISE, EXPRESSION);
+        b.rule(RAISE_STMT).is(RAISE, b.optional(EXPRESSION));
 
         b.rule(EXECUTE_STMT).is(EXECUTE, LPAREN, EXPRESSION, RPAREN);
 
