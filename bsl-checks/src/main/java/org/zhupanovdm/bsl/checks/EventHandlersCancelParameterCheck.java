@@ -32,8 +32,9 @@ public class EventHandlersCancelParameterCheck extends BslCheck {
         cancelParam = null;
 
         if (handlersPatterns.isEmpty()) {
-            handlersPatterns.add(Pattern.compile(caseInsensitiveBilingualRegexpString("OnSave", "ПриЗаписи")));
-            handlersPatterns.add(Pattern.compile(caseInsensitiveBilingualRegexpString("OnSave", "ОбработкаПроверкиЗаполнения")));
+            handlersPatterns.add(Pattern.compile(caseInsensitiveBilingualRegexpString("BeforeWrite", "ПередЗаписью")));
+            handlersPatterns.add(Pattern.compile(caseInsensitiveBilingualRegexpString("OnWrite", "ПриЗаписи")));
+            handlersPatterns.add(Pattern.compile(caseInsensitiveBilingualRegexpString("FillCheckProcessing", "ОбработкаПроверкиЗаполнения")));
         }
     }
 
@@ -58,12 +59,19 @@ public class EventHandlersCancelParameterCheck extends BslCheck {
 
     @Override
     public void onVisitAssignmentStatement(AssignmentStatement stmt) {
-        if (cancelParam != null && isCancel(stmt.getTarget())) {
-            if (stmt.getExpression().is(TRUE) ||
-                    (stmt.getExpression().is(OR) && isCancel(stmt.getExpression().as(BinaryExpression.class).getLeft()))) {
-                saveIssue(Issue.lineIssue(stmt.getFirstToken().getLine(), MESSAGE_FALSE));
-            }
+        if (cancelParam != null &&
+                isCancel(stmt.getTarget()) &&
+                !(isTrueAssigned(stmt) || isOrExpression(stmt))) {
+            saveIssue(Issue.lineIssue(stmt.getFirstToken().getLine(), MESSAGE_FALSE));
         }
+    }
+
+    private boolean isTrueAssigned(AssignmentStatement stmt) {
+        return stmt.getExpression().is(TRUE);
+    }
+
+    private boolean isOrExpression(AssignmentStatement stmt) {
+        return stmt.getExpression().is(OR) && isCancel(stmt.getExpression().as(BinaryExpression.class).getLeft());
     }
 
     private boolean isCancel(BslTree node) {
