@@ -7,5 +7,5 @@
   "defaultSeverity": "Major",
   "ruleSpecification": "SPEC-001",
   "sqKey": "S001",
-  "scope": "Main"
+  "scope": "All"
 }

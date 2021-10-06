@@ -12,7 +12,7 @@ public final class CheckList {
     public static List<Class<?>> getChecks() {
         return Arrays.asList(
                 CommentRegularExpressionCheck.class,
-                CancelParameterCheck.class
+                EventHandlersCancelParameterCheck.class
         );
     }
 }
