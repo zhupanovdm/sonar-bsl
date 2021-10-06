@@ -17,12 +17,12 @@ import static org.zhupanovdm.bsl.tree.BslTree.Type.*;
 public class BslSymbolTableCreator implements BslTreeSubscriber {
     @Getter
     private BslSymbolTable table;
-    private final Deque<Scope> scopes = new LinkedList<>();
+    private final Deque<Scope> nesting = new LinkedList<>();
 
     @Override
     public void init() {
         table = new BslSymbolTable();
-        scopes.clear();
+        nesting.clear();
     }
 
     @Override
@@ -54,36 +54,36 @@ public class BslSymbolTableCreator implements BslTreeSubscriber {
     @Override
     public void onLeaveNode(BslTree node) {
         if (node.is(MODULE, FUNCTION, PROCEDURE)) {
-            scopes.pop();
+            nesting.pop();
         }
     }
 
     private void createGlobalScope(BslTree owner) {
-        Scope scope = new Scope(null, owner);
-        scopes.push(scope);
+        Scope scope = owner == null ? Scope.global() : new Scope(Scope.global(), owner);
+        nesting.push(scope);
         table.setGlobalScope(scope);
     }
 
     private void createScope(BslTree owner) {
-        Scope parent = scopes.getFirst();
+        Scope parent = nesting.getFirst();
         Scope scope = new Scope(parent, owner);
         parent.getScopes().add(scope);
-        scopes.push(scope);
+        nesting.push(scope);
     }
 
     private void createSymbol(BslTree owner, String name) {
-        if (scopes.isEmpty()) {
+        if (nesting.isEmpty()) {
             createGlobalScope(null);
         }
-        Scope scope = scopes.getFirst();
+        Scope scope = nesting.getFirst();
         scope.getSymbols().add(new Symbol(scope, owner, name));
     }
 
     private void createReference(BslTree owner, String name) {
-        if (scopes.isEmpty()) {
+        if (nesting.isEmpty()) {
             createGlobalScope(null);
         }
-        Scope scope = scopes.getFirst();
-        scope.getRefs().add(new Symbol(scope, owner, name));
+        Scope scope = nesting.getFirst();
+        scope.getReferences().add(new SymbolReference(scope, owner, name));
     }
 }
