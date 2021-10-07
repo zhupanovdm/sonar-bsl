@@ -12,14 +12,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.sonar.sslr.api.GenericTokenType.EOF;
-
 public class ModuleMetrics implements BslTreeSubscriber {
-    private static final String NOSONAR = "NOSONAR";
+    private static final String NO_SONAR = "NOSONAR";
 
     private final Set<Integer> linesOfCode = new HashSet<>();
     private final Set<Integer> linesOfComments = new HashSet<>();
     private final Set<Integer> linesNoSonar = new HashSet<>();
+    private final Set<Integer> executableLines = new HashSet<>();
 
     @Getter
     private int numberOfStatements;
@@ -27,11 +26,8 @@ public class ModuleMetrics implements BslTreeSubscriber {
     @Getter
     private int numberOfFunctions;
 
-    private final Set<Integer> alreadyMarked = new HashSet<>();
-    private final StringBuilder executableLinesBuilder = new StringBuilder();
-
-    public String getExecutableLines() {
-        return executableLinesBuilder.toString();
+    public Set<Integer> getExecutableLines() {
+        return Collections.unmodifiableSet(executableLines);
     }
 
     public Set<Integer> getLinesOfCode() {
@@ -51,8 +47,7 @@ public class ModuleMetrics implements BslTreeSubscriber {
         linesOfCode.clear();
         linesOfComments.clear();
         linesNoSonar.clear();
-        alreadyMarked.clear();
-        executableLinesBuilder.delete(0, executableLinesBuilder.length());
+        executableLines.clear();
 
         numberOfStatements = 0;
         numberOfFunctions = 0;
@@ -60,9 +55,7 @@ public class ModuleMetrics implements BslTreeSubscriber {
 
     @Override
     public void onEnterNode(BslTree node) {
-        for (BslToken token : node.getTokens()) {
-            visitToken(token);
-        }
+        node.getTokens().forEach(this::visitToken);
     }
 
     @Override
@@ -168,16 +161,13 @@ public class ModuleMetrics implements BslTreeSubscriber {
 
     private void addExecutableLine(BslTree node) {
         BslToken token = node.getFirstToken();
-        if (token == null) {
-            return;
+        if (token != null) {
+            executableLines.add(token.getLine());
         }
-        int line = token.getLine();
-        if (alreadyMarked.add(line))
-            executableLinesBuilder.append(line).append("=1;");
     }
 
     private void visitToken(BslToken token) {
-        if (!token.getType().equals(EOF)) {
+        if (!token.is(BslToken.Type.EOF)) {
             linesOfCode.add(token.getLine());
         }
 
@@ -207,6 +197,6 @@ public class ModuleMetrics implements BslTreeSubscriber {
     }
 
     private static boolean isNoSonar(String content) {
-        return content.contains(NOSONAR);
+        return content.contains(NO_SONAR);
     }
 }

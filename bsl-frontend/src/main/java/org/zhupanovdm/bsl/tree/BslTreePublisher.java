@@ -1,5 +1,6 @@
 package org.zhupanovdm.bsl.tree;
 
+import org.zhupanovdm.bsl.ModuleFile;
 import org.zhupanovdm.bsl.tree.definition.*;
 import org.zhupanovdm.bsl.tree.expression.*;
 import org.zhupanovdm.bsl.tree.module.Module;
@@ -7,10 +8,19 @@ import org.zhupanovdm.bsl.tree.module.PreprocessorElsif;
 import org.zhupanovdm.bsl.tree.module.PreprocessorIf;
 import org.zhupanovdm.bsl.tree.statement.*;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 public class BslTreePublisher implements BslTreeSubscriber {
     protected final List<BslTreeSubscriber> subscribers = new LinkedList<>();
+
+    public void scan(ModuleFile context) {
+        onEnterFile(context);
+        publish(context.getEntry());
+        onLeaveFile(context);
+    }
 
     public void publish(BslTree node) {
         if (node != null) {
@@ -19,13 +29,27 @@ public class BslTreePublisher implements BslTreeSubscriber {
     }
 
     public BslTreePublisher subscribe(BslTreeSubscriber ...subscribers) {
-        this.subscribers.addAll(Arrays.asList(subscribers));
+        return subscribe(Arrays.asList(subscribers));
+    }
+
+    public BslTreePublisher subscribe(Collection<? extends BslTreeSubscriber> subscribers) {
+        this.subscribers.addAll(subscribers);
         return this;
     }
 
     @Override
     public void init() {
         subscribers.forEach(BslTreeSubscriber::init);
+    }
+
+    @Override
+    public void onEnterFile(ModuleFile context) {
+        subscribers.forEach(subscriber -> subscriber.onEnterFile(context));
+    }
+
+    @Override
+    public void onLeaveFile(ModuleFile context) {
+        subscribers.forEach(subscriber -> subscriber.onLeaveFile(context));
     }
 
     @Override

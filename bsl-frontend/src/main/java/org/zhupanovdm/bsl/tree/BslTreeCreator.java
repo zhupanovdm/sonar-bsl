@@ -70,7 +70,7 @@ public class BslTreeCreator {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
         Module module = new Module();
         body(module, cursor.optional(BODY));
-        module.addToken(cursor.next().getToken());
+        addToken(module, cursor.next(), BslToken.Type.EOF);
         return module;
     }
 
@@ -96,28 +96,28 @@ public class BslTreeCreator {
                 body.add(definition);
 
             }  else if (cursor.has(REGION)) {
-                addTokens(parent, cursor.next()); // #Region
-                parent.addToken(cursor.next().getToken()); // name
+                addPreprocessorToken(parent, cursor.next()); // #Region
+                addToken(parent, cursor.next(), BslToken.Type.IDENTIFIER); // name
                 body(parent, cursor.optional(BODY));
-                addTokens(parent, cursor.next()); // #EndRegion
+                addPreprocessorToken(parent, cursor.next()); // #EndRegion
 
             } else if (cursor.has(PP_IF)) {
                 PreprocessorIf ppIf = new PreprocessorIf(parent);
-                addTokens(ppIf, cursor.next()); // #If
+                addPreprocessorToken(ppIf, cursor.next()); // #If
                 ppIf.setCondition(expression(ppIf, cursor.next()));
-                ppIf.addToken(cursor.next().getToken()); // Then
+                addToken(ppIf, cursor.next(), BslToken.Type.PREPROCESSOR); // Then
                 body(ppIf, cursor.optional(BODY));
 
                 while (cursor.has(PP_ELSIF)) {
                     PreprocessorElsif ppElsIf = new PreprocessorElsif(ppIf);
-                    addTokens(ppElsIf, cursor.next()); // #ElsIf
+                    addPreprocessorToken(ppElsIf, cursor.next()); // #ElsIf
                     ppElsIf.setCondition(expression(ppElsIf, cursor.next()));
-                    ppElsIf.addToken(cursor.next().getToken()); // Then
+                    addToken(ppElsIf, cursor.next(), BslToken.Type.PREPROCESSOR); // Then
                     body(ppElsIf, cursor.optional(BODY));
 
                     ppIf.getElsIfBranches().add(ppElsIf);
                 }
-                addTokens(ppIf, cursor.next()); // #EndIf
+                addPreprocessorToken(ppIf, cursor.next()); // #EndIf
 
                 body.add(ppIf);
 
@@ -144,33 +144,33 @@ public class BslTreeCreator {
         }
         if (cursor.has(ASYNC)) {
             callable.setAsync(true);
-            callable.addToken(cursor.next().getToken());
+            addToken(callable, cursor.next(), BslToken.Type.KEYWORD_SYNTACTIC);
         }
 
-        callable.addToken(cursor.next().getToken()); // Function / Procedure
+        addToken(callable, cursor.next(), BslToken.Type.KEYWORD); // Function / Procedure
 
         AstNode name = cursor.next().getFirstChild();
         callable.setName(name.getTokenOriginalValue());
-        callable.addToken(name.getToken());
+        addToken(callable, name, BslToken.Type.IDENTIFIER);
 
-        callable.addToken(cursor.next().getToken()); // (
+        addToken(callable, cursor.next(), BslToken.Type.PUNCTUATOR); // (
         List<Parameter> params = callable.getParameters();
         int index = 0;
         while (cursor.has(PARAMETER)) {
             params.add(parameter(callable, index++, cursor.next()));
             if (cursor.has(COMMA)) {
-                callable.addToken(cursor.next().getToken()); // ,
+                addToken(callable, cursor.next(), BslToken.Type.PUNCTUATOR); // ,
             }
         }
-        callable.addToken(cursor.next().getToken()); // )
+        addToken(callable, cursor.next(), BslToken.Type.PUNCTUATOR); // )
 
         if (cursor.has(EXPORT)) {
             callable.setExport(true);
-            callable.addToken(cursor.next().getToken());
+            addToken(callable, cursor.next(), BslToken.Type.KEYWORD);
         }
 
         body(callable, cursor.optional(BODY));
-        callable.addToken(cursor.next().getToken()); // EndFunction / EndProcedure
+        addToken(callable, cursor.next(), BslToken.Type.KEYWORD); // EndFunction / EndProcedure
 
         return callable;
     }
@@ -183,15 +183,15 @@ public class BslTreeCreator {
 
         if (cursor.has(VAL)) {
             parameter.setVal(true);
-            parameter.addToken(cursor.next().getToken());
+            addToken(parameter, cursor.next(), BslToken.Type.KEYWORD);
         }
 
         AstNode name = cursor.next().getFirstChild();
         parameter.setName(name.getTokenOriginalValue());
-        parameter.addToken(name.getToken());
+        addToken(parameter, name, BslToken.Type.IDENTIFIER);
 
         if (cursor.hasNext()) {
-            parameter.addToken(cursor.next().getToken()); // =
+            addToken(parameter, cursor.next(), BslToken.Type.PUNCTUATOR); // =
             parameter.setDefaultValue(primitiveExpr(parameter, cursor.next()));
         }
 
@@ -206,15 +206,15 @@ public class BslTreeCreator {
             varDef.setDirective(directive(varDef, cursor.next()));
         }
 
-        varDef.addToken(cursor.next().getToken()); // Var
+        addToken(varDef, cursor.next(), BslToken.Type.KEYWORD); // Var
         List<BslTree> variables = varDef.getBody();
         while (cursor.has(VARIABLE)) {
             variables.add(variable(varDef, cursor.next()));
             if (cursor.has(COMMA)) {
-                varDef.addToken(cursor.next().getToken()); // ,
+                addToken(varDef, cursor.next(), BslToken.Type.PUNCTUATOR); // ,
             }
         }
-        varDef.addToken(cursor.next().getToken()); // ;
+        addToken(varDef, cursor.next(), BslToken.Type.PUNCTUATOR); // ;
 
         return varDef;
     }
@@ -226,11 +226,11 @@ public class BslTreeCreator {
 
         AstNode name = cursor.next().getFirstChild();
         variable.setName(name.getTokenOriginalValue());
-        variable.addToken(name.getToken());
+        addToken(variable, name, BslToken.Type.IDENTIFIER);
 
         if (cursor.hasNext()) {
             variable.setExport(true);
-            variable.addToken(cursor.next().getToken());
+            addToken(variable, cursor.next(), BslToken.Type.KEYWORD);
         }
 
         return variable;
@@ -240,11 +240,11 @@ public class BslTreeCreator {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
         Directive directive = new Directive(parent);
-        directive.addToken(cursor.next().getToken()); // &
+        addToken(directive, cursor.next(), BslToken.Type.PREPROCESSOR); // &
 
         AstNode node = cursor.next();
         directive.setValue((BslDirective) node.getType());
-        directive.addToken(node.getToken());
+        addToken(directive, node, BslToken.Type.PREPROCESSOR);
 
         return directive;
     }
@@ -266,7 +266,7 @@ public class BslTreeCreator {
                     int line = token.getLine();
                     throw new RecognitionException(line, "Parse error at line " + line + ": Statements delimiter is not expected.");
                 }
-                stmt.addToken(node.getToken());
+                addToken(stmt, node, BslToken.Type.PUNCTUATOR);
             } else {
                 stmt = statement(node);
                 stmt.setParent(parent);
@@ -280,7 +280,7 @@ public class BslTreeCreator {
 
         AssignmentStatement stmt = new AssignmentStatement();
         stmt.setTarget(expression(stmt, cursor.next()));
-        stmt.addToken(cursor.next().getToken()); // =
+        addToken(stmt, cursor.next(), BslToken.Type.PUNCTUATOR); // =
         stmt.setExpression(expression(stmt, cursor.next()));
 
         return stmt;
@@ -290,17 +290,17 @@ public class BslTreeCreator {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
         IfStatement stmt = new IfStatement();
-        stmt.addToken(cursor.next().getToken()); // If
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // If
         stmt.setCondition(expression(stmt, cursor.next()));
-        stmt.addToken(cursor.next().getToken()); // Then
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // Then
         body(stmt, cursor.optional(BODY));
 
         List<ElsIfBranch> branches = stmt.getElsIfBranches();
         while (cursor.has(ELSIF)) {
             ElsIfBranch elsIfBranch = new ElsIfBranch(stmt);
-            elsIfBranch.addToken(cursor.next().getToken()); // ElsIf
+            addToken(elsIfBranch, cursor.next(), BslToken.Type.KEYWORD); // ElsIf
             elsIfBranch.setCondition(expression(elsIfBranch, cursor.next()));
-            elsIfBranch.addToken(cursor.next().getToken()); // Then
+            addToken(elsIfBranch, cursor.next(), BslToken.Type.KEYWORD); // Then
             body(elsIfBranch, cursor.optional(BODY));
 
             branches.add(elsIfBranch);
@@ -308,13 +308,13 @@ public class BslTreeCreator {
 
         if (cursor.has(ELSE)) {
             ElseClause elseClause = new ElseClause(stmt);
-            elseClause.addToken(cursor.next().getToken()); // Else
+            addToken(elseClause, cursor.next(), BslToken.Type.KEYWORD); // Else
             body(elseClause, cursor.optional(BODY));
 
             stmt.setElseClause(elseClause);
         }
 
-        stmt.addToken(cursor.next().getToken()); // EndIf
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // EndIf
 
         return stmt;
     }
@@ -323,11 +323,11 @@ public class BslTreeCreator {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
         WhileStatement stmt = new WhileStatement();
-        stmt.addToken(cursor.next().getToken()); // While
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // While
         stmt.setCondition(expression(stmt, cursor.next()));
-        stmt.addToken(cursor.next().getToken()); // Do
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // Do
         body(stmt, cursor.optional(BODY));
-        stmt.addToken(cursor.next().getToken()); // EndDo
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // EndDo
 
         return stmt;
     }
@@ -336,15 +336,15 @@ public class BslTreeCreator {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
         ForStatement stmt = new ForStatement();
-        stmt.addToken(cursor.next().getToken()); // For
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // For
         stmt.setVariable(variable(stmt, cursor.next()));
-        stmt.addToken(cursor.next().getToken()); // =
+        addToken(stmt, cursor.next(), BslToken.Type.PUNCTUATOR); // =
         stmt.setInit(expression(stmt, cursor.next()));
-        stmt.addToken(cursor.next().getToken()); // To
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // To
         stmt.setCondition(expression(stmt, cursor.next()));
-        stmt.addToken(cursor.next().getToken()); // Do
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // Do
         body(stmt, cursor.optional(BODY));
-        stmt.addToken(cursor.next().getToken()); // EndDo
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // EndDo
 
         return stmt;
     }
@@ -353,14 +353,14 @@ public class BslTreeCreator {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
         ForEachStatement stmt = new ForEachStatement();
-        stmt.addToken(cursor.next().getToken()); // For
-        stmt.addToken(cursor.next().getToken()); // each
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // For
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // each
         stmt.setVariable(variable(stmt, cursor.next()));
-        stmt.addToken(cursor.next().getToken()); // In
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // In
         stmt.setCollection(expression(stmt, cursor.next()));
-        stmt.addToken(cursor.next().getToken()); // Do
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // Do
         body(stmt, cursor.optional(BODY));
-        stmt.addToken(cursor.next().getToken()); // EndDo
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // EndDo
 
         return stmt;
     }
@@ -369,14 +369,14 @@ public class BslTreeCreator {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
         TryStatement stmt = new TryStatement();
-        stmt.addToken(cursor.next().getToken()); // Try
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // Try
         body(stmt, cursor.next());
-        stmt.addToken(cursor.next().getToken()); // Except
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // Except
 
         ExceptClause exceptClause = new ExceptClause(stmt);
         stmt.setExceptClause(exceptClause);
         body(exceptClause, cursor.optional(BODY));
-        stmt.addToken(cursor.next().getToken()); // EndTry
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // EndTry
 
         return stmt;
     }
@@ -391,7 +391,7 @@ public class BslTreeCreator {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
         ReturnStatement stmt = new ReturnStatement();
-        stmt.addToken(cursor.next().getToken()); // Return
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // Return
         if (cursor.hasNext()) {
             stmt.setExpression(expression(stmt, cursor.next()));
         }
@@ -401,19 +401,19 @@ public class BslTreeCreator {
 
     public BreakStatement breakStmt(AstNode tree) {
         BreakStatement stmt = new BreakStatement();
-        stmt.addToken(tree.getFirstChild().getToken());
+        addToken(stmt, tree.getFirstChild(), BslToken.Type.KEYWORD);
         return stmt;
     }
 
     public ContinueStatement continueStmt(AstNode tree) {
         ContinueStatement stmt = new ContinueStatement();
-        stmt.addToken(tree.getFirstChild().getToken());
+        addToken(stmt, tree.getFirstChild(), BslToken.Type.KEYWORD);
         return stmt;
     }
 
     public EmptyStatement emptyStmt(AstNode tree) {
         EmptyStatement stmt = new EmptyStatement();
-        stmt.addToken(tree.getFirstChild().getToken());
+        addToken(stmt, tree.getFirstChild(), BslToken.Type.PUNCTUATOR);
         return stmt;
     }
 
@@ -421,7 +421,7 @@ public class BslTreeCreator {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
         GotoStatement stmt = new GotoStatement();
-        stmt.addToken(cursor.next().getToken()); // Goto
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // Goto
         stmt.setLabel(label(stmt, cursor.next()));
 
         return stmt;
@@ -432,7 +432,7 @@ public class BslTreeCreator {
 
         LabelDefinition def = new LabelDefinition();
         def.setLabel(label(def, cursor.next()));
-        def.addToken(cursor.next().getToken()); // :
+        addToken(def, cursor.next(), BslToken.Type.PUNCTUATOR); // :
 
         return def;
     }
@@ -441,11 +441,11 @@ public class BslTreeCreator {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
         Label label = new Label(parent);
-        label.addToken(cursor.next().getToken()); // ~
+        addToken(label, cursor.next(), BslToken.Type.PUNCTUATOR); // ~
 
         AstNode name = cursor.next();
         label.setName(name.getTokenOriginalValue());
-        label.addToken(name.getToken());
+        addToken(label, name, BslToken.Type.IDENTIFIER);
 
         return label;
     }
@@ -454,10 +454,10 @@ public class BslTreeCreator {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
         ExecuteStatement stmt = new ExecuteStatement();
-        stmt.addToken(cursor.next().getToken()); // Execute
-        stmt.addToken(cursor.next().getToken()); // (
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // Execute
+        addToken(stmt, cursor.next(), BslToken.Type.PUNCTUATOR); // (
         stmt.setExpression(expression(stmt, cursor.next()));
-        stmt.addToken(cursor.next().getToken()); // )
+        addToken(stmt, cursor.next(), BslToken.Type.PUNCTUATOR); // )
 
         return stmt;
     }
@@ -466,7 +466,7 @@ public class BslTreeCreator {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
         RaiseStatement stmt = new RaiseStatement();
-        stmt.addToken(cursor.next().getToken()); // Raise
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD); // Raise
         if (cursor.hasNext()) {
             stmt.setExpression(expression(stmt, cursor.next()));
         }
@@ -478,9 +478,9 @@ public class BslTreeCreator {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
         AddHandlerStatement stmt = new AddHandlerStatement();
-        stmt.addToken(cursor.next().getToken()); // AddHandler
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD_SYNTACTIC); // AddHandler
         stmt.setEvent(expression(stmt, cursor.next()));
-        stmt.addToken(cursor.next().getToken()); // ,
+        addToken(stmt, cursor.next(), BslToken.Type.PUNCTUATOR); // ,
         stmt.setHandler(expression(stmt, cursor.next()));
 
         return stmt;
@@ -490,9 +490,9 @@ public class BslTreeCreator {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
         RemoveHandlerStatement stmt = new RemoveHandlerStatement();
-        stmt.addToken(cursor.next().getToken()); // RemoveHandler
+        addToken(stmt, cursor.next(), BslToken.Type.KEYWORD_SYNTACTIC); // RemoveHandler
         stmt.setEvent(expression(stmt, cursor.next()));
-        stmt.addToken(cursor.next().getToken()); // ,
+        addToken(stmt, cursor.next(), BslToken.Type.PUNCTUATOR); // ,
         stmt.setHandler(expression(stmt, cursor.next()));
 
         return stmt;
@@ -540,7 +540,7 @@ public class BslTreeCreator {
         PostfixExpression expr = new PostfixExpression(parent);
         if (cursor.has(AWAIT)) {
             expr.setAwait(true);
-            expr.addToken(cursor.next().getToken());
+            addToken(expr, cursor.next(), BslToken.Type.KEYWORD_SYNTACTIC);
         }
         expr.setReference(primaryExpr(expr, cursor.next()).as(ReferenceExpression.class));
         expr.setPostfix(postfix(expr, cursor));
@@ -558,9 +558,9 @@ public class BslTreeCreator {
             AstSiblingsCursor c = cursor.descend();
 
             IndexPostfix postfix = new IndexPostfix(parent);
-            postfix.addToken(c.next().getToken()); // [
+            addToken(postfix, c.next(), BslToken.Type.PUNCTUATOR); // [
             postfix.setIndex(expression(postfix, c.next()));
-            postfix.addToken(c.next().getToken()); // ]
+            addToken(postfix, c.next(), BslToken.Type.PUNCTUATOR); // ]
             postfix.setPostfix(postfix(postfix, cursor));
 
             return postfix;
@@ -568,11 +568,11 @@ public class BslTreeCreator {
 
         if (node.is(DEREFERENCE_POSTFIX, ASSIGNABLE_DEREFERENCE_POSTFIX, CALLABLE_DEREFERENCE_POSTFIX)) {
             DereferencePostfix postfix = new DereferencePostfix(parent);
-            postfix.addToken(cursor.next().getToken()); // .
+            addToken(postfix, cursor.next(), BslToken.Type.PUNCTUATOR); // .
 
             AstNode name = cursor.next().getFirstChild();
             postfix.setName(name.getTokenOriginalValue());
-            postfix.addToken(name.getToken());
+            addToken(postfix, name, BslToken.Type.IDENTIFIER);
 
             postfix.setPostfix(postfix(postfix, cursor));
 
@@ -583,24 +583,24 @@ public class BslTreeCreator {
             AstSiblingsCursor c = cursor.descend();
 
             CallPostfix postfix = new CallPostfix(parent);
-            postfix.addToken(c.next().getToken()); // (
+            addToken(postfix, c.next(), BslToken.Type.PUNCTUATOR); // (
 
             boolean addTail = false;
             List<BslTree> arguments = postfix.getArguments();
             while (!c.has(RPAREN)) {
                 if (c.has(COMMA)) {
-                    postfix.addToken(c.next().getToken());
+                    addToken(postfix, c.next(), BslToken.Type.PUNCTUATOR);
                     arguments.add(new EmptyExpression(postfix));
                     addTail = c.has(RPAREN);
                 } else {
                     arguments.add(expression(postfix, c.next()));
                     if (c.has(COMMA)) {
-                        postfix.addToken(c.next().getToken());
+                        addToken(postfix, c.next(), BslToken.Type.PUNCTUATOR);
                         addTail = c.has(RPAREN);
                     }
                 }
             }
-            postfix.addToken(c.next().getToken()); // )
+            addToken(postfix, c.next(), BslToken.Type.PUNCTUATOR); // )
             if (addTail) {
                 arguments.add(new EmptyExpression(postfix));
             }
@@ -629,7 +629,7 @@ public class BslTreeCreator {
             throw new RecognitionException(line, "Parse error at line " + line + ": Unknown binary operator: " + token);
         }
         expr.setType(op);
-        expr.addToken(node.getToken());
+        addToken(expr, node, BslToken.Type.PUNCTUATOR); // op
 
         expr.setRight(expression(expr, cursor.next()));
 
@@ -651,7 +651,7 @@ public class BslTreeCreator {
             int line = token.getLine();
             throw new RecognitionException(line, "Parse error at line " + line + ": Unary operator expected. Got: " + token);
         }
-        expr.addToken(node.getToken());
+        addToken(expr, node, BslToken.Type.PUNCTUATOR); // op
 
         expr.setExpression(expression(expr, cursor.next()));
 
@@ -662,14 +662,14 @@ public class BslTreeCreator {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
         TernaryExpression expr = new TernaryExpression(parent);
-        expr.addToken(cursor.next().getToken()); // ?
-        expr.addToken(cursor.next().getToken()); // (
+        addToken(expr, cursor.next(), BslToken.Type.PUNCTUATOR); // ?
+        addToken(expr, cursor.next(), BslToken.Type.PUNCTUATOR); // (
         expr.setCondition(expression(expr, cursor.next()));
-        expr.addToken(cursor.next().getToken()); // ,
+        addToken(expr, cursor.next(), BslToken.Type.PUNCTUATOR); // ,
         expr.setTrueExpression(expression(expr, cursor.next()));
-        expr.addToken(cursor.next().getToken()); // ,
+        addToken(expr, cursor.next(), BslToken.Type.PUNCTUATOR); // ,
         expr.setFalseExpression(expression(expr, cursor.next()));
-        expr.addToken(cursor.next().getToken()); // )
+        addToken(expr, cursor.next(), BslToken.Type.PUNCTUATOR); // )
 
         return expr;
     }
@@ -678,11 +678,11 @@ public class BslTreeCreator {
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
 
         NewExpression expr = new NewExpression(parent);
-        expr.addToken(cursor.next().getToken()); // new
+        addToken(expr, cursor.next(), BslToken.Type.KEYWORD); // new
 
         AstNode name = cursor.next().getFirstChild();
         expr.setName(name.getTokenOriginalValue());
-        expr.addToken(name.getToken());
+        addToken(expr, name, BslToken.Type.IDENTIFIER);
 
         expr.setPostfix(postfix(expr, cursor));
 
@@ -697,7 +697,7 @@ public class BslTreeCreator {
 
             AstNode name = cursor.next().getFirstChild();
             expr.setName(name.getTokenOriginalValue());
-            expr.addToken(name.getToken());
+            addToken(expr, name, BslToken.Type.IDENTIFIER);
 
             return expr;
         }
@@ -708,9 +708,9 @@ public class BslTreeCreator {
 
         if (cursor.has(LPAREN)) {
             ParenthesisExpression expr = new ParenthesisExpression(parent);
-            expr.addToken(cursor.next().getToken()); // (
+            addToken(expr, cursor.next(), BslToken.Type.PUNCTUATOR); // (
             expr.setExpression(expression(expr, cursor.next()));
-            expr.addToken(cursor.next().getToken()); // )
+            addToken(expr, cursor.next(), BslToken.Type.PUNCTUATOR); // )
 
             return expr;
         }
@@ -736,31 +736,31 @@ public class BslTreeCreator {
         }
         if (node.is(NUMBER)) {
             PrimitiveExpression expr = new PrimitiveExpression(parent, BslTree.Type.NUMBER);
-            expr.addToken(node.getToken());
+            addToken(expr, node, BslToken.Type.NUMERIC);
             expr.setValue(node.getTokenOriginalValue());
             return expr;
         }
         if (node.is(TRUE)) {
             PrimitiveExpression expr = new PrimitiveExpression(parent, BslTree.Type.TRUE);
-            expr.addToken(node.getToken());
+            addToken(expr, node, BslToken.Type.CONSTANT);
             expr.setValue(node.getTokenOriginalValue());
             return expr;
         }
         if (node.is(FALSE)) {
             PrimitiveExpression expr = new PrimitiveExpression(parent, BslTree.Type.FALSE);
-            expr.addToken(node.getToken());
+            addToken(expr, node, BslToken.Type.CONSTANT);
             expr.setValue(node.getTokenOriginalValue());
             return expr;
         }
         if (node.is(UNDEFINED)) {
             PrimitiveExpression expr = new PrimitiveExpression(parent, BslTree.Type.UNDEFINED);
-            expr.addToken(node.getToken());
+            addToken(expr, node, BslToken.Type.CONSTANT);
             expr.setValue(node.getTokenOriginalValue());
             return expr;
         }
         if (node.is(DATE)) {
             PrimitiveExpression expr = new PrimitiveExpression(parent, BslTree.Type.DATE);
-            expr.addToken(node.getToken());
+            addToken(expr, node, BslToken.Type.DATE_LITERAL);
 
             String value = node.getTokenOriginalValue();
             expr.setValue(value.substring(1).substring(0, value.length() - 2));
@@ -769,7 +769,7 @@ public class BslTreeCreator {
         }
         if (node.is(NULL)) {
             PrimitiveExpression expr = new PrimitiveExpression(parent, BslTree.Type.NULL);
-            expr.addToken(node.getToken());
+            addToken(expr, node, BslToken.Type.CONSTANT);
             expr.setValue(node.getTokenOriginalValue());
             return expr;
         }
@@ -784,31 +784,35 @@ public class BslTreeCreator {
         StringBuilder builder = new StringBuilder();
 
         PrimitiveExpression literal = new PrimitiveExpression(parent, BslTree.Type.STRING);
-        literal.addToken(cursor.next().getToken()); // "
+        addToken(literal, cursor.next(), BslToken.Type.STRING_LITERAL); // "
         while (!cursor.has(QUOTE)) {
             if (cursor.has(STRING_CONTENT)) {
                 AstNode node = cursor.next();
-                literal.addToken(node.getToken());
+                addToken(literal, node, BslToken.Type.STRING_LITERAL);
                 builder.append(node.getTokenOriginalValue());
             } else if (cursor.has(PIPE)) {
                 builder.append('\n');
-                literal.addToken(cursor.next().getToken());
+                addToken(literal, cursor.next(), BslToken.Type.STRING_LITERAL);
             } else {
                 Token token = cursor.next().getToken();
                 int line = token.getLine();
                 throw new RecognitionException(line, "Parse error at line " + line + ": Unknown string literal token: " + token);
             }
         }
-        literal.addToken(cursor.next().getToken()); // "
+        addToken(literal, cursor.next(), BslToken.Type.STRING_LITERAL); // "
 
         literal.setValue(builder.toString());
 
         return literal;
     }
 
-    private static void addTokens(BslTree target, AstNode tree) {
-        for (AstNode n : new AstSiblingsCursor(tree.getFirstChild())) {
-            target.addToken(n.getToken());
+    private static void addToken(BslTree target, AstNode tree, BslToken.Type type) {
+        target.addToken(new BslToken(tree.getToken(), type));
+    }
+
+    private static void addPreprocessorToken(BslTree target, AstNode tree) {
+        for (AstNode node : new AstSiblingsCursor(tree.getFirstChild())) {
+            addToken(target, node, BslToken.Type.PREPROCESSOR);
         }
     }
 

@@ -1,37 +1,29 @@
 package org.zhupanovdm.bsl;
 
+import lombok.Data;
+
+import javax.annotation.Nonnull;
+import java.util.Optional;
+
+@Data
 public class Issue {
   private final Integer line;
   private final String message;
   private final Double cost;
+  private final Check check;
 
-  private Issue(Integer line, String message, Double cost) {
-    this.line = line;
+  public Issue(@Nonnull Check check, @Nonnull String message, Integer line, Double cost) {
+    this.check = check;
     this.message = message;
+    this.line = line;
     this.cost = cost;
   }
 
-  public Integer line() {
-    return line;
+  public Optional<Integer> getLine() {
+    return Optional.ofNullable(line);
   }
 
-  public String message() {
-    return message;
-  }
-
-  public Double cost() {
-    return cost;
-  }
-
-  public static Issue fileIssue(String message) {
-    return new Issue(null, message, null);
-  }
-
-  public static Issue lineIssue(int line, String message) {
-    return new Issue(line, message, null);
-  }
-
-  public static Issue lineIssue(int line, String message, double cost) {
-    return new Issue(line, message, cost);
+  public Optional<Double> getCost() {
+    return Optional.ofNullable(cost);
   }
 }

@@ -2,7 +2,7 @@ package org.zhupanovdm.bsl.checks;
 
 import org.sonar.check.Rule;
 import org.sonar.check.RuleProperty;
-import org.zhupanovdm.bsl.BslCheck;
+import org.zhupanovdm.bsl.Check;
 import org.zhupanovdm.bsl.Issue;
 import org.zhupanovdm.bsl.tree.BslToken;
 import org.zhupanovdm.bsl.tree.BslTree;
@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 import static org.zhupanovdm.bsl.utils.StringUtils.isNullOrEmpty;
 
 @Rule(key = "CommentRegularExpression")
-public class CommentRegularExpressionCheck extends BslCheck {
+public class CommentRegularExpressionCheck extends Check {
   private static final String DEFAULT_MESSAGE = "The regular expression matches this comment.";
 
   @RuleProperty(
@@ -42,7 +42,7 @@ public class CommentRegularExpressionCheck extends BslCheck {
     if (regexp != null) {
       for (BslTrivia comment : token.getComments()) {
         if (regexp.matcher(comment.getValue()).matches()) {
-          saveIssue(Issue.lineIssue(comment.getTokens().get(0).getLine(), message));
+          addIssue(message, comment.getTokens().get(0).getLine());
         }
       }
     }

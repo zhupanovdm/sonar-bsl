@@ -15,7 +15,7 @@ public class RaiseStatementTest {
     public void test() {
         assertThat(g.rule(RAISE_STMT))
                 .matches("Raise expr1")
-                .notMatches("Raise");
+                .matches("Raise");
     }
 
 }

@@ -1,6 +1,5 @@
 package org.zhupanovdm.bsl.tree;
 
-import com.sonar.sslr.api.Token;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -57,8 +56,8 @@ public abstract class BslTree {
         return isParentOf(node.parent);
     }
 
-    public void addToken(Token token) {
-        tokens.add(new BslToken(token));
+    public void addToken(BslToken token) {
+        tokens.add(token);
     }
 
     public BslToken getFirstToken() {

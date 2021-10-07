@@ -6,6 +6,8 @@ import lombok.Data;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.zhupanovdm.bsl.tree.BslToken.Type.COMMENT;
+
 @Data
 public class BslTrivia {
     private final List<BslToken> tokens = new LinkedList<>();
@@ -13,6 +15,6 @@ public class BslTrivia {
 
     public BslTrivia(Trivia trivia) {
         this.value = trivia.getToken().getOriginalValue();
-        trivia.getTokens().forEach(t -> tokens.add(new BslToken(t)));
+        trivia.getTokens().forEach(t -> tokens.add(new BslToken(t, COMMENT)));
     }
 }

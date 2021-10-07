@@ -8,10 +8,12 @@ import org.zhupanovdm.bsl.grammar.BslGrammar;
 import java.nio.charset.Charset;
 
 public final class BslParser {
+    private static final LexerlessGrammar BSL_GRAMMAR = BslGrammar.create();
+
     private BslParser() {
     }
 
     public static Parser<LexerlessGrammar> create(Charset charset) {
-        return new ParserAdapter<>(charset, BslGrammar.create());
+        return new ParserAdapter<>(charset, BSL_GRAMMAR);
     }
 }

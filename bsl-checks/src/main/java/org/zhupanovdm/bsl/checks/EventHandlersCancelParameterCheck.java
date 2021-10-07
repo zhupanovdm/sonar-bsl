@@ -1,8 +1,7 @@
 package org.zhupanovdm.bsl.checks;
 
 import org.sonar.check.Rule;
-import org.zhupanovdm.bsl.BslCheck;
-import org.zhupanovdm.bsl.Issue;
+import org.zhupanovdm.bsl.Check;
 import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.Named;
 import org.zhupanovdm.bsl.tree.definition.CallableDefinition;
@@ -20,7 +19,7 @@ import static org.zhupanovdm.bsl.tree.BslTree.Type.*;
 import static org.zhupanovdm.bsl.utils.StringUtils.caseInsensitiveBilingualRegexpString;
 
 @Rule(key = "STD68")
-public class EventHandlersCancelParameterCheck extends BslCheck {
+public class EventHandlersCancelParameterCheck extends Check {
     private static final String MESSAGE_FALSE = "Не следует присваивать параметру 'Отказ' значние Ложь.";
 
     private Parameter cancelParam;
@@ -62,7 +61,7 @@ public class EventHandlersCancelParameterCheck extends BslCheck {
         if (cancelParam != null &&
                 isCancel(stmt.getTarget()) &&
                 !(isTrueAssigned(stmt) || isOrExpression(stmt))) {
-            saveIssue(Issue.lineIssue(stmt.getFirstToken().getLine(), MESSAGE_FALSE));
+            addIssue(MESSAGE_FALSE, stmt.getFirstToken().getLine());
         }
     }
 
