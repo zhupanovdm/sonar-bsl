@@ -24,6 +24,6 @@ public class NewExpression extends Postfix implements Named {
 
     @Override
     public String toString() {
-        return "New " + name + (getPostfix() == null ? "" : getPostfix());
+        return "New " + name + getPostfix().map(Postfix::toString).orElse("");
     }
 }

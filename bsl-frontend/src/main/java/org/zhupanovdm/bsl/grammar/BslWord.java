@@ -5,7 +5,6 @@ import com.sonar.sslr.api.TokenType;
 import org.sonar.sslr.grammar.GrammarRuleKey;
 
 public interface BslWord extends TokenType, GrammarRuleKey {
-
     String getValueAlt();
 
     @Override
@@ -16,5 +15,4 @@ public interface BslWord extends TokenType, GrammarRuleKey {
     static <E extends Enum<E>> String toValue(Enum<E> e) {
         return e.name().replaceAll("_", "");
     }
-
 }

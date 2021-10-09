@@ -33,9 +33,7 @@ public class CallPostfix extends Postfix {
         collectionToString(builder, arguments, BslTree::toString, ", ");
         builder.append(')');
 
-        if (getPostfix() != null) {
-            builder.append(getPostfix());
-        }
+        getPostfix().ifPresent(builder::append);
         return builder.toString();
     }
 }

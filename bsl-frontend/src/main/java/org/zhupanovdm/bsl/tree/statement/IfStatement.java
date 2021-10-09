@@ -8,6 +8,7 @@ import org.zhupanovdm.bsl.tree.HasCondition;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.IF_STMT;
 
@@ -20,6 +21,10 @@ public class IfStatement extends BslTree implements HasCondition {
 
     public IfStatement() {
         super(null, IF_STMT);
+    }
+
+    public Optional<ElseClause> getElseClause() {
+        return Optional.ofNullable(elseClause);
     }
 
     @Override

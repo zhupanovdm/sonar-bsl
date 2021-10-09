@@ -27,5 +27,4 @@ public enum BslDirective implements BslWord {
     public String getName() {
         return name();
     }
-
 }

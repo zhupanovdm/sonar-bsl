@@ -3,6 +3,7 @@ package org.zhupanovdm.bsl.tree;
 import com.sonar.sslr.api.Trivia;
 import lombok.Data;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,5 +17,9 @@ public class BslTrivia {
     public BslTrivia(Trivia trivia) {
         this.value = trivia.getToken().getOriginalValue();
         trivia.getTokens().forEach(t -> tokens.add(new BslToken(t, COMMENT)));
+    }
+
+    public List<BslToken> getTokens() {
+        return Collections.unmodifiableList(tokens);
     }
 }

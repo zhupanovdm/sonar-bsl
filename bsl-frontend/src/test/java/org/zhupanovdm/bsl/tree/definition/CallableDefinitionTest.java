@@ -16,6 +16,7 @@ import static org.zhupanovdm.bsl.grammar.BslGrammar.FUNC_DEF;
 import static org.zhupanovdm.bsl.grammar.BslGrammar.PROC_DEF;
 import static org.zhupanovdm.bsl.tree.BslTree.Type.*;
 
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class CallableDefinitionTest {
     private final LexerlessGrammar g = BslGrammar.create();
     private final BslTreeCreator creator = new BslTreeCreator();
@@ -24,7 +25,7 @@ public class CallableDefinitionTest {
     public void function() {
         CallableDefinition stmt = creator.callableDef(parse("Function Foo() ; EndFunction", g.rule(FUNC_DEF)), FUNCTION);
 
-        assertThat(stmt.getDirective()).isNull();
+        assertThat(stmt.getDirective().isPresent()).isFalse();
         assertThat(stmt.isAsync()).isFalse();
         assertThat(stmt.getType()).isEqualTo(FUNCTION);
         assertThat(stmt.getName()).isEqualTo("Foo");
@@ -39,7 +40,7 @@ public class CallableDefinitionTest {
     public void procedure() {
         CallableDefinition stmt = creator.callableDef(parse("Procedure Foo() ; EndProcedure", g.rule(PROC_DEF)), PROCEDURE);
 
-        assertThat(stmt.getDirective()).isNull();
+        assertThat(stmt.getDirective().isPresent()).isFalse();
         assertThat(stmt.isAsync()).isFalse();
         assertThat(stmt.getType()).isEqualTo(PROCEDURE);
         assertThat(stmt.getName()).isEqualTo("Foo");
@@ -86,8 +87,8 @@ public class CallableDefinitionTest {
     public void directiveFunction() {
         CallableDefinition stmt = creator.callableDef(parse("&AtServer Function Foo() EndFunction", g.rule(FUNC_DEF)), FUNCTION);
 
-        assertThat(stmt.getDirective().getType()).isEqualTo(BslTree.Type.DIRECTIVE);
-        assertThat(stmt.getDirective().getValue()).isEqualTo(BslDirective.AT_SERVER);
+        assertThat(stmt.getDirective().get().getType()).isEqualTo(BslTree.Type.DIRECTIVE);
+        assertThat(stmt.getDirective().get().getValue()).isEqualTo(BslDirective.AT_SERVER);
         assertThat(stmt.getTokens()).hasSize(5);
     }
 
@@ -95,8 +96,8 @@ public class CallableDefinitionTest {
     public void directiveProcedure() {
         CallableDefinition stmt = creator.callableDef(parse("&AtServer Procedure Foo() EndProcedure", g.rule(PROC_DEF)), PROCEDURE);
 
-        assertThat(stmt.getDirective().getType()).isEqualTo(BslTree.Type.DIRECTIVE);
-        assertThat(stmt.getDirective().getValue()).isEqualTo(BslDirective.AT_SERVER);
+        assertThat(stmt.getDirective().get().getType()).isEqualTo(BslTree.Type.DIRECTIVE);
+        assertThat(stmt.getDirective().get().getValue()).isEqualTo(BslDirective.AT_SERVER);
         assertThat(stmt.getTokens()).hasSize(5);
     }
 
@@ -120,13 +121,13 @@ public class CallableDefinitionTest {
         assertThat(param1.getName()).isEqualTo("A");
         assertThat(param1.getIndex()).isEqualTo(0);
         assertThat(param1.isVal()).isFalse();
-        assertThat(param1.getDefaultValue()).isNull();
+        assertThat(param1.getDefaultValue().isPresent()).isFalse();
 
         Parameter param2 = params.get(1);
         assertThat(param2.getName()).isEqualTo("B");
         assertThat(param2.getIndex()).isEqualTo(1);
         assertThat(param2.isVal()).isTrue();
-        assertThat(param2.getDefaultValue().as(PrimitiveExpression.class).getValue()).isEqualTo("0");
+        assertThat(param2.getDefaultValue().get().as(PrimitiveExpression.class).getValue()).isEqualTo("0");
         assertThat(param2.getTokens()).hasSize(3);
 
         Parameter param3 = params.get(2);

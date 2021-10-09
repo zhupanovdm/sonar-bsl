@@ -6,6 +6,7 @@ import org.zhupanovdm.bsl.tree.*;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.zhupanovdm.bsl.utils.StringUtils.collectionToString;
 
@@ -28,11 +29,14 @@ public class CallableDefinition extends BslTree implements Named, Exportable, Ha
     }
 
     @Override
+    public Optional<Directive> getDirective() {
+        return Optional.ofNullable(directive);
+    }
+
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        if (directive != null) {
-            builder.append(directive).append(' ');
-        }
+        getDirective().ifPresent(d -> builder.append(d).append(' '));
         if (async) {
             builder.append("Async ");
         }

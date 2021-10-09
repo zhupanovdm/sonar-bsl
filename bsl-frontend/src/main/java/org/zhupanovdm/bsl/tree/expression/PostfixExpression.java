@@ -33,6 +33,6 @@ public class PostfixExpression extends Postfix {
 
     @Override
     public String toString() {
-        return (await ? "Await " : "") + reference + (getPostfix() == null ? "" : getPostfix());
+        return (await ? "Await " : "") + reference + getPostfix().map(Postfix::toString).orElse("");
     }
 }

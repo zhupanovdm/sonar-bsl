@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 import static com.sonar.sslr.api.GenericTokenType.IDENTIFIER;
 
 public class BslIdentifierAndKeywordChannel extends Channel<Lexer> {
-
     private final Map<String, TokenType> tokenMap = new HashMap<>();
     private final StringBuilder tmpBuilder = new StringBuilder();
     private final Token.Builder tokenBuilder = Token.builder();
@@ -55,5 +54,4 @@ public class BslIdentifierAndKeywordChannel extends Channel<Lexer> {
 
         return false;
     }
-
 }

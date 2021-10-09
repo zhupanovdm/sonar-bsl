@@ -6,6 +6,8 @@ import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 import org.zhupanovdm.bsl.tree.Named;
 
+import java.util.Optional;
+
 import static org.zhupanovdm.bsl.tree.BslTree.Type.PARAMETER;
 
 @Data
@@ -25,8 +27,12 @@ public class Parameter extends BslTree implements Named {
         subscriber.onVisitParameter(this);
     }
 
+    public Optional<BslTree> getDefaultValue() {
+        return Optional.ofNullable(defaultValue);
+    }
+
     @Override
     public String toString() {
-        return (val ? "Val " : "") + name + (defaultValue == null ? "" : " = " + defaultValue);
+        return (val ? "Val " : "") + name + getDefaultValue().map(expr -> " = " + expr).orElse("");
     }
 }

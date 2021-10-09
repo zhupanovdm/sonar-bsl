@@ -5,6 +5,7 @@ import com.sonar.sslr.api.Trivia;
 import lombok.Data;
 import org.sonarsource.analyzer.commons.TokenLocation;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,6 +37,10 @@ public class BslToken {
             }
         }
         return false;
+    }
+
+    public List<BslTrivia> getComments() {
+        return Collections.unmodifiableList(comments);
     }
 
     public TokenLocation getLocation() {

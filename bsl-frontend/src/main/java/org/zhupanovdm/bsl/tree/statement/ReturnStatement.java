@@ -5,6 +5,8 @@ import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 
+import java.util.Optional;
+
 import static org.zhupanovdm.bsl.tree.BslTree.Type.RETURN_STMT;
 
 @Data
@@ -21,8 +23,12 @@ public class ReturnStatement extends BslTree {
         subscriber.onVisitReturnStatement(this);
     }
 
+    public Optional<BslTree> getExpression() {
+        return Optional.ofNullable(expression);
+    }
+
     @Override
     public String toString() {
-        return "Return" + (expression == null ? "" : " " + expression);
+        return "Return" + getExpression().map(expr -> " " + expr).orElse("");
     }
 }

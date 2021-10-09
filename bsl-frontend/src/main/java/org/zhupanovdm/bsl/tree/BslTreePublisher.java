@@ -92,7 +92,7 @@ public class BslTreePublisher implements BslTreeSubscriber {
     @Override
     public void onVisitCallableDefinition(CallableDefinition def) {
         onEnterNode(def);
-        publish(def.getDirective());
+        def.getDirective().ifPresent(this::publish);
         publish(def.getParameters());
         publish(def.getBody());
         onLeaveNode(def);
@@ -101,7 +101,7 @@ public class BslTreePublisher implements BslTreeSubscriber {
     @Override
     public void onVisitVariablesDefinition(VariablesDefinition def) {
         onEnterNode(def);
-        publish(def.getDirective());
+        def.getDirective().ifPresent(this::publish);
         publish(def.getBody());
         onLeaveNode(def);
     }
@@ -127,7 +127,7 @@ public class BslTreePublisher implements BslTreeSubscriber {
         publish(stmt.getCondition());
         publish(stmt.getBody());
         publish(stmt.getElsIfBranches());
-        publish(stmt.getElseClause());
+        stmt.getElseClause().ifPresent(this::publish);
         onLeaveNode(stmt);
     }
 
@@ -176,7 +176,7 @@ public class BslTreePublisher implements BslTreeSubscriber {
     @Override
     public void onVisitReturnStatement(ReturnStatement stmt) {
         onEnterNode(stmt);
-        publish(stmt.getExpression());
+        stmt.getExpression().ifPresent(this::publish);
         onLeaveNode(stmt);
     }
 
@@ -195,7 +195,7 @@ public class BslTreePublisher implements BslTreeSubscriber {
     @Override
     public void onVisitRaiseStatement(RaiseStatement stmt) {
         onEnterNode(stmt);
-        publish(stmt.getExpression());
+        stmt.getExpression().ifPresent(this::publish);
         onLeaveNode(stmt);
     }
 
@@ -266,7 +266,7 @@ public class BslTreePublisher implements BslTreeSubscriber {
     @Override
     public void onVisitParameter(Parameter parameter) {
         onEnterNode(parameter);
-        publish(parameter.getDefaultValue());
+        parameter.getDefaultValue().ifPresent(this::publish);
         onLeaveNode(parameter);
     }
 
@@ -300,7 +300,7 @@ public class BslTreePublisher implements BslTreeSubscriber {
     @Override
     public void onVisitNewExpression(NewExpression expr) {
         onEnterNode(expr);
-        publish(expr.getPostfix());
+        expr.getPostfix().ifPresent(this::publish);
         onLeaveNode(expr);
     }
 
@@ -308,7 +308,7 @@ public class BslTreePublisher implements BslTreeSubscriber {
     public void onVisitPostfixExpression(PostfixExpression expr) {
         onEnterNode(expr);
         publish(expr.getReference());
-        publish(expr.getPostfix());
+        expr.getPostfix().ifPresent(this::publish);
         onLeaveNode(expr);
     }
 
@@ -316,14 +316,14 @@ public class BslTreePublisher implements BslTreeSubscriber {
     public void onVisitCallPostfix(CallPostfix postfix) {
         onEnterNode(postfix);
         publish(postfix.getArguments());
-        publish(postfix.getPostfix());
+        postfix.getPostfix().ifPresent(this::publish);
         onLeaveNode(postfix);
     }
 
     @Override
     public void onVisitDereferencePostfix(DereferencePostfix postfix) {
         onEnterNode(postfix);
-        publish(postfix.getPostfix());
+        postfix.getPostfix().ifPresent(this::publish);
         onLeaveNode(postfix);
     }
 
@@ -331,7 +331,7 @@ public class BslTreePublisher implements BslTreeSubscriber {
     public void onVisitIndexPostfix(IndexPostfix postfix) {
         onEnterNode(postfix);
         publish(postfix.getIndex());
-        publish(postfix.getPostfix());
+        postfix.getPostfix().ifPresent(this::publish);
         onLeaveNode(postfix);
     }
 

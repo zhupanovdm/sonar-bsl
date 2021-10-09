@@ -24,6 +24,6 @@ public class IndexPostfix extends Postfix {
 
     @Override
     public String toString() {
-        return "[" + index + ']' + (getPostfix() == null ? "" : getPostfix());
+        return "[" + index + ']' + getPostfix().map(Postfix::toString).orElse("");
     }
 }

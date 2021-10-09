@@ -12,6 +12,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.zhupanovdm.bsl.TestUtils.parse;
 
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class VariablesDefinitionTest {
     private final LexerlessGrammar g = BslGrammar.create();
     private final BslTreeCreator creator = new BslTreeCreator();
@@ -22,7 +23,7 @@ public class VariablesDefinitionTest {
         Variable variable = def.getBody().get(0).as(Variable.class);
 
         assertThat(def.getType()).isEqualTo(BslTree.Type.VAR_DEF);
-        assertThat(def.getDirective()).isNull();
+        assertThat(def.getDirective().isPresent()).isFalse();
         assertThat(def.getBody()).hasSize(1);
         assertThat(def.getTokens()).hasSize(2);
 
@@ -36,7 +37,7 @@ public class VariablesDefinitionTest {
         VariablesDefinition def = creator.variablesDef(parse("Var Foo, Bar Export;", g.rule(BslGrammar.VAR_DEF)));
         List<BslTree> body = def.getBody();
 
-        assertThat(def.getDirective()).isNull();
+        assertThat(def.getDirective().isPresent()).isFalse();
         assertThat(def.getTokens()).hasSize(3);
 
         assertThat(body.get(0).as(Variable.class).getName()).isEqualTo("Foo");
@@ -52,7 +53,7 @@ public class VariablesDefinitionTest {
     public void directive() {
         VariablesDefinition def = creator.variablesDef(parse("&AtClient Var Foo;", g.rule(BslGrammar.VAR_DEF)));
 
-        assertThat(def.getDirective().getType()).isEqualTo(BslTree.Type.DIRECTIVE);
-        assertThat(def.getDirective().getValue()).isEqualTo(BslDirective.AT_CLIENT);
+        assertThat(def.getDirective().get().getType()).isEqualTo(BslTree.Type.DIRECTIVE);
+        assertThat(def.getDirective().get().getValue()).isEqualTo(BslDirective.AT_CLIENT);
     }
 }

@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.zhupanovdm.bsl.TestUtils.parse;
 import static org.zhupanovdm.bsl.tree.BslTree.Type.*;
 
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class AssignmentStatementTest {
     private final LexerlessGrammar g = BslGrammar.create();
     private final BslTreeCreator creator = new BslTreeCreator();
@@ -24,6 +25,7 @@ public class AssignmentStatementTest {
         assertThat(stmt.getTarget().as(Variable.class).getName()).isEqualTo("Foo");
         assertThat(stmt.getExpression().as(ReferenceExpression.class).getName()).isEqualTo("Bar");
         assertThat(stmt.getBody()).isEmpty();
+
         assertThat(stmt.getTokens()).hasSize(1);
     }
 
@@ -33,8 +35,9 @@ public class AssignmentStatementTest {
 
         assertThat(stmt.getTarget().getType()).isEqualTo(POSTFIX);
         assertThat(stmt.getTarget().as(PostfixExpression.class).getReference().getName()).isEqualTo("Foo");
-        assertThat(stmt.getTarget().as(PostfixExpression.class).getPostfix().getType()).isEqualTo(DEREFERENCE);
-        assertThat(stmt.getTarget().as(PostfixExpression.class).getPostfix(DereferencePostfix.class).getName()).isEqualTo("A");
+        assertThat(stmt.getTarget().as(PostfixExpression.class).getPostfix().get().getType()).isEqualTo(DEREFERENCE);
+        assertThat(stmt.getTarget().as(PostfixExpression.class).getPostfix(DereferencePostfix.class).get().getName()).isEqualTo("A");
+
         assertThat(stmt.getTokens()).hasSize(1);
     }
 
@@ -44,8 +47,13 @@ public class AssignmentStatementTest {
 
         assertThat(stmt.getTarget().getType()).isEqualTo(POSTFIX);
         assertThat(stmt.getTarget().as(PostfixExpression.class).getReference().getName()).isEqualTo("Foo");
-        assertThat(stmt.getTarget().as(PostfixExpression.class).getPostfix().getType()).isEqualTo(INDEX);
-        assertThat(stmt.getTarget().as(PostfixExpression.class).getPostfix(IndexPostfix.class).getIndex().as(ReferenceExpression.class).getName()).isEqualTo("A");
+
+        assertThat(stmt.getTarget().as(PostfixExpression.class).getPostfix().isPresent()).isTrue();
+        assertThat(stmt.getTarget().as(PostfixExpression.class).getPostfix().get().getType()).isEqualTo(INDEX);
+
+        assertThat(stmt.getTarget().as(PostfixExpression.class).getPostfix(IndexPostfix.class).isPresent()).isTrue();
+        assertThat(stmt.getTarget().as(PostfixExpression.class).getPostfix(IndexPostfix.class).get().getIndex().as(ReferenceExpression.class).getName()).isEqualTo("A");
+
         assertThat(stmt.getTokens()).hasSize(1);
     }
 
@@ -55,10 +63,10 @@ public class AssignmentStatementTest {
 
         assertThat(stmt.getTarget().getType()).isEqualTo(POSTFIX);
         assertThat(stmt.getTarget().as(PostfixExpression.class).getReference().getName()).isEqualTo("Foo");
-        assertThat(stmt.getTarget().as(PostfixExpression.class).getPostfix().getType()).isEqualTo(CALL);
+        assertThat(stmt.getTarget().as(PostfixExpression.class).getPostfix().get().getType()).isEqualTo(CALL);
         assertThat(stmt.getTarget().as(PostfixExpression.class)
-                .getPostfix(CallPostfix.class)
-                .getPostfix(IndexPostfix.class)
+                .getPostfix(CallPostfix.class).get()
+                .getPostfix(IndexPostfix.class).get()
                 .getIndex().as(ReferenceExpression.class).getName()).isEqualTo("A");
     }
 
@@ -68,9 +76,10 @@ public class AssignmentStatementTest {
 
         assertThat(stmt.getTarget().getType()).isEqualTo(POSTFIX);
         assertThat(stmt.getTarget().as(PostfixExpression.class).getReference().getName()).isEqualTo("Foo");
-        assertThat(stmt.getTarget().as(PostfixExpression.class).getPostfix().getType()).isEqualTo(CALL);
+        assertThat(stmt.getTarget().as(PostfixExpression.class).getPostfix().get().getType()).isEqualTo(CALL);
         assertThat(stmt.getTarget().as(PostfixExpression.class)
-                .getPostfix(CallPostfix.class)
-                .getPostfix(DereferencePostfix.class).getName()).isEqualTo("A");
+                .getPostfix(CallPostfix.class).get()
+                .getPostfix(DereferencePostfix.class).get()
+                .getName()).isEqualTo("A");
     }
 }

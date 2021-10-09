@@ -15,12 +15,21 @@ public class ReturnStatementTest {
     private final BslTreeCreator creator = new BslTreeCreator();
 
     @Test
-    public void test() {
+    public void parametrized() {
         ReturnStatement stmt = creator.returnStmt(parse("Return Foo", g.rule(BslGrammar.RETURN_STMT)));
 
         assertThat(stmt.getType()).isEqualTo(RETURN_STMT);
-        assertThat(stmt.getExpression().as(ReferenceExpression.class).getName()).isEqualTo("Foo");
+        assertThat(stmt.getExpression().isPresent()).isTrue();
+        assertThat(stmt.getExpression().get().as(ReferenceExpression.class).getName()).isEqualTo("Foo");
         assertThat(stmt.getBody()).isEmpty();
         assertThat(stmt.getTokens()).hasSize(1);
+    }
+
+    @Test
+    public void noParam() {
+        ReturnStatement stmt = creator.returnStmt(parse("Return", g.rule(BslGrammar.RETURN_STMT)));
+
+        assertThat(stmt.getType()).isEqualTo(RETURN_STMT);
+        assertThat(stmt.getExpression().isPresent()).isFalse();
     }
 }

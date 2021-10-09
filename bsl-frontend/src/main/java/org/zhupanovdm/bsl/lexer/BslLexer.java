@@ -15,7 +15,6 @@ import static org.zhupanovdm.bsl.lexer.BslTokenType.DATE_LITERAL;
 import static org.zhupanovdm.bsl.lexer.BslTokenType.NUMERIC_LITERAL;
 
 public final class BslLexer {
-
     private BslLexer() {
     }
 
@@ -38,7 +37,5 @@ public final class BslLexer {
 
                 .withChannel(new UnknownCharacterChannel())
                 .build();
-
     }
-
 }

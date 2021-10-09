@@ -13,6 +13,7 @@ import static org.zhupanovdm.bsl.TestUtils.parse;
 import static org.zhupanovdm.bsl.tree.BslTree.Type.CALL;
 import static org.zhupanovdm.bsl.tree.BslTree.Type.POSTFIX;
 
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class CallStatementTest {
     private final LexerlessGrammar g = BslGrammar.create();
     private final BslTreeCreator creator = new BslTreeCreator();
@@ -22,18 +23,19 @@ public class CallStatementTest {
         CallStatement stmt = creator.callStmt(parse("Foo()", g.rule(BslGrammar.CALL_STMT)));
 
         assertThat(stmt.getExpression().getType()).isEqualTo(POSTFIX);
-        assertThat(stmt.getExpression().getPostfix().getType()).isEqualTo(CALL);
-        assertThat(stmt.getExpression().getPostfix()).isInstanceOf(CallPostfix.class);
-        assertThat(stmt.getExpression().getPostfix(CallPostfix.class).getArguments()).isEmpty();
+        assertThat(stmt.getExpression().getPostfix().get().getType()).isEqualTo(CALL);
+        assertThat(stmt.getExpression().getPostfix().get()).isInstanceOf(CallPostfix.class);
+        assertThat(stmt.getExpression().getPostfix(CallPostfix.class).get().getArguments()).isEmpty();
         assertThat(stmt.getExpression().getReference().getName()).isEqualTo("Foo");
         assertThat(stmt.getBody()).isEmpty();
+
         assertThat(stmt.getTokens()).isEmpty();
     }
 
     @Test
     public void args() {
         CallStatement stmt = creator.callStmt(parse("Foo(A, B, C)", g.rule(BslGrammar.CALL_STMT)));
-        CallPostfix postfix = stmt.getExpression().getPostfix(CallPostfix.class);
+        CallPostfix postfix = stmt.getExpression().getPostfix(CallPostfix.class).get();
 
         assertThat(postfix.getArguments().stream().map(e -> e.as(ReferenceExpression.class).getName())).containsExactly("A", "B", "C");
         assertThat(stmt.getTokens()).isEmpty();
@@ -45,25 +47,26 @@ public class CallStatementTest {
         CallPostfix postfix;
 
         stmt = creator.callStmt(parse("Foo(,)", g.rule(BslGrammar.CALL_STMT)));
-        postfix = stmt.getExpression().getPostfix(CallPostfix.class);
+
+        postfix = stmt.getExpression().getPostfix(CallPostfix.class).get();
 
         assertThat(postfix.getArguments().get(0)).isInstanceOf(EmptyExpression.class);
         assertThat(postfix.getArguments().get(1)).isInstanceOf(EmptyExpression.class);
 
         stmt = creator.callStmt(parse("Foo(A,)", g.rule(BslGrammar.CALL_STMT)));
-        postfix = stmt.getExpression().getPostfix(CallPostfix.class);
+        postfix = stmt.getExpression().getPostfix(CallPostfix.class).get();
 
         assertThat(postfix.getArguments().get(0)).isInstanceOf(ReferenceExpression.class);
         assertThat(postfix.getArguments().get(1)).isInstanceOf(EmptyExpression.class);
 
         stmt = creator.callStmt(parse("Foo(, A)", g.rule(BslGrammar.CALL_STMT)));
-        postfix = stmt.getExpression().getPostfix(CallPostfix.class);
+        postfix = stmt.getExpression().getPostfix(CallPostfix.class).get();
 
         assertThat(postfix.getArguments().get(0)).isInstanceOf(EmptyExpression.class);
         assertThat(postfix.getArguments().get(1)).isInstanceOf(ReferenceExpression.class);
 
         stmt = creator.callStmt(parse("Foo(,,)", g.rule(BslGrammar.CALL_STMT)));
-        postfix = stmt.getExpression().getPostfix(CallPostfix.class);
+        postfix = stmt.getExpression().getPostfix(CallPostfix.class).get();
 
         assertThat(postfix.getArguments().get(0)).isInstanceOf(EmptyExpression.class);
         assertThat(postfix.getArguments().get(1)).isInstanceOf(EmptyExpression.class);

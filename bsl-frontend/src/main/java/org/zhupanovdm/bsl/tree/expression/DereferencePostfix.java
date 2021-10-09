@@ -24,6 +24,6 @@ public class DereferencePostfix extends Postfix implements Named {
 
     @Override
     public String toString() {
-        return "." + name + (getPostfix() == null ? "" : getPostfix());
+        return "." + name + getPostfix().map(Postfix::toString).orElse("");
     }
 }

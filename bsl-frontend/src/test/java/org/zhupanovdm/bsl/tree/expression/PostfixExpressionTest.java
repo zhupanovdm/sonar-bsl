@@ -14,6 +14,7 @@ import static org.zhupanovdm.bsl.TestUtils.parse;
 import static org.zhupanovdm.bsl.grammar.BslGrammar.EXPRESSION;
 import static org.zhupanovdm.bsl.tree.BslTree.Type.*;
 
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class PostfixExpressionTest {
     private final LexerlessGrammar g = BslGrammar.create();
     private final BslTreeCreator creator = new BslTreeCreator();
@@ -26,9 +27,9 @@ public class PostfixExpressionTest {
         assertThat(stmt.getReference().getName()).isEqualTo("Foo");
         assertThat(stmt.getTokens()).isEmpty();
 
-        assertThat(stmt.getPostfix().getType()).isEqualTo(DEREFERENCE);
-        assertThat(stmt.getPostfix(DereferencePostfix.class).getName()).isEqualTo("Bar");
-        assertThat(stmt.getPostfix().getTokens()).hasSize(2);
+        assertThat(stmt.getPostfix().get().getType()).isEqualTo(DEREFERENCE);
+        assertThat(stmt.getPostfix(DereferencePostfix.class).get().getName()).isEqualTo("Bar");
+        assertThat(stmt.getPostfix().get().getTokens()).hasSize(2);
     }
 
     @Test
@@ -39,9 +40,9 @@ public class PostfixExpressionTest {
         assertThat(stmt.getReference().getName()).isEqualTo("Foo");
         assertThat(stmt.getTokens()).isEmpty();
 
-        assertThat(stmt.getPostfix().getType()).isEqualTo(INDEX);
-        assertThat(stmt.getPostfix(IndexPostfix.class).getIndex().as(ReferenceExpression.class).getName()).isEqualTo("Bar");
-        assertThat(stmt.getPostfix().getTokens()).hasSize(2);
+        assertThat(stmt.getPostfix().get().getType()).isEqualTo(INDEX);
+        assertThat(stmt.getPostfix(IndexPostfix.class).get().getIndex().as(ReferenceExpression.class).getName()).isEqualTo("Bar");
+        assertThat(stmt.getPostfix().get().getTokens()).hasSize(2);
     }
 
     @Test
@@ -52,16 +53,16 @@ public class PostfixExpressionTest {
         assertThat(stmt.getReference().getName()).isEqualTo("Foo");
         assertThat(stmt.getTokens()).isEmpty();
 
-        assertThat(stmt.getPostfix().getType()).isEqualTo(CALL);
-        assertThat(stmt.getPostfix(CallPostfix.class).getArguments()).isEmpty();
-        assertThat(stmt.getPostfix().getTokens()).hasSize(2);
+        assertThat(stmt.getPostfix().get().getType()).isEqualTo(CALL);
+        assertThat(stmt.getPostfix(CallPostfix.class).get().getArguments()).isEmpty();
+        assertThat(stmt.getPostfix().get().getTokens()).hasSize(2);
     }
 
     @Test
     public void callArgs() {
         PostfixExpression stmt = creator.expression(parse("Foo(A,)", g.rule(EXPRESSION)).getFirstChild()).as(PostfixExpression.class);
 
-        List<BslTree> args = stmt.getPostfix(CallPostfix.class).getArguments();
+        List<BslTree> args = stmt.getPostfix(CallPostfix.class).get().getArguments();
         assertThat(args.get(0).as(ReferenceExpression.class).getName()).isEqualTo("A");
         assertThat(args.get(1).as(EmptyExpression.class)).isNotNull();
         assertThat(args).hasSize(2);
@@ -73,15 +74,14 @@ public class PostfixExpressionTest {
         PostfixExpression stmt = creator.expression(tree.getFirstChild()).as(PostfixExpression.class);
 
         assertThat(stmt.getPostfix(DereferencePostfix.class)).isNotNull();
-        assertThat(stmt.getPostfix(DereferencePostfix.class)
+        assertThat(stmt.getPostfix(DereferencePostfix.class).get()
                 .getPostfix(IndexPostfix.class)).isNotNull();
-        assertThat(stmt.getPostfix(DereferencePostfix.class)
-                .getPostfix(IndexPostfix.class)
+        assertThat(stmt.getPostfix(DereferencePostfix.class).get()
+                .getPostfix(IndexPostfix.class).get()
                 .getPostfix(DereferencePostfix.class)).isNotNull();
-        assertThat(stmt.getPostfix(DereferencePostfix.class)
-                .getPostfix(IndexPostfix.class)
-                .getPostfix(DereferencePostfix.class)
+        assertThat(stmt.getPostfix(DereferencePostfix.class).get()
+                .getPostfix(IndexPostfix.class).get()
+                .getPostfix(DereferencePostfix.class).get()
                 .getPostfix(CallPostfix.class)).isNotNull();
     }
-
 }

@@ -5,6 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.zhupanovdm.bsl.tree.BslTree;
 
+import java.util.Optional;
+
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -15,7 +17,11 @@ public abstract class Postfix extends BslTree {
         super(parent, type);
     }
 
-    public <T extends Postfix> T getPostfix(Class<T> type) {
-        return postfix.as(type);
+    public Optional<Postfix> getPostfix() {
+        return Optional.ofNullable(postfix);
+    }
+
+    public <T extends Postfix> Optional<T> getPostfix(Class<T> type) {
+        return getPostfix().map(p -> p.as(type));
     }
 }

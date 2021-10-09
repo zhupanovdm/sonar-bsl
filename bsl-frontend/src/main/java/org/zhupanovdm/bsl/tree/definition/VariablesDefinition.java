@@ -6,6 +6,8 @@ import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 import org.zhupanovdm.bsl.tree.HasDirective;
 
+import java.util.Optional;
+
 import static org.zhupanovdm.bsl.tree.BslTree.Type.VAR_DEF;
 import static org.zhupanovdm.bsl.utils.StringUtils.collectionToString;
 
@@ -24,11 +26,14 @@ public class VariablesDefinition extends BslTree implements HasDirective {
     }
 
     @Override
+    public Optional<Directive> getDirective() {
+        return Optional.ofNullable(directive);
+    }
+
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        if (getDirective() != null) {
-            builder.append(getDirective()).append(' ');
-        }
+        getDirective().ifPresent(d -> builder.append(d).append(' '));
         builder.append("Var ");
         return collectionToString(builder, getBody(), Object::toString, ", ").toString();
     }
