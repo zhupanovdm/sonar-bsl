@@ -1,9 +1,9 @@
 package org.zhupanovdm.bsl.tree;
 
-import org.zhupanovdm.bsl.ModuleFile;
+import org.zhupanovdm.bsl.AbstractModuleContext;
 import org.zhupanovdm.bsl.tree.definition.*;
 import org.zhupanovdm.bsl.tree.expression.*;
-import org.zhupanovdm.bsl.tree.module.Module;
+import org.zhupanovdm.bsl.tree.module.ModuleRoot;
 import org.zhupanovdm.bsl.tree.module.PreprocessorElsif;
 import org.zhupanovdm.bsl.tree.module.PreprocessorIf;
 import org.zhupanovdm.bsl.tree.statement.*;
@@ -11,13 +11,13 @@ import org.zhupanovdm.bsl.tree.statement.*;
 public interface BslTreeSubscriber {
     default void init() {}
 
-    default void onEnterFile(ModuleFile context) {}
-    default void onLeaveFile(ModuleFile context) {}
+    default void onEnterFile(AbstractModuleContext context) {}
+    default void onLeaveFile(AbstractModuleContext context) {}
 
     default void onEnterNode(BslTree node) {}
     default void onLeaveNode(BslTree node) {}
 
-    default void onVisitModule(Module module) {}
+    default void onVisitModule(ModuleRoot module) {}
     default void onVisitPreprocessorIf(PreprocessorIf pp) {}
     default void onVisitPreprocessorElsif(PreprocessorElsif pp) {}
 

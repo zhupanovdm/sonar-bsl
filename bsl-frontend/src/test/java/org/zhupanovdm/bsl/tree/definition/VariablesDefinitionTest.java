@@ -10,7 +10,7 @@ import org.zhupanovdm.bsl.tree.BslTreeCreator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.zhupanovdm.bsl.TestUtils.parse;
+import static org.zhupanovdm.bsl.ParserTestUtils.parse;
 
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 public class VariablesDefinitionTest {

@@ -84,13 +84,13 @@ public class BslScanner {
     }
 
     private void scanFile(InputFile file) {
-        BslModuleFileContext fileContext = new BslModuleFileContext(context, checks, file);
-        BslTreePublisher publisher = new BslTreePublisher();
+        BslModuleFileContext fileContext = new BslModuleFileContext(new BslModuleFile(file), context, checks);
 
         ModuleMetrics metrics = new ModuleMetrics();
         CyclomaticComplexity cyclomaticComplexity = new CyclomaticComplexity();
         CognitiveComplexity cognitiveComplexity = new CognitiveComplexity();
 
+        BslTreePublisher publisher = new BslTreePublisher();
         publisher.subscribe(checks.all());
         publisher.subscribe(
                 metrics,
@@ -110,7 +110,9 @@ public class BslScanner {
                               CyclomaticComplexity cyclomaticComplexity,
                               CognitiveComplexity cognitiveComplexity) {
 
-        noSonarFilter.noSonarInFile(module.getFile(), metrics.getLinesNoSonar());
+        InputFile file = module.getFile().getInput();
+
+        noSonarFilter.noSonarInFile(file, metrics.getLinesNoSonar());
 
         saveMeasure(context, module, CoreMetrics.NCLOC, metrics.getLinesOfCode().size());
         saveMeasure(context, module, CoreMetrics.COMMENT_LINES, metrics.getLinesOfComments().size());
@@ -119,13 +121,13 @@ public class BslScanner {
         saveMeasure(context, module, CoreMetrics.COMPLEXITY, cyclomaticComplexity.getComplexity());
         saveMeasure(context, module, CoreMetrics.COGNITIVE_COMPLEXITY, cognitiveComplexity.getComplexity());
 
-        FileLinesContext fileLines = fileLinesContextFactory.createFor(module.getFile());
+        FileLinesContext fileLines = fileLinesContextFactory.createFor(file);
         metrics.getLinesOfCode().forEach(line -> fileLines.setIntValue(CoreMetrics.NCLOC_DATA_KEY, line, 1));
         metrics.getExecutableLines().forEach(line -> fileLines.setIntValue(CoreMetrics.EXECUTABLE_LINES_DATA_KEY, line, 1));
         fileLines.save();
     }
 
     private static <T extends Serializable> void saveMeasure(SensorContext context, BslModuleFileContext module, Metric<T> metric, T value) {
-        context.<T>newMeasure().on(module.getFile()).forMetric(metric).withValue(value).save();
+        context.<T>newMeasure().on(module.getFile().getInput()).forMetric(metric).withValue(value).save();
     }
 }

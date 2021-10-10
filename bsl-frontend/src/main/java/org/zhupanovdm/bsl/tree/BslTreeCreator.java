@@ -7,7 +7,7 @@ import com.sonar.sslr.api.Token;
 import org.zhupanovdm.bsl.grammar.BslDirective;
 import org.zhupanovdm.bsl.tree.definition.*;
 import org.zhupanovdm.bsl.tree.expression.*;
-import org.zhupanovdm.bsl.tree.module.Module;
+import org.zhupanovdm.bsl.tree.module.ModuleRoot;
 import org.zhupanovdm.bsl.tree.module.PreprocessorElsif;
 import org.zhupanovdm.bsl.tree.module.PreprocessorIf;
 import org.zhupanovdm.bsl.tree.statement.*;
@@ -63,12 +63,12 @@ public class BslTreeCreator {
         binOpRules.put(LE,              BslTree.Type.LE);
     }
 
-    public Module create(AstNode tree) {
+    public ModuleRoot create(AstNode tree) {
         if (!tree.is(MODULE)) {
             throw new IllegalArgumentException("Is not BSL module AST");
         }
         AstSiblingsCursor cursor = new AstSiblingsCursor(tree.getFirstChild());
-        Module module = new Module();
+        ModuleRoot module = new ModuleRoot();
         body(module, cursor.optional(BODY));
         addToken(module, cursor.next(), BslToken.Type.EOF);
         return module;
@@ -816,7 +816,7 @@ public class BslTreeCreator {
         }
     }
 
-    public static Module module(AstNode tree) {
+    public static ModuleRoot module(AstNode tree) {
         return new BslTreeCreator().create(tree);
     }
 }

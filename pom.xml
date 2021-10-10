@@ -68,11 +68,7 @@
                 <artifactId>sslr-core</artifactId>
                 <version>${sslr.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.sonarsource.sslr</groupId>
-                <artifactId>sslr-xpath</artifactId>
-                <version>${sslr.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.sonarsource.sslr</groupId>
                 <artifactId>sslr-toolkit</artifactId>

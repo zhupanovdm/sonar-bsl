@@ -3,7 +3,6 @@ package org.zhupanovdm.bsl.tree;
 import com.sonar.sslr.api.Token;
 import com.sonar.sslr.api.Trivia;
 import lombok.Data;
-import org.sonarsource.analyzer.commons.TokenLocation;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -41,10 +40,6 @@ public class BslToken {
 
     public List<BslTrivia> getComments() {
         return Collections.unmodifiableList(comments);
-    }
-
-    public TokenLocation getLocation() {
-        return new TokenLocation(line, column, value);
     }
 
     public enum Type {

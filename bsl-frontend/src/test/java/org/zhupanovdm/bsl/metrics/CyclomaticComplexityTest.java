@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.zhupanovdm.bsl.tree.BslTreePublisher;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.zhupanovdm.bsl.TestUtils.moduleFile;
+import static org.zhupanovdm.bsl.ParserTestUtils.moduleFile;
 
 public class CyclomaticComplexityTest {
     @Test

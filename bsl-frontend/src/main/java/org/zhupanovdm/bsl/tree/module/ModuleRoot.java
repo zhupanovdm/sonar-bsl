@@ -5,8 +5,8 @@ import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.MODULE;
 
-public class Module extends BslTree {
-    public Module() {
+public class ModuleRoot extends BslTree {
+    public ModuleRoot() {
         super(null, MODULE);
     }
 

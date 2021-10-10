@@ -7,7 +7,7 @@ import org.zhupanovdm.bsl.tree.definition.CallableDefinition;
 import org.zhupanovdm.bsl.tree.definition.Parameter;
 import org.zhupanovdm.bsl.tree.definition.Variable;
 import org.zhupanovdm.bsl.tree.expression.ReferenceExpression;
-import org.zhupanovdm.bsl.tree.module.Module;
+import org.zhupanovdm.bsl.tree.module.ModuleRoot;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -16,17 +16,17 @@ import static org.zhupanovdm.bsl.tree.BslTree.Type.*;
 
 public class BslSymbolTableCreator implements BslTreeSubscriber {
     @Getter
-    private BslSymbolTable table;
+    private SymbolTable table;
     private final Deque<Scope> nesting = new LinkedList<>();
 
     @Override
     public void init() {
-        table = new BslSymbolTable();
+        table = new SymbolTable();
         nesting.clear();
     }
 
     @Override
-    public void onVisitModule(Module module) {
+    public void onVisitModule(ModuleRoot module) {
         createGlobalScope(module);
     }
 

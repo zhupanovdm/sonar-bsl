@@ -8,7 +8,7 @@ import org.zhupanovdm.bsl.tree.expression.PrimitiveExpression;
 import org.zhupanovdm.bsl.tree.expression.ReferenceExpression;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.zhupanovdm.bsl.TestUtils.parse;
+import static org.zhupanovdm.bsl.ParserTestUtils.parse;
 import static org.zhupanovdm.bsl.tree.BslTree.Type.FOR_STMT;
 import static org.zhupanovdm.bsl.tree.BslTree.Type.VARIABLE;
 

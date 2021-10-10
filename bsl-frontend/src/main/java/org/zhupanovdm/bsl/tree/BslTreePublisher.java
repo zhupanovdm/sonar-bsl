@@ -1,9 +1,9 @@
 package org.zhupanovdm.bsl.tree;
 
-import org.zhupanovdm.bsl.ModuleFile;
+import org.zhupanovdm.bsl.AbstractModuleContext;
 import org.zhupanovdm.bsl.tree.definition.*;
 import org.zhupanovdm.bsl.tree.expression.*;
-import org.zhupanovdm.bsl.tree.module.Module;
+import org.zhupanovdm.bsl.tree.module.ModuleRoot;
 import org.zhupanovdm.bsl.tree.module.PreprocessorElsif;
 import org.zhupanovdm.bsl.tree.module.PreprocessorIf;
 import org.zhupanovdm.bsl.tree.statement.*;
@@ -16,7 +16,7 @@ import java.util.List;
 public class BslTreePublisher implements BslTreeSubscriber {
     protected final List<BslTreeSubscriber> subscribers = new LinkedList<>();
 
-    public void scan(ModuleFile context) {
+    public void scan(AbstractModuleContext context) {
         onEnterFile(context);
         publish(context.getEntry());
         onLeaveFile(context);
@@ -43,12 +43,12 @@ public class BslTreePublisher implements BslTreeSubscriber {
     }
 
     @Override
-    public void onEnterFile(ModuleFile context) {
+    public void onEnterFile(AbstractModuleContext context) {
         subscribers.forEach(subscriber -> subscriber.onEnterFile(context));
     }
 
     @Override
-    public void onLeaveFile(ModuleFile context) {
+    public void onLeaveFile(AbstractModuleContext context) {
         subscribers.forEach(subscriber -> subscriber.onLeaveFile(context));
     }
 
@@ -66,7 +66,7 @@ public class BslTreePublisher implements BslTreeSubscriber {
     }
 
     @Override
-    public void onVisitModule(Module module) {
+    public void onVisitModule(ModuleRoot module) {
         onEnterNode(module);
         publish(module.getBody());
         onLeaveNode(module);

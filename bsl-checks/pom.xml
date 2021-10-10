@@ -24,23 +24,16 @@
         <dependency>
             <groupId>org.sonarsource.sonarqube</groupId>
             <artifactId>sonar-plugin-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.sonarsource.sslr</groupId>
-            <artifactId>sslr-xpath</artifactId>
         </dependency>
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.sonarsource.analyzer-commons</groupId>
             <artifactId>sonar-analyzer-test-commons</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 

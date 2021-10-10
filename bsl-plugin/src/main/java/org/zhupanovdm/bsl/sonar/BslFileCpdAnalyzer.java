@@ -4,7 +4,7 @@ import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.cpd.NewCpdTokens;
 import org.sonarsource.analyzer.commons.TokenLocation;
-import org.zhupanovdm.bsl.ModuleFile;
+import org.zhupanovdm.bsl.AbstractModuleContext;
 import org.zhupanovdm.bsl.tree.BslToken;
 import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
@@ -30,12 +30,12 @@ public class BslFileCpdAnalyzer implements BslTreeSubscriber {
     }
 
     @Override
-    public void onEnterFile(ModuleFile module) {
+    public void onEnterFile(AbstractModuleContext module) {
         cpdTokens = context.newCpdTokens().onFile(file);
     }
 
     @Override
-    public void onLeaveFile(ModuleFile context) {
+    public void onLeaveFile(AbstractModuleContext context) {
         cpdTokens.save();
     }
 
@@ -53,8 +53,8 @@ public class BslFileCpdAnalyzer implements BslTreeSubscriber {
             if (!expr.getBody().isEmpty()) {
                 BslTree last = expr.getBody().get(expr.getBody().size() - 1);
 
-                TokenLocation locationFirst = expr.getBody().get(0).getTokens().get(0).getLocation();
-                TokenLocation locationLast = last.getTokens().get(last.getTokens().size() - 1).getLocation();
+                TokenLocation locationFirst = location(expr.getBody().get(0).getTokens().get(0));
+                TokenLocation locationLast = location(last.getTokens().get(last.getTokens().size() - 1));
                 cpdTokens.addToken(locationFirst.startLine(), locationFirst.startLineOffset(), locationLast.endLine(), locationLast.endLineOffset(), NORMALIZED_STRING);
             }
         } else if (expr.is(UNDEFINED, NULL, TRUE, FALSE)) {
@@ -82,7 +82,11 @@ public class BslFileCpdAnalyzer implements BslTreeSubscriber {
     }
 
     private void addToken(BslToken token, String image) {
-        TokenLocation location = token.getLocation();
+        TokenLocation location = location(token);
         cpdTokens.addToken(location.startLine(), location.startLineOffset(), location.endLine(), location.endLineOffset(), image);
+    }
+
+    private static TokenLocation location(BslToken token) {
+        return new TokenLocation(token.getLine(), token.getColumn(), token.getValue());
     }
 }

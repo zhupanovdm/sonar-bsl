@@ -5,7 +5,7 @@ import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.highlighting.NewHighlighting;
 import org.sonar.api.batch.sensor.highlighting.TypeOfText;
 import org.sonarsource.analyzer.commons.TokenLocation;
-import org.zhupanovdm.bsl.ModuleFile;
+import org.zhupanovdm.bsl.AbstractModuleContext;
 import org.zhupanovdm.bsl.tree.BslToken;
 import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
@@ -26,12 +26,12 @@ public class BslFileHighlighter implements BslTreeSubscriber {
     }
 
     @Override
-    public void onEnterFile(ModuleFile fileContext) {
+    public void onEnterFile(AbstractModuleContext fileContext) {
         highlighting = context.newHighlighting().onFile(file);
     }
 
     @Override
-    public void onLeaveFile(ModuleFile context) {
+    public void onLeaveFile(AbstractModuleContext context) {
         highlighting.save();
     }
 
@@ -56,11 +56,15 @@ public class BslFileHighlighter implements BslTreeSubscriber {
     }
 
     private void highlight(BslToken token, TypeOfText typeOfText) {
-        TokenLocation location = token.getLocation();
+        TokenLocation location = location(token);
         highlighting.highlight(location.startLine(), location.startLineOffset(), location.endLine(), location.endLineOffset(), typeOfText);
     }
 
     private void highlightComment(Collection<BslToken> tokens) {
         tokens.forEach(token -> highlight(token, TypeOfText.COMMENT));
+    }
+
+    private static TokenLocation location(BslToken token) {
+        return new TokenLocation(token.getLine(), token.getColumn(), token.getValue());
     }
 }

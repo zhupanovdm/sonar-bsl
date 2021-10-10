@@ -3,7 +3,6 @@ package org.zhupanovdm.bsl.checks;
 import org.sonar.check.Rule;
 import org.sonar.check.RuleProperty;
 import org.zhupanovdm.bsl.Check;
-import org.zhupanovdm.bsl.Issue;
 import org.zhupanovdm.bsl.tree.BslToken;
 import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTrivia;

@@ -3,15 +3,15 @@ package org.zhupanovdm.bsl;
 import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 
 public abstract class Check implements BslTreeSubscriber {
-    protected ModuleFile context;
+    protected AbstractModuleContext context;
 
     @Override
-    public void onEnterFile(ModuleFile context) {
+    public void onEnterFile(AbstractModuleContext context) {
         this.context = context;
     }
 
     @Override
-    public void onLeaveFile(ModuleFile context) {
+    public void onLeaveFile(AbstractModuleContext context) {
         this.context = null;
     }
 

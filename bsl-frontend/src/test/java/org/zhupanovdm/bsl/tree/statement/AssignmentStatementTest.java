@@ -8,7 +8,7 @@ import org.zhupanovdm.bsl.tree.definition.Variable;
 import org.zhupanovdm.bsl.tree.expression.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.zhupanovdm.bsl.TestUtils.parse;
+import static org.zhupanovdm.bsl.ParserTestUtils.parse;
 import static org.zhupanovdm.bsl.tree.BslTree.Type.*;
 
 @SuppressWarnings("OptionalGetWithoutIsPresent")

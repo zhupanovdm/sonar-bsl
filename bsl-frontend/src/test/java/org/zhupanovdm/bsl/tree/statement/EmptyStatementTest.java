@@ -6,7 +6,7 @@ import org.zhupanovdm.bsl.grammar.BslGrammar;
 import org.zhupanovdm.bsl.tree.BslTreeCreator;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.zhupanovdm.bsl.TestUtils.parse;
+import static org.zhupanovdm.bsl.ParserTestUtils.parse;
 import static org.zhupanovdm.bsl.tree.BslTree.Type.EMPTY_STMT;
 
 public class EmptyStatementTest {

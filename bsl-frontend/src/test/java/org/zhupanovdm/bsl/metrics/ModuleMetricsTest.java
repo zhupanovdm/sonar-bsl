@@ -4,8 +4,8 @@ import org.junit.Test;
 import org.zhupanovdm.bsl.tree.BslTreePublisher;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.zhupanovdm.bsl.TestUtils.module;
-import static org.zhupanovdm.bsl.TestUtils.moduleFile;
+import static org.zhupanovdm.bsl.ParserTestUtils.module;
+import static org.zhupanovdm.bsl.ParserTestUtils.moduleFile;
 
 public class ModuleMetricsTest {
     @Test

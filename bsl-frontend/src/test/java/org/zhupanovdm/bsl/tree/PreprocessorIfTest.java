@@ -6,7 +6,7 @@ import org.zhupanovdm.bsl.tree.module.PreprocessorElsif;
 import org.zhupanovdm.bsl.tree.module.PreprocessorIf;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.zhupanovdm.bsl.TestUtils.module;
+import static org.zhupanovdm.bsl.ParserTestUtils.module;
 import static org.zhupanovdm.bsl.tree.BslTree.Type.PREPROCESSOR;
 
 public class PreprocessorIfTest {

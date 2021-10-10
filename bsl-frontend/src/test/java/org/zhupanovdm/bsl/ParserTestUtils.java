@@ -3,27 +3,35 @@ package org.zhupanovdm.bsl;
 import com.sonar.sslr.api.AstNode;
 import com.sonar.sslr.api.RecognitionException;
 import com.sonar.sslr.api.Rule;
+import com.sonar.sslr.impl.Parser;
 import org.sonar.sslr.internal.matchers.AstCreator;
 import org.sonar.sslr.internal.matchers.InputBuffer;
 import org.sonar.sslr.internal.matchers.LocatedText;
 import org.sonar.sslr.parser.*;
-import org.sonarsource.analyzer.commons.checks.verifier.FileContent;
-import org.zhupanovdm.bsl.tree.module.Module;
 import org.zhupanovdm.bsl.tree.BslTreeCreator;
+import org.zhupanovdm.bsl.tree.module.ModuleRoot;
 
-import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class TestUtils {
+public class ParserTestUtils {
     private static final String RESOURCES = "src/test/resources/";
+    private static final Parser<LexerlessGrammar> PARSER = BslParser.create(Charset.defaultCharset());
 
     public static String resource(String fileName) {
-        return new FileContent(Paths.get(RESOURCES, fileName)).getContent();
+        Path path = Paths.get(RESOURCES, fileName);
+        try {
+            return new String(Files.readAllBytes(path));
+        } catch (IOException e) {
+            throw new IllegalStateException("Can't read file " + path, e);
+        }
     }
 
     public static AstNode parse(String src) {
-        return BslParser.create(Charset.defaultCharset()).parse(src);
+        return PARSER.parse(src);
     }
 
     public static AstNode parse(String source, Rule rule) {
@@ -42,14 +50,14 @@ public class TestUtils {
     }
 
     public static AstNode parseFile(String fileName) {
-        return BslParser.create(Charset.defaultCharset()).parse(new File(RESOURCES, fileName));
+        return PARSER.parse(resource(fileName));
     }
 
-    public static Module module(String src) {
+    public static ModuleRoot module(String src) {
         return new BslTreeCreator().create(parse(src));
     }
 
-    public static Module moduleFile(String fileName) {
+    public static ModuleRoot moduleFile(String fileName) {
         return new BslTreeCreator().create(parseFile(fileName));
     }
 }

@@ -5,18 +5,14 @@ import org.sonar.api.batch.fs.FilePredicates;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.rule.CheckFactory;
-import org.sonar.api.batch.rule.Checks;
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
 import org.sonar.api.issue.NoSonarFilter;
 import org.sonar.api.measures.FileLinesContextFactory;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
-import org.zhupanovdm.bsl.Check;
-import org.zhupanovdm.bsl.checks.CheckList;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.sonar.api.batch.fs.InputFile.Type.MAIN;
 

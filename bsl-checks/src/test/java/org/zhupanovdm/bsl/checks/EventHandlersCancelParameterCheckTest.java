@@ -3,7 +3,7 @@ package org.zhupanovdm.bsl.checks;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.zhupanovdm.bsl.checks.TestUtils.doCheck;
+import static org.zhupanovdm.bsl.checks.CheckTestUtils.doCheck;
 
 public class EventHandlersCancelParameterCheckTest {
     private EventHandlersCancelParameterCheck check;
