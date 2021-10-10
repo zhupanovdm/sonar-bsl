@@ -8,7 +8,6 @@ import org.sonar.api.issue.NoSonarFilter;
 import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.measures.FileLinesContext;
 import org.sonar.api.measures.FileLinesContextFactory;
-import org.sonar.api.measures.Metric;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 import org.sonarsource.analyzer.commons.ProgressReport;
@@ -17,7 +16,6 @@ import org.zhupanovdm.bsl.metrics.CyclomaticComplexity;
 import org.zhupanovdm.bsl.metrics.ModuleMetrics;
 import org.zhupanovdm.bsl.tree.BslTreePublisher;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -84,28 +82,27 @@ public class BslScanner {
     }
 
     private void scanFile(InputFile file) {
-        BslModuleFileContext fileContext = new BslModuleFileContext(new BslModuleFile(file), context, checks);
+        BslModuleContext module = new BslModuleContext(new BslModuleFile(file), context, checks);
 
         ModuleMetrics metrics = new ModuleMetrics();
         CyclomaticComplexity cyclomaticComplexity = new CyclomaticComplexity();
         CognitiveComplexity cognitiveComplexity = new CognitiveComplexity();
 
         BslTreePublisher publisher = new BslTreePublisher();
-        publisher.subscribe(checks.all());
+        publisher.subscribe(module.getChecks().all());
         publisher.subscribe(
                 metrics,
                 cyclomaticComplexity,
                 cognitiveComplexity,
-                new BslFileCpdAnalyzer(context, file),
-                new BslFileHighlighter(context, file));
+                new BslModuleCpdAnalyzer(module),
+                new BslModuleHighlighter(module));
         publisher.init();
-        publisher.scan(fileContext);
+        publisher.scan(module);
 
-        saveMeasures(context, fileContext, metrics, cyclomaticComplexity, cognitiveComplexity);
+        saveMeasures(module, metrics, cyclomaticComplexity, cognitiveComplexity);
     }
 
-    private void saveMeasures(SensorContext context,
-                              BslModuleFileContext module,
+    private void saveMeasures(BslModuleContext module,
                               ModuleMetrics metrics,
                               CyclomaticComplexity cyclomaticComplexity,
                               CognitiveComplexity cognitiveComplexity) {
@@ -114,20 +111,16 @@ public class BslScanner {
 
         noSonarFilter.noSonarInFile(file, metrics.getLinesNoSonar());
 
-        saveMeasure(context, module, CoreMetrics.NCLOC, metrics.getLinesOfCode().size());
-        saveMeasure(context, module, CoreMetrics.COMMENT_LINES, metrics.getLinesOfComments().size());
-        saveMeasure(context, module, CoreMetrics.FUNCTIONS, metrics.getNumberOfFunctions());
-        saveMeasure(context, module, CoreMetrics.STATEMENTS, metrics.getNumberOfStatements());
-        saveMeasure(context, module, CoreMetrics.COMPLEXITY, cyclomaticComplexity.getComplexity());
-        saveMeasure(context, module, CoreMetrics.COGNITIVE_COMPLEXITY, cognitiveComplexity.getComplexity());
+        module.saveMeasure(CoreMetrics.NCLOC, metrics.getLinesOfCode().size());
+        module.saveMeasure(CoreMetrics.COMMENT_LINES, metrics.getLinesOfComments().size());
+        module.saveMeasure(CoreMetrics.FUNCTIONS, metrics.getNumberOfFunctions());
+        module.saveMeasure(CoreMetrics.STATEMENTS, metrics.getNumberOfStatements());
+        module.saveMeasure(CoreMetrics.COMPLEXITY, cyclomaticComplexity.getComplexity());
+        module.saveMeasure(CoreMetrics.COGNITIVE_COMPLEXITY, cognitiveComplexity.getComplexity());
 
         FileLinesContext fileLines = fileLinesContextFactory.createFor(file);
         metrics.getLinesOfCode().forEach(line -> fileLines.setIntValue(CoreMetrics.NCLOC_DATA_KEY, line, 1));
         metrics.getExecutableLines().forEach(line -> fileLines.setIntValue(CoreMetrics.EXECUTABLE_LINES_DATA_KEY, line, 1));
         fileLines.save();
-    }
-
-    private static <T extends Serializable> void saveMeasure(SensorContext context, BslModuleFileContext module, Metric<T> metric, T value) {
-        context.<T>newMeasure().on(module.getFile().getInput()).forMetric(metric).withValue(value).save();
     }
 }

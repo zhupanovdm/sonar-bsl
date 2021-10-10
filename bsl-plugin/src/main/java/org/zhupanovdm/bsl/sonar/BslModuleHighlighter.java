@@ -1,7 +1,5 @@
 package org.zhupanovdm.bsl.sonar;
 
-import org.sonar.api.batch.fs.InputFile;
-import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.highlighting.NewHighlighting;
 import org.sonar.api.batch.sensor.highlighting.TypeOfText;
 import org.sonarsource.analyzer.commons.TokenLocation;
@@ -14,20 +12,17 @@ import java.util.Collection;
 
 import static org.zhupanovdm.bsl.tree.BslToken.Type.*;
 
-public class BslFileHighlighter implements BslTreeSubscriber {
-    private final SensorContext context;
-    private final InputFile file;
-
+public class BslModuleHighlighter implements BslTreeSubscriber {
+    private final BslModuleContext context;
     private NewHighlighting highlighting;
 
-    public BslFileHighlighter(SensorContext context, InputFile file) {
+    public BslModuleHighlighter(BslModuleContext context) {
         this.context = context;
-        this.file = file;
     }
 
     @Override
     public void onEnterFile(AbstractModuleContext fileContext) {
-        highlighting = context.newHighlighting().onFile(file);
+        highlighting = context.getSensor().newHighlighting().onFile(context.getFile().getInput());
     }
 
     @Override

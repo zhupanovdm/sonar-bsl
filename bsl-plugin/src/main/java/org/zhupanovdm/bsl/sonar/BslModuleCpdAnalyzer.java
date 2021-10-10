@@ -1,7 +1,5 @@
 package org.zhupanovdm.bsl.sonar;
 
-import org.sonar.api.batch.fs.InputFile;
-import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.cpd.NewCpdTokens;
 import org.sonarsource.analyzer.commons.TokenLocation;
 import org.zhupanovdm.bsl.AbstractModuleContext;
@@ -13,25 +11,22 @@ import org.zhupanovdm.bsl.tree.expression.PrimitiveExpression;
 import static org.zhupanovdm.bsl.tree.BslToken.Type.*;
 import static org.zhupanovdm.bsl.tree.BslTree.Type.*;
 
-public class BslFileCpdAnalyzer implements BslTreeSubscriber {
+public class BslModuleCpdAnalyzer implements BslTreeSubscriber {
     public static final String NORMALIZED_IDENTIFIER = "IDENTIFIER";
     public static final String NORMALIZED_NUMERIC = "000";
     public static final String NORMALIZED_STRING = "STRING";
     public static final String NORMALIZED_DATE = "'00010101'";
 
-    private final SensorContext context;
-    private final InputFile file;
-
+    private final BslModuleContext context;
     private NewCpdTokens cpdTokens;
 
-    public BslFileCpdAnalyzer(SensorContext context, InputFile file) {
+    public BslModuleCpdAnalyzer(BslModuleContext context) {
         this.context = context;
-        this.file = file;
     }
 
     @Override
     public void onEnterFile(AbstractModuleContext module) {
-        cpdTokens = context.newCpdTokens().onFile(file);
+        cpdTokens = context.getSensor().newCpdTokens().onFile(context.getFile().getInput());
     }
 
     @Override

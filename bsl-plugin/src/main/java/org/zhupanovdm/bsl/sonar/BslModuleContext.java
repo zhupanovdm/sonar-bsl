@@ -6,20 +6,22 @@ import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.issue.NewIssue;
 import org.sonar.api.batch.sensor.issue.NewIssueLocation;
+import org.sonar.api.measures.Metric;
 import org.sonar.api.rule.RuleKey;
 import org.zhupanovdm.bsl.AbstractModuleContext;
 import org.zhupanovdm.bsl.Issue;
 
 import javax.annotation.Nonnull;
+import java.io.Serializable;
 import java.util.Objects;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class BslModuleFileContext extends AbstractModuleContext {
+public class BslModuleContext extends AbstractModuleContext {
     private final SensorContext sensor;
     private final BslChecks checks;
 
-    public BslModuleFileContext(BslModuleFile moduleFile, SensorContext sensor, BslChecks checks) {
+    public BslModuleContext(BslModuleFile moduleFile, SensorContext sensor, BslChecks checks) {
         super(moduleFile);
         this.sensor = sensor;
         this.checks = checks;
@@ -42,5 +44,9 @@ public class BslModuleFileContext extends AbstractModuleContext {
         checkIssue.getLine().ifPresent(line -> location.at(inputFile.selectLine(line)));
         checkIssue.getCost().ifPresent(issue::gap);
         issue.at(location).forRule(ruleKey).save();
+    }
+
+    public <T extends Serializable> void saveMeasure(Metric<T> metric, T value) {
+        sensor.<T>newMeasure().on(getFile().getInput()).forMetric(metric).withValue(value).save();
     }
 }
