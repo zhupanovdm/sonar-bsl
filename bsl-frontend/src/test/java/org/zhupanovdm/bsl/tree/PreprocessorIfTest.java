@@ -10,7 +10,6 @@ import static org.zhupanovdm.bsl.ParserTestUtils.module;
 import static org.zhupanovdm.bsl.tree.BslTree.Type.PREPROCESSOR;
 
 public class PreprocessorIfTest {
-
     @Test
     public void testIf() {
         PreprocessorIf pp = module("#If Foo Then ; #EndIf").getBody().get(0).as(PreprocessorIf.class);

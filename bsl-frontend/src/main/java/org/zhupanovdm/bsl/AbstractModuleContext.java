@@ -2,27 +2,50 @@ package org.zhupanovdm.bsl;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.zhupanovdm.bsl.context.ModuleKind;
 import org.zhupanovdm.bsl.symbol.SymbolTable;
 import org.zhupanovdm.bsl.tree.BslTreeCreator;
+import org.zhupanovdm.bsl.tree.BslTreePublisher;
+import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 import org.zhupanovdm.bsl.tree.module.ModuleRoot;
 
 import javax.annotation.Nonnull;
+import java.util.Collection;
 
 @Data
 @NoArgsConstructor
 public abstract class AbstractModuleContext {
     protected ModuleFile file;
     protected ModuleRoot entry;
+    protected ModuleKind kind;
     protected SymbolTable symbolTable;
+    private final BslTreePublisher publisher = new BslTreePublisher();
 
     public AbstractModuleContext(@Nonnull ModuleFile file) {
-        setFile(file);
+        this.file = file;
+        this.entry = parse(file);
     }
 
     public void setFile(ModuleFile file) {
         this.file = file;
-        this.entry = BslTreeCreator.module(BslParser.create(file.getCharset()).parse(file.getContent()));
+        this.entry = parse(file);
     }
 
     public abstract void addIssue(@Nonnull Issue issue);
+
+    public void scan() {
+        publisher.scan(this);
+    }
+
+    public void subscribe(BslTreeSubscriber...subscribers) {
+        publisher.subscribe(subscribers);
+    }
+
+    public void subscribe(Collection<? extends BslTreeSubscriber> subscribers) {
+        publisher.subscribe(subscribers);
+    }
+
+    private static ModuleRoot parse(ModuleFile file) {
+        return BslTreeCreator.module(BslParser.create(file.getCharset()).parse(file.getContent()));
+    }
 }

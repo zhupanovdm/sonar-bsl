@@ -2,8 +2,7 @@ package org.zhupanovdm.bsl.checks;
 
 import org.sonarsource.analyzer.commons.checks.verifier.FileContent;
 import org.sonarsource.analyzer.commons.checks.verifier.MultiFileVerifier;
-import org.zhupanovdm.bsl.*;
-import org.zhupanovdm.bsl.tree.*;
+import org.zhupanovdm.bsl.Check;
 
 import java.nio.file.Paths;
 
@@ -15,10 +14,9 @@ public class CheckTestUtils {
     }
 
     public static MultiFileVerifier doCheck(String fileName, Check checkToTest) {
-        VerifyingSampleModuleContext context = new VerifyingSampleModuleContext(new SampleModuleFile(fileName));
-        BslTreePublisher publisher = new BslTreePublisher().subscribe(checkToTest, new VerifierCommentsSubscriber(context));
-        publisher.init();
-        publisher.scan(context);
-        return context.getVerifier();
+        VerifyingSampleModuleContext module = new VerifyingSampleModuleContext(new SampleModuleFile(fileName));
+        module.subscribe(checkToTest, new VerifierCommentsSubscriber(module));
+        module.scan();
+        return module.getVerifier();
     }
 }

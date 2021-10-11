@@ -19,7 +19,7 @@ public class Directive extends BslTree {
 
     @Override
     public void accept(BslTreeSubscriber subscriber) {
-        subscriber.onVisitCompilationDirective(this);
+        subscriber.onVisitDirective(this);
     }
 
     @Override

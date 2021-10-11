@@ -60,6 +60,6 @@ public interface BslTreeSubscriber {
 
     default void onVisitVariable(Variable variable) {}
     default void onVisitParameter(Parameter parameter) {}
-    default void onVisitCompilationDirective(Directive directive) {}
+    default void onVisitDirective(Directive directive) {}
     default void onVisitLabel(Label label) {}
 }

@@ -14,7 +14,6 @@ import org.sonarsource.analyzer.commons.ProgressReport;
 import org.zhupanovdm.bsl.metrics.CognitiveComplexity;
 import org.zhupanovdm.bsl.metrics.CyclomaticComplexity;
 import org.zhupanovdm.bsl.metrics.ModuleMetrics;
-import org.zhupanovdm.bsl.tree.BslTreePublisher;
 
 import java.util.Collection;
 import java.util.List;
@@ -82,22 +81,19 @@ public class BslScanner {
     }
 
     private void scanFile(InputFile file) {
-        BslModuleContext module = new BslModuleContext(new BslModuleFile(file), context, checks);
-
         ModuleMetrics metrics = new ModuleMetrics();
         CyclomaticComplexity cyclomaticComplexity = new CyclomaticComplexity();
         CognitiveComplexity cognitiveComplexity = new CognitiveComplexity();
 
-        BslTreePublisher publisher = new BslTreePublisher();
-        publisher.subscribe(module.getChecks().all());
-        publisher.subscribe(
+        BslModuleContext module = new BslModuleContext(new BslModuleFile(file), context, checks);
+        module.subscribe(
                 metrics,
                 cyclomaticComplexity,
                 cognitiveComplexity,
                 new BslModuleCpdAnalyzer(module),
                 new BslModuleHighlighter(module));
-        publisher.init();
-        publisher.scan(module);
+        module.subscribe(module.getChecks().all());
+        module.scan();
 
         saveMeasures(module, metrics, cyclomaticComplexity, cognitiveComplexity);
     }
