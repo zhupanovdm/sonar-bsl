@@ -6,11 +6,10 @@ import org.zhupanovdm.bsl.context.ModuleKind;
 import org.zhupanovdm.bsl.symbol.SymbolTable;
 import org.zhupanovdm.bsl.tree.BslTreeCreator;
 import org.zhupanovdm.bsl.tree.BslTreePublisher;
-import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
+import org.zhupanovdm.bsl.tree.BslTreeSubscribers;
 import org.zhupanovdm.bsl.tree.module.ModuleRoot;
 
 import javax.annotation.Nonnull;
-import java.util.Collection;
 
 @Data
 @NoArgsConstructor
@@ -19,7 +18,6 @@ public abstract class AbstractModuleContext {
     protected ModuleRoot entry;
     protected ModuleKind kind;
     protected SymbolTable symbolTable;
-    private final BslTreePublisher publisher = new BslTreePublisher();
 
     public AbstractModuleContext(@Nonnull ModuleFile file) {
         this.file = file;
@@ -33,16 +31,8 @@ public abstract class AbstractModuleContext {
 
     public abstract void addIssue(@Nonnull Issue issue);
 
-    public void scan() {
-        publisher.scan(this);
-    }
-
-    public void subscribe(BslTreeSubscriber...subscribers) {
-        publisher.subscribe(subscribers);
-    }
-
-    public void subscribe(Collection<? extends BslTreeSubscriber> subscribers) {
-        publisher.subscribe(subscribers);
+    public void scan(BslTreeSubscribers subscribers) {
+        new BslTreePublisher(subscribers).scan(this);
     }
 
     private static ModuleRoot parse(ModuleFile file) {

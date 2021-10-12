@@ -31,8 +31,7 @@ public class BslTreePublisherTest {
 
     @Before
     public void setup() {
-        publisher = new BslTreePublisher();
-        publisher.subscribe(subscriber);
+        publisher = new BslTreePublisher(subscriber);
     }
 
     @Test

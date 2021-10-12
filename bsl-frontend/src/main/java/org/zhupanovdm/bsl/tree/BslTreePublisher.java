@@ -1,5 +1,6 @@
 package org.zhupanovdm.bsl.tree;
 
+import lombok.Getter;
 import org.zhupanovdm.bsl.AbstractModuleContext;
 import org.zhupanovdm.bsl.tree.definition.*;
 import org.zhupanovdm.bsl.tree.expression.*;
@@ -8,38 +9,36 @@ import org.zhupanovdm.bsl.tree.module.PreprocessorElsif;
 import org.zhupanovdm.bsl.tree.module.PreprocessorIf;
 import org.zhupanovdm.bsl.tree.statement.*;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 public class BslTreePublisher {
-    protected final List<BslTreeSubscriber> subscribers = new LinkedList<>();
-    private final TreeSubscriber subscriber = new TreeSubscriber();
+    @Getter
+    private final BslTreeSubscribers subscribers;
+    private final BslTreeVisitor visitor = new BslTreeVisitor();
 
-    public void subscribe(BslTreeSubscriber ...subscribers) {
-        subscribe(Arrays.asList(subscribers));
+    public BslTreePublisher(BslTreeSubscriber ...subscribers) {
+        this(new BslTreeSubscribers(subscribers));
     }
 
-    public void subscribe(Collection<? extends BslTreeSubscriber> subscribers) {
-        this.subscribers.addAll(subscribers);
+    public BslTreePublisher(BslTreeSubscribers subscribers) {
+        this.subscribers = subscribers;
     }
 
     public void scan(AbstractModuleContext context) {
-        subscriber.init();
-        subscriber.onEnterFile(context);
+        visitor.init();
+        visitor.onEnterFile(context);
         publish(context.getEntry());
-        subscriber.onLeaveFile(context);
+        visitor.onLeaveFile(context);
     }
 
     public void scan(BslTree tree) {
-        subscriber.init();
+        visitor.init();
         publish(tree);
     }
 
     private void publish(BslTree node) {
         if (node != null) {
-            node.accept(subscriber);
+            node.accept(visitor);
         }
     }
 
@@ -47,31 +46,29 @@ public class BslTreePublisher {
         nodes.forEach(this::publish);
     }
 
-    public static void publish(BslTree tree, BslTreeSubscriber ...subscribers) {
-        BslTreePublisher publisher = new BslTreePublisher();
-        publisher.subscribe(subscribers);
-        publisher.scan(tree);
+    public static void scan(BslTree tree, BslTreeSubscriber ...subscribers) {
+        new BslTreePublisher(subscribers).scan(tree);
     }
 
-    private class TreeSubscriber implements BslTreeSubscriber {
+    private class BslTreeVisitor implements BslTreeSubscriber {
         @Override
         public void init() {
-            subscribers.forEach(BslTreeSubscriber::init);
+            subscribers.accept(BslTreeSubscriber::init);
         }
 
         @Override
         public void onEnterFile(AbstractModuleContext context) {
-            subscribers.forEach(subscriber -> subscriber.onEnterFile(context));
+            subscribers.accept(subscriber -> subscriber.onEnterFile(context));
         }
 
         @Override
         public void onLeaveFile(AbstractModuleContext context) {
-            subscribers.forEach(subscriber -> subscriber.onLeaveFile(context));
+            subscribers.accept(subscriber -> subscriber.onLeaveFile(context));
         }
 
         @Override
         public void onEnterNode(BslTree node) {
-            subscribers.forEach(subscriber -> {
+            subscribers.accept(subscriber -> {
                 subscriber.onEnterNode(node);
                 node.accept(subscriber);
             });
@@ -79,7 +76,7 @@ public class BslTreePublisher {
 
         @Override
         public void onLeaveNode(BslTree node) {
-            subscribers.forEach(subscriber -> subscriber.onLeaveNode(node));
+            subscribers.accept(subscriber -> subscriber.onLeaveNode(node));
         }
 
         @Override
