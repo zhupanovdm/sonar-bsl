@@ -19,8 +19,8 @@ class VerifierCommentsSubscriber implements BslTreeSubscriber {
                 BslToken t = comment.getTokens().get(0);
                 context.getVerifier().addComment(
                         context.getFile().getPath(),
-                        t.getLine(),
-                        t.getColumn(),
+                        t.getPosition().getLine(),
+                        t.getPosition().getColumn(),
                         t.getValue(),
                         2,
                         0);

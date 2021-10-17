@@ -3,7 +3,6 @@ package org.zhupanovdm.bsl;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.zhupanovdm.bsl.context.ModuleKind;
-import org.zhupanovdm.bsl.symbol.SymbolTable;
 import org.zhupanovdm.bsl.tree.BslTreeCreator;
 import org.zhupanovdm.bsl.tree.BslTreePublisher;
 import org.zhupanovdm.bsl.tree.BslTreeSubscribers;
@@ -17,7 +16,6 @@ public abstract class AbstractModuleContext {
     protected ModuleFile file;
     protected ModuleRoot entry;
     protected ModuleKind kind;
-    protected SymbolTable symbolTable;
 
     public AbstractModuleContext(@Nonnull ModuleFile file) {
         this.file = file;

@@ -41,7 +41,7 @@ public class CommentRegularExpressionCheck extends Check {
     if (regexp != null) {
       for (BslTrivia comment : token.getComments()) {
         if (regexp.matcher(comment.getValue()).matches()) {
-          addIssue(message, comment.getTokens().get(0).getLine());
+          addIssue(message, comment.getTokens().get(0).getPosition().getLine());
         }
       }
     }

@@ -3,6 +3,7 @@ package org.zhupanovdm.bsl.tree;
 import com.sonar.sslr.api.Token;
 import com.sonar.sslr.api.Trivia;
 import lombok.Data;
+import org.zhupanovdm.bsl.Position;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -11,16 +12,14 @@ import java.util.List;
 @Data
 public class BslToken {
     private final Type type;
-    private final int line;
-    private final int column;
+    private final Position position;
     private final String value;
     private final List<BslTrivia> comments = new LinkedList<>();
 
     public BslToken(Token token, Type type) {
-        this.line   = token.getLine();
-        this.column = token.getColumn();
-        this.value  = token.getOriginalValue();
-        this.type   = type;
+        this.position   = Position.fromToken(token);
+        this.value      = token.getOriginalValue();
+        this.type       = type;
 
         for (Trivia trivia : token.getTrivia()) {
             if (trivia.isComment()) {

@@ -61,7 +61,7 @@ public class EventHandlersCancelParameterCheck extends Check {
         if (cancelParam != null &&
                 isCancel(stmt.getTarget()) &&
                 !(isTrueAssigned(stmt) || isOrExpression(stmt))) {
-            addIssue(MESSAGE_FALSE, stmt.getFirstToken().getLine());
+            addIssue(MESSAGE_FALSE, stmt.getFirstToken().getPosition().getLine());
         }
     }
 

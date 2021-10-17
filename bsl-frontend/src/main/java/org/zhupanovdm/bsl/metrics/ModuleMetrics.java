@@ -162,18 +162,18 @@ public class ModuleMetrics implements BslTreeSubscriber {
     private void addExecutableLine(BslTree node) {
         BslToken token = node.getFirstToken();
         if (token != null) {
-            executableLines.add(token.getLine());
+            executableLines.add(token.getPosition().getLine());
         }
     }
 
     private void visitToken(BslToken token) {
         if (!token.is(BslToken.Type.EOF)) {
-            linesOfCode.add(token.getLine());
+            linesOfCode.add(token.getPosition().getLine());
         }
 
         for (BslTrivia trivia : token.getComments()) {
             String content = getContents(trivia.getValue());
-            int line = trivia.getTokens().get(0).getLine();
+            int line = trivia.getTokens().get(0).getPosition().getLine();
             if (isNoSonar(content)) {
                 linesOfComments.remove(line);
                 linesNoSonar.add(line);
