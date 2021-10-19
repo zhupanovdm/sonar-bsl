@@ -3,6 +3,7 @@ package org.zhupanovdm.bsl.sonar;
 import org.sonar.api.batch.sensor.cpd.NewCpdTokens;
 import org.sonarsource.analyzer.commons.TokenLocation;
 import org.zhupanovdm.bsl.AbstractModuleContext;
+import org.zhupanovdm.bsl.Position;
 import org.zhupanovdm.bsl.tree.BslToken;
 import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
@@ -82,6 +83,7 @@ public class BslModuleCpdAnalyzer implements BslTreeSubscriber {
     }
 
     private static TokenLocation location(BslToken token) {
-        return new TokenLocation(token.getLine(), token.getColumn(), token.getValue());
+        Position position = token.getPosition();
+        return new TokenLocation(position.getLine(), position.getColumn(), token.getValue());
     }
 }

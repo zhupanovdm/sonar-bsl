@@ -4,13 +4,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
-import org.zhupanovdm.bsl.tree.Named;
+import org.zhupanovdm.bsl.tree.NamedNode;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.NEW;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class NewExpression extends Postfix implements Named {
+public class NewExpression extends Postfix implements NamedNode {
     private String name;
 
     public NewExpression(BslTree parent) {

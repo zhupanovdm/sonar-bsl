@@ -12,7 +12,7 @@ import static org.zhupanovdm.bsl.utils.StringUtils.collectionToString;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class CallableDefinition extends BslTree implements Named, Exportable, HasDirective {
+public class CallableDefinition extends BslTree implements NamedNode, Exportable, HasDirective {
     private String name;
     private final List<Parameter> parameters = new LinkedList<>();
     private Directive directive;

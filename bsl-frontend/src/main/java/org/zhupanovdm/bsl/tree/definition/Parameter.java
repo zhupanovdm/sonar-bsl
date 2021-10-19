@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
-import org.zhupanovdm.bsl.tree.Named;
+import org.zhupanovdm.bsl.tree.NamedNode;
 
 import java.util.Optional;
 
@@ -12,7 +12,7 @@ import static org.zhupanovdm.bsl.tree.BslTree.Type.PARAMETER;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Parameter extends BslTree implements Named {
+public class Parameter extends BslTree implements NamedNode {
     private String name;
     private boolean val;
     private int index;

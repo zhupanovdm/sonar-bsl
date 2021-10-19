@@ -5,13 +5,13 @@ import lombok.EqualsAndHashCode;
 import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
 import org.zhupanovdm.bsl.tree.Exportable;
-import org.zhupanovdm.bsl.tree.Named;
+import org.zhupanovdm.bsl.tree.NamedNode;
 
 import static org.zhupanovdm.bsl.tree.BslTree.Type.VARIABLE;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Variable extends BslTree implements Named, Exportable {
+public class Variable extends BslTree implements NamedNode, Exportable {
     private String name;
     private boolean export;
 

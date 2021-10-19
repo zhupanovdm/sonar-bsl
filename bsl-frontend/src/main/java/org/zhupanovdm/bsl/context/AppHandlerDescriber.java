@@ -21,7 +21,7 @@ public class AppHandlerDescriber {
 
     private boolean isFunction;
     private Set<ModuleKind> allowedLocations = new HashSet<>();
-    private String metadataLocation;
+    private MetadataClass metadataLocation;
 
     private final List<Parameter> parameters = new LinkedList<>();
 

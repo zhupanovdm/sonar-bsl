@@ -2,6 +2,7 @@ package org.zhupanovdm.bsl;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.zhupanovdm.bsl.context.MetadataObject;
 import org.zhupanovdm.bsl.context.ModuleKind;
 import org.zhupanovdm.bsl.tree.BslTreeCreator;
 import org.zhupanovdm.bsl.tree.BslTreePublisher;
@@ -16,6 +17,7 @@ public abstract class AbstractModuleContext {
     protected ModuleFile file;
     protected ModuleRoot entry;
     protected ModuleKind kind;
+    protected MetadataObject owner;
 
     public AbstractModuleContext(@Nonnull ModuleFile file) {
         this.file = file;

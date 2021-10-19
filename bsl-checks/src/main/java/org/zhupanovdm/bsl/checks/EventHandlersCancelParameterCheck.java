@@ -3,7 +3,7 @@ package org.zhupanovdm.bsl.checks;
 import org.sonar.check.Rule;
 import org.zhupanovdm.bsl.Check;
 import org.zhupanovdm.bsl.tree.BslTree;
-import org.zhupanovdm.bsl.tree.Named;
+import org.zhupanovdm.bsl.tree.NamedNode;
 import org.zhupanovdm.bsl.tree.definition.CallableDefinition;
 import org.zhupanovdm.bsl.tree.definition.Parameter;
 import org.zhupanovdm.bsl.tree.definition.Variable;
@@ -85,7 +85,7 @@ public class EventHandlersCancelParameterCheck extends Check {
         return node.is(REFERENCE) && cancelParam.getName().equalsIgnoreCase(node.as(ReferenceExpression.class).getName());
     }
 
-    private boolean hasCancelParam(Named node) {
+    private boolean hasCancelParam(NamedNode node) {
         for (Pattern pattern : handlersPatterns) {
             if (pattern.matcher(node.getName()).matches()) {
                 return true;

@@ -4,6 +4,7 @@ import org.sonar.api.batch.sensor.highlighting.NewHighlighting;
 import org.sonar.api.batch.sensor.highlighting.TypeOfText;
 import org.sonarsource.analyzer.commons.TokenLocation;
 import org.zhupanovdm.bsl.AbstractModuleContext;
+import org.zhupanovdm.bsl.Position;
 import org.zhupanovdm.bsl.tree.BslToken;
 import org.zhupanovdm.bsl.tree.BslTree;
 import org.zhupanovdm.bsl.tree.BslTreeSubscriber;
@@ -60,6 +61,7 @@ public class BslModuleHighlighter implements BslTreeSubscriber {
     }
 
     private static TokenLocation location(BslToken token) {
-        return new TokenLocation(token.getLine(), token.getColumn(), token.getValue());
+        Position position = token.getPosition();
+        return new TokenLocation(position.getLine(), position.getColumn(), token.getValue());
     }
 }

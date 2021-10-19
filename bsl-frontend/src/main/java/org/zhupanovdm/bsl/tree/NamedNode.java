@@ -1,6 +1,6 @@
 package org.zhupanovdm.bsl.tree;
 
-public interface Named {
+public interface NamedNode {
     String getName();
     void setName(String name);
 }
